@@ -1441,6 +1441,12 @@ footer b{ color:var(--ink-dim); font-weight:500; }
             <div class="cr-sec"><span>Special Thanks</span></div>
             <p class="cr-thanks">The 5 a.m. alarm · black coffee · Buffalo winters<br>the 19th hole · the gym at closing time<br>and everyone who ever asked, <em>“so what are you building now?”</em></p>
 
+            <div class="cr-sec" style="margin-top:52px"><span>Original Score</span></div>
+            <div class="cr-block">
+              <p class="cr-name">“Silent Moonlight”</p>
+              <p class="cr-note">Dontcry &amp; Allem Iversom · CC BY-SA 4.0</p>
+            </div>
+
             <div class="cr-sec" style="margin-top:52px"><span>Dedicated To</span></div>
             <p class="cr-ded">my people — every one of you was the lead.</p>
 
@@ -1751,7 +1757,7 @@ function stripeTexture(c1="#f4ecda", c2="#14110c", n=6){
    pad fades up on the first grab; grabs chime, throws whoosh with
    the speed of the flick, and props chime softly as they re-dock. */
 const sfx = (() => {
-  let ctx = null, master = null, noiseBuf = null, pad = null;
+  let ctx = null, master = null, noiseBuf = null;
   let enabled = localStorage.getItem("am-sfx") !== "0";
   const btn = document.getElementById("sfx-toggle");
   const paint = () => { if (btn){ btn.setAttribute("aria-pressed", String(enabled)); btn.textContent = enabled ? "♪ sound on" : "♪ sound off"; } };
@@ -1798,35 +1804,27 @@ const sfx = (() => {
     src.connect(bp); bp.connect(g); g.connect(master);
     src.start(t); src.stop(t + dur + .05);
   }
+  let bgm = null;
   return {
     toggle(){
       enabled = !enabled;
       localStorage.setItem("am-sfx", enabled ? "1" : "0");
-      if (!enabled){ if (ctx) ctx.suspend(); }
-      else { if (ensure()) this.ambient(); }
+      if (!enabled){ if (ctx) ctx.suspend(); if (bgm) bgm.pause(); }
+      else { if (ctx) ctx.resume(); this.ambient(); }
       paint();
     },
     ambient(){
-      if (!ensure() || pad) return;
-      // two slow detuned sines breathing through a drifting lowpass — the room tone of space
-      const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 520; lp.Q.value = .4;
-      const g = ctx.createGain(); g.gain.value = 0;
-      g.gain.linearRampToValueAtTime(.05, ctx.currentTime + 3.5);
-      const o1 = ctx.createOscillator(); o1.frequency.value = 55;
-      const o2 = ctx.createOscillator(); o2.frequency.value = 82.5; o2.detune.value = 4;
-      const o3 = ctx.createOscillator(); o3.type = "triangle"; o3.frequency.value = 110; o3.detune.value = -6;
-      const g3 = ctx.createGain(); g3.gain.value = .25;
-      const lfo = ctx.createOscillator(); lfo.frequency.value = .06;
-      const lfoG = ctx.createGain(); lfoG.gain.value = 240;
-      lfo.connect(lfoG); lfoG.connect(lp.frequency);
-      o1.connect(lp); o2.connect(lp); o3.connect(g3); g3.connect(lp);
-      lp.connect(g); g.connect(master);
-      [o1, o2, o3, lfo].forEach(o => o.start());
-      pad = { g };
+      // real lofi — "Silent Moonlight" by Dontcry & Allem Iversom (CC BY-SA 4.0)
+      if (!enabled) return;
+      if (!bgm){
+        bgm = new Audio("assets/lofi.mp3");
+        bgm.loop = true;
+        bgm.volume = .5;                    // medium volume
+      }
+      if (bgm.paused) bgm.play().catch(() => {});
     },
     grab(){
       if (!ensure()) return;
-      this.ambient();
       tone(392, 587, .22, .10);            // a soft rising fourth — "got it"
       tone(1175, 1568, .14, .035, "triangle");
       whoosh(.05, .18, 900, 1600, 2.5);
@@ -1847,6 +1845,8 @@ const sfx = (() => {
 window.__sfx = sfx;
 const sfxBtn = document.getElementById("sfx-toggle");
 if (sfxBtn) sfxBtn.addEventListener("click", () => sfx.toggle());
+// background music starts on the visitor's first gesture (autoplay rules)
+addEventListener("pointerdown", () => sfx.ambient(), { once:true });
 
 let heroVisible = false, heroAPI = null;
 (function initHero(){
@@ -2070,11 +2070,12 @@ let heroVisible = false, heroAPI = null;
       else { ringEl.classList.remove("is-hover"); ringEl.dataset.label = "view"; }
     }
   }
+  let grabId = null, hovering = false;
   heroSec.addEventListener("pointerdown", e => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     const p = pickProp(e);
     if (!p) return;
-    held = p;
+    held = p; grabId = e.pointerId;
     const u = p.userData;
     u.mode = "held"; u.vel.set(0, 0, 0);
     u.target.copy(p.position);
@@ -2082,25 +2083,28 @@ let heroVisible = false, heroAPI = null;
     dragPlane.setFromNormalAndCoplanarPoint(camDir.negate(), p.position);
     flicks.length = 0;
     flicks.push({ t:performance.now(), x:p.position.x, y:p.position.y, z:p.position.z });
-    try{ heroSec.setPointerCapture(e.pointerId); }catch(_){}
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
     grabCursor("grabbing");
-    sfx.grab();
+    try{ sfx.grab(); }catch(_){}
     e.preventDefault();
   });
-  heroSec.addEventListener("pointermove", e => {
-    if (held){
+  // window-level so the drag survives leaving the hero (and needs no pointer capture)
+  addEventListener("pointermove", e => {
+    if (held && e.pointerId === grabId){
       setRay(e);
       if (ray.ray.intersectPlane(dragPlane, planeHit)){
         held.userData.target.copy(planeHit);
         flicks.push({ t:performance.now(), x:planeHit.x, y:planeHit.y, z:planeHit.z });
         if (flicks.length > 7) flicks.shift();
       }
-    } else if (!TOUCH3D){
-      grabCursor(pickProp(e) ? "grab" : null);
+    } else if (!held && !TOUCH3D && heroVisible){
+      const over = !!pickProp(e);
+      if (over !== hovering){ hovering = over; grabCursor(over ? "grab" : null); }
     }
   }, { passive:true });
-  function release(){
-    if (!held) return;
+  function release(e){
+    if (!held || (e && e.pointerId !== undefined && e.pointerId !== grabId)) return;
     const u = held.userData;
     u.mode = "free";
     const now = performance.now();
@@ -2114,19 +2118,28 @@ let heroVisible = false, heroAPI = null;
     }
     u.tumX = (Math.random()-.5) * u.vel.length()*.9;
     u.tumZ = (Math.random()-.5) * u.vel.length()*.9;
-    sfx.toss(u.vel.length()/16);
-    held = null;
+    try{ sfx.toss(u.vel.length()/16); }catch(_){}
+    held = null; grabId = null; hovering = false;
+    document.body.style.userSelect = "";
+    document.body.style.webkitUserSelect = "";
     grabCursor(null);
   }
-  heroSec.addEventListener("pointerup", release);
-  heroSec.addEventListener("pointercancel", release);
-  // read-only debug hook (same spirit as __golfDebug)
-  window.__heroDebug = () => props.children.map(p => {
-    const v = p.position.clone().project(camera);
-    const r = canvas.getBoundingClientRect();
-    return { mode:p.userData.mode, vel:+p.userData.vel.length().toFixed(2),
-      sx:Math.round(r.left + (v.x+1)/2*r.width), sy:Math.round(r.top + (-v.y+1)/2*r.height) };
-  });
+  addEventListener("pointerup", release);
+  addEventListener("pointercancel", release);
+  addEventListener("blur", () => release());
+  // read-only-ish debug hook (same spirit as __golfDebug) — primes matrices
+  // so it works even before the first rendered frame
+  window.__heroDebug = () => {
+    placeProps(performance.now(), scrollP, .016);
+    props.updateMatrixWorld(true);
+    camera.updateMatrixWorld(true);
+    return props.children.map(p => {
+      const v = p.position.clone().project(camera);
+      const r = canvas.getBoundingClientRect();
+      return { mode:p.userData.mode, vel:+p.userData.vel.length().toFixed(2),
+        sx:Math.round(r.left + (v.x+1)/2*r.width), sy:Math.round(r.top + (-v.y+1)/2*r.height) };
+    });
+  };
   // on touch, hijack the scroll only when the finger actually lands on a prop
   canvas.addEventListener("touchstart", e => {
     const t = e.touches[0];
