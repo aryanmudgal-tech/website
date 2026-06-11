@@ -29,9 +29,9 @@ Everything lives in a single `index.html` (Three.js + GSAP via CDN — needs int
 | Intermission | **The 19th Hole** — drag from the ball to aim, release to putt |
 | Act III | Research trilogy (horizontal reel): MIDL-accepted FMH detection, PPG accuracy, early wound detection |
 | Act IV | The Ensemble: 30,000+ (SUNY Delegate), $500K+ (Senator), Men In Green, Clean Campus (100K+ impressions), Civic Platform (30K+ students) |
-| Act V | Filmography with real titles: Software Engineer Intern (Linde · Meta Layer Initiative), Technical Analyst (HCLTech) |
+| Act V | Filmography, three roles: Software Engineer Intern — Linde (Summer 2026, ML for remote plant operators), Software Engineer Intern — Meta Layer Initiative (Summer 2025, browser extension for human-AI interaction), Technical Analyst — HCLTech (Summer 2024) |
 | Behind the Scenes | Gym · Golf · Badminton · Acting & Mimicry (rotating impressions) |
-| Closing credits | Rolling credits (3,000+ on LinkedIn) + casting call (contact) |
+| Closing credits | A real film **end-credits crawl** — a letterboxed cinema screen, text scrolling up on a seamless loop (pause on hover), crediting family, friends, mentors, communities + locations (New Delhi · Buffalo · San Francisco) — then a casting call (contact) |
 
 Palette: premiere-night indigo with marquee gold, coral, electric cyan, neon pink,
 and bright green — each act carries its own accent color.

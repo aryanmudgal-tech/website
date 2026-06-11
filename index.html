@@ -718,14 +718,64 @@ section{ position:relative; }
 
 /* ============ CLOSING CREDITS + CONTACT ============ */
 #credits-end{ padding:clamp(110px,16vh,190px) 0 60px; text-align:center; overflow:hidden; }
-.roll{ max-width:660px; margin:0 auto 70px; }
-.roll-row{
-  display:flex; justify-content:space-between; align-items:baseline; gap:24px;
-  padding:13px 4px; border-bottom:1px solid var(--line-soft);
+/* the cinema screen — a framed letterbox the credits crawl through */
+.cred-frame{
+  position:relative; max-width:780px; margin:0 auto 68px;
+  border:1px solid var(--line); border-radius:18px;
+  background:
+    radial-gradient(130% 70% at 50% -10%, rgba(255,196,69,.07), transparent 58%),
+    linear-gradient(180deg, var(--bg-2), var(--bg));
+  box-shadow:0 50px 130px -55px rgba(0,0,0,.85), inset 0 1px 0 var(--line-soft);
+  overflow:hidden; text-align:center;
 }
-.roll-row .r{ font:500 10px/1.8 var(--font-m); letter-spacing:.26em; text-transform:uppercase; color:var(--ink-faint); text-align:left; }
-.roll-row .n{ font-family:var(--font-d); font-size:clamp(16px,2vw,21px); font-weight:520; text-align:right; }
-.roll-row .n em{ color:var(--gold); font-style:italic; font-weight:400; }
+/* viewfinder corner ticks */
+.cred-frame::before,.cred-frame::after{
+  content:""; position:absolute; width:16px; height:16px; pointer-events:none; z-index:4;
+  border:solid var(--ink-faint); opacity:.35;
+}
+.cred-frame::before{ top:13px; left:13px; border-width:1px 0 0 1px; }
+.cred-frame::after{ bottom:13px; right:13px; border-width:0 1px 1px 0; }
+.cred-head{
+  display:flex; align-items:center; justify-content:center; gap:11px; position:relative; z-index:3;
+  padding:15px; border-bottom:1px solid var(--line-soft);
+  font:500 10px/1 var(--font-m); letter-spacing:.34em; text-transform:uppercase; color:var(--ink-faint);
+}
+.cred-head .rec{ width:7px; height:7px; border-radius:50%; background:var(--red); box-shadow:0 0 12px var(--red); animation:recblink 1.7s steps(1) infinite; }
+@keyframes recblink{ 0%,62%{opacity:1} 63%,100%{opacity:.22} }
+.cred-screen{ position:relative; }
+.cred-frame.is-rolling .cred-screen{
+  height:clamp(440px,68vh,660px); overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 15%,#000 85%,transparent 100%);
+          mask-image:linear-gradient(180deg,transparent 0,#000 15%,#000 85%,transparent 100%);
+}
+.cred-frame.is-rolling .cred-crawl{ position:absolute; left:0; right:0; top:0; animation:cred-crawl linear infinite; }
+.cred-frame.is-rolling:hover .cred-crawl,
+.cred-frame.is-rolling:focus-within .cred-crawl{ animation-play-state:paused; }
+@keyframes cred-crawl{ from{ transform:translateY(0); } to{ transform:translateY(-50%); } }
+.cred-track{ padding:clamp(40px,7vh,68px) clamp(20px,4vw,40px); }
+
+/* crawl typography */
+.cr-card{ font-family:var(--font-d); font-weight:560; font-size:clamp(24px,4vw,40px); letter-spacing:.02em; margin:0 0 8px; }
+.cr-card .it{ font-style:italic; font-weight:380; color:var(--gold); }
+.cr-tag{ font:500 10px/1.8 var(--font-m); letter-spacing:.3em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:54px; }
+.cr-block{ margin:0 0 46px; }
+.cr-role{ font:500 10px/1.8 var(--font-m); letter-spacing:.28em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:9px; }
+.cr-name{ font-family:var(--font-d); font-weight:520; font-size:clamp(21px,2.9vw,29px); line-height:1.2; }
+.cr-name.lead{ font-size:clamp(25px,3.5vw,37px); color:var(--gold-hi); letter-spacing:.05em; }
+.cr-note{ color:var(--ink-dim); font-size:clamp(13px,1.5vw,15px); max-width:38ch; margin:11px auto 0; line-height:1.62; }
+.cr-turn{ font-family:var(--font-d); font-style:italic; font-weight:400; color:var(--ink); font-size:clamp(20px,2.7vw,31px); line-height:1.36; max-width:22ch; margin:0 auto 58px; }
+.cr-turn b{ color:var(--gold); font-weight:400; }
+.cr-sec{ display:flex; align-items:center; justify-content:center; gap:14px; margin:0 0 26px; }
+.cr-sec span{ font:600 11px/1 var(--font-m); letter-spacing:.32em; text-transform:uppercase; color:var(--gold); }
+.cr-sec::before,.cr-sec::after{ content:"✦"; color:var(--gold); opacity:.55; font-size:10px; }
+.cr-loc{ margin-bottom:18px; }
+.cr-loc .city{ font-family:var(--font-d); font-weight:500; font-size:clamp(19px,2.4vw,26px); }
+.cr-loc .desc{ display:block; font:400 10.5px/1 var(--font-m); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); margin-top:7px; }
+.cr-thanks{ color:var(--ink-dim); line-height:2.1; font-size:clamp(14px,1.7vw,16px); max-width:34ch; margin:0 auto; }
+.cr-thanks em{ color:var(--ink); font-style:italic; }
+.cr-ded{ font-family:var(--font-d); font-style:italic; color:var(--gold); font-size:clamp(20px,2.7vw,29px); line-height:1.42; max-width:24ch; margin:6px auto 0; }
+.cred-hint{ position:absolute; right:14px; bottom:11px; z-index:3; font:500 9px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint); opacity:.5; pointer-events:none; }
+.cred-frame:not(.is-rolling) .cred-hint{ display:none; }
 .sequel{
   font-family:var(--font-d); font-weight:560; letter-spacing:-.015em;
   font-size:clamp(40px,7.5vw,92px); margin:10px 0 16px;
@@ -1143,15 +1193,74 @@ footer b{ color:var(--ink-dim); font-weight:500; }
 <!-- ════════ CLOSING CREDITS + CONTACT ════════ -->
 <section id="credits-end">
   <div class="wrap">
-    <div class="roll">
-      <div class="roll-row"><span class="r">Engineer</span><span class="n">Aryan Mudgal</span></div>
-      <div class="roll-row"><span class="r">Researcher</span><span class="n">Aryan Mudgal</span></div>
-      <div class="roll-row"><span class="r">Founder ×2</span><span class="n">Aryan Mudgal</span></div>
-      <div class="roll-row"><span class="r">Senator</span><span class="n">Aryan Mudgal</span></div>
-      <div class="roll-row"><span class="r">Golfer · aspiring scratch</span><span class="n">Aryan Mudgal</span></div>
-      <div class="roll-row"><span class="r">The Following</span><span class="n">3,000+ <em>on LinkedIn</em></span></div>
-      <div class="roll-row"><span class="r">Catering</span><span class="n"><em>also Aryan</em></span></div>
-      <div class="roll-row"><span class="r">Special Thanks</span><span class="n"><em>coffee &amp; Buffalo winters</em></span></div>
+    <div class="cred-frame">
+      <div class="cred-head"><span class="rec"></span> End Credits</div>
+      <div class="cred-screen">
+        <div class="cred-crawl">
+          <div class="cred-track">
+
+            <p class="cr-card">A One-Man <span class="it">Show</span></p>
+            <p class="cr-tag">but nobody does it alone</p>
+
+            <div class="cr-block">
+              <p class="cr-role">Directed by</p>
+              <p class="cr-name">Aryan Mudgal</p>
+            </div>
+            <div class="cr-block">
+              <p class="cr-role">Written, Engineered &amp; Performed by</p>
+              <p class="cr-name">Aryan Mudgal</p>
+            </div>
+            <div class="cr-block">
+              <p class="cr-role">Starring</p>
+              <p class="cr-name lead">Aryan Mudgal</p>
+              <p class="cr-note">…as himself. In every role. Which was always the joke —</p>
+            </div>
+
+            <p class="cr-turn">because the marquee lies. <b>No show is really a one-man show.</b></p>
+
+            <div class="cr-sec"><span>The Original Producers</span></div>
+            <div class="cr-block">
+              <p class="cr-name">My Family</p>
+              <p class="cr-note">Billed above the title. They funded every reckless idea in love and signed off long before there was any proof it would work.</p>
+            </div>
+
+            <div class="cr-sec"><span>The Supporting Leads</span></div>
+            <div class="cr-block">
+              <p class="cr-name">Friends — old and new</p>
+              <p class="cr-note">For every late-night table read, every “just send it,” and every take I fumbled while they kept the camera rolling.</p>
+            </div>
+            <div class="cr-block">
+              <p class="cr-name">The friends I made on the way</p>
+              <p class="cr-note">3 a.m. hackathon teammates, lab partners, co-founders — strangers in new cities who became the cast.</p>
+            </div>
+
+            <div class="cr-sec"><span>Direction &amp; Notes</span></div>
+            <div class="cr-block">
+              <p class="cr-name">Mentors, professors &amp; advisors</p>
+              <p class="cr-note">Who handed me the harder script and trusted me to read it.</p>
+            </div>
+
+            <div class="cr-sec"><span>The Ensemble</span></div>
+            <div class="cr-block">
+              <p class="cr-name">Every community that let me in</p>
+              <p class="cr-note">The campus that elected me, the movements that marched, the 30,000 who logged on, the 3,000 who followed — everyone who said “yes” before there was anything to say yes to.</p>
+            </div>
+
+            <div class="cr-sec"><span>Filmed on Location</span></div>
+            <div class="cr-loc"><span class="city">New Delhi, India</span><span class="desc">where the story opens · home</span></div>
+            <div class="cr-loc"><span class="city">Buffalo, New York</span><span class="desc">where the work got built · one winter at a time</span></div>
+            <div class="cr-loc" style="margin-bottom:48px"><span class="city">San Francisco, California</span><span class="desc">where the next act is already shooting</span></div>
+
+            <div class="cr-sec"><span>Special Thanks</span></div>
+            <p class="cr-thanks">The 5 a.m. alarm · black coffee · Buffalo winters<br>the 19th hole · the gym at closing time<br>and everyone who ever asked, <em>“so what are you building now?”</em></p>
+
+            <div class="cr-sec" style="margin-top:52px"><span>Dedicated To</span></div>
+            <p class="cr-ded">my people — every one of you was the lead.</p>
+
+          </div>
+        </div>
+      </div>
+      <p class="cred-hint">Hover to pause ❚❚</p>
     </div>
     <h2 class="sequel">The sequel is <span class="it">in development.</span></h2>
     <p class="sequel-sub">Casting now for collaborators, co-founders, and anyone with a problem worth obsessing over. Auditions are just conversations.</p>
@@ -1312,12 +1421,28 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       gsap.from(c, { opacity:0, y:40, duration:.75, ease:"power3.out",
         scrollTrigger:{ trigger:c, start:"top 90%", once:true } });
     });
-    // closing credits roll
-    gsap.from(".roll-row", { opacity:0, y:30, duration:.7, ease:"power2.out", stagger:.1,
-      scrollTrigger:{ trigger:".roll", start:"top 80%", once:true } });
+    // closing credits — fade the cinema frame in as it enters
+    gsap.from(".cred-frame", { opacity:0, y:46, duration:1, ease:"power3.out",
+      scrollTrigger:{ trigger:".cred-frame", start:"top 82%", once:true } });
     gsap.from(".sequel, .sequel-sub, .contact-row", { opacity:0, y:40, duration:1, ease:"power3.out", stagger:.15,
       scrollTrigger:{ trigger:".sequel", start:"top 85%", once:true } });
   }
+
+  /* ---------- end-credits crawl: seamless loop, pause on hover ---------- */
+  (function(){
+    const frame = $("#credits-end .cred-frame");
+    if (!frame || REDUCED) return;            // reduced motion → static, fully readable list
+    const crawl = $(".cred-crawl", frame), track = $(".cred-track", frame);
+    if (!crawl || !track) return;
+    const clone = track.cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    crawl.appendChild(clone);                 // two identical tracks → translateY(-50%) loops seamlessly
+    const SPEED = 40;                         // pixels per second
+    const setDur = () => { crawl.style.animationDuration = Math.max(30, Math.round(track.offsetHeight / SPEED)) + "s"; };
+    setDur();
+    frame.classList.add("is-rolling");
+    addEventListener("resize", setDur, { passive:true });
+  })();
 
   /* ---------- impressions rotator (the mimic at work) ---------- */
   const impressions = [
