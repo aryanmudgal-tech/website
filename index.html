@@ -261,6 +261,18 @@ section{ position:relative; }
   animation:blink 1.6s ease-in-out infinite;
 }
 @keyframes blink{ 0%,100%{ opacity:1 } 50%{ opacity:.25 } }
+#sfx-toggle{
+  border:1px solid var(--line-soft); padding:8px 13px; border-radius:999px;
+  background:none; color:inherit; font:inherit; letter-spacing:inherit; text-transform:inherit;
+  cursor:pointer; transition:color .3s, border-color .3s;
+}
+#sfx-toggle[aria-pressed="true"]{ color:var(--gold); border-color:rgba(255,196,69,.45); }
+#sfx-toggle:hover{ color:var(--ink); }
+.grab-hint{
+  margin-top:20px; font:500 10px/1.8 var(--font-m); letter-spacing:.24em;
+  text-transform:uppercase; color:var(--ink-faint); opacity:.85;
+}
+#hero-canvas{ touch-action:pan-y; }
 .scroll-cue{
   position:absolute; bottom:26px; left:50%; transform:translateX(-50%); z-index:3;
   font:400 10px/1.8 var(--font-m); letter-spacing:.3em; text-transform:uppercase;
@@ -971,7 +983,9 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       <span class="live"><i></i>Now filming: Litos</span>
       <span>MIDL-accepted author</span>
       <span>4× hackathon winner</span>
+      <button id="sfx-toggle" type="button" aria-pressed="true" data-hover="sound">♪ sound on</button>
     </div>
+    <p class="grab-hint">✋ the props are loose — grab one, give it a throw</p>
   </div>
   <p class="scroll-cue">The story begins below</p>
 </section>
@@ -1509,7 +1523,8 @@ footer b{ color:var(--ink-dim); font-weight:500; }
     gsap.from(".hero-title .ch", { yPercent:118, rotate:6, opacity:0, duration:1.1, ease:"power4.out", stagger:.045 });
     gsap.from(".hero-kicker",   { opacity:0, y:-14, duration:.9, ease:"power2.out", delay:.15 });
     gsap.from(".hero-sub",      { opacity:0, y:18, duration:.9, ease:"power2.out", delay:.55 });
-    gsap.from(".hero-meta span",{ opacity:0, y:14, duration:.7, ease:"power2.out", delay:.75, stagger:.09 });
+    gsap.from(".hero-meta span, .hero-meta button",{ opacity:0, y:14, duration:.7, ease:"power2.out", delay:.75, stagger:.09 });
+    gsap.from(".grab-hint",     { opacity:0, duration:1.2, ease:"power2.out", delay:1.4 });
   }, { once:true });
 
   /* ---------- custom cursor ---------- */
@@ -1706,6 +1721,7 @@ footer b{ color:var(--ink-dim); font-weight:500; }
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const TOUCH3D = matchMedia("(pointer: coarse)").matches;
 const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
 
 /* ───────────────────────── shared helpers ───────────────────────── */
@@ -1730,6 +1746,108 @@ function stripeTexture(c1="#f4ecda", c2="#14110c", n=6){
 }
 
 /* ════════════════════════ HERO SCENE ════════════════════════ */
+/* ════════════════════════ SOUND DESIGN ════════════════════════
+   A tiny synthesized space-foley kit — no audio files. An ambient
+   pad fades up on the first grab; grabs chime, throws whoosh with
+   the speed of the flick, and props chime softly as they re-dock. */
+const sfx = (() => {
+  let ctx = null, master = null, noiseBuf = null, pad = null;
+  let enabled = localStorage.getItem("am-sfx") !== "0";
+  const btn = document.getElementById("sfx-toggle");
+  const paint = () => { if (btn){ btn.setAttribute("aria-pressed", String(enabled)); btn.textContent = enabled ? "♪ sound on" : "♪ sound off"; } };
+  paint();
+  function ensure(){
+    if (!enabled) return null;
+    if (!ctx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC){ enabled = false; return null; }
+      ctx = new AC();
+      master = ctx.createGain(); master.gain.value = .26;
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -22; comp.ratio.value = 8;
+      master.connect(comp); comp.connect(ctx.destination);
+      noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 1.2), ctx.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
+    }
+    if (ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+  function tone(f0, f1, dur, gain, type){
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || "sine";
+    o.frequency.setValueAtTime(f0, t);
+    if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(gain, t + .015);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + dur + .05);
+  }
+  function whoosh(amp, dur, f0, f1, q){
+    const t = ctx.currentTime;
+    const src = ctx.createBufferSource(); src.buffer = noiseBuf;
+    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = q || 1.1;
+    bp.frequency.setValueAtTime(f0, t);
+    bp.frequency.exponentialRampToValueAtTime(f1, t + dur*.7);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(amp, t + dur*.18);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    src.connect(bp); bp.connect(g); g.connect(master);
+    src.start(t); src.stop(t + dur + .05);
+  }
+  return {
+    toggle(){
+      enabled = !enabled;
+      localStorage.setItem("am-sfx", enabled ? "1" : "0");
+      if (!enabled){ if (ctx) ctx.suspend(); }
+      else { if (ensure()) this.ambient(); }
+      paint();
+    },
+    ambient(){
+      if (!ensure() || pad) return;
+      // two slow detuned sines breathing through a drifting lowpass — the room tone of space
+      const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 520; lp.Q.value = .4;
+      const g = ctx.createGain(); g.gain.value = 0;
+      g.gain.linearRampToValueAtTime(.05, ctx.currentTime + 3.5);
+      const o1 = ctx.createOscillator(); o1.frequency.value = 55;
+      const o2 = ctx.createOscillator(); o2.frequency.value = 82.5; o2.detune.value = 4;
+      const o3 = ctx.createOscillator(); o3.type = "triangle"; o3.frequency.value = 110; o3.detune.value = -6;
+      const g3 = ctx.createGain(); g3.gain.value = .25;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = .06;
+      const lfoG = ctx.createGain(); lfoG.gain.value = 240;
+      lfo.connect(lfoG); lfoG.connect(lp.frequency);
+      o1.connect(lp); o2.connect(lp); o3.connect(g3); g3.connect(lp);
+      lp.connect(g); g.connect(master);
+      [o1, o2, o3, lfo].forEach(o => o.start());
+      pad = { g };
+    },
+    grab(){
+      if (!ensure()) return;
+      this.ambient();
+      tone(392, 587, .22, .10);            // a soft rising fourth — "got it"
+      tone(1175, 1568, .14, .035, "triangle");
+      whoosh(.05, .18, 900, 1600, 2.5);
+    },
+    toss(power){                            // 0..1 — the whoosh rides the flick speed
+      if (!ensure()) return;
+      const p = Math.min(1, Math.max(.15, power || 0));
+      whoosh(.16 + .3*p, .5 + .25*p, 260 + 240*p, 1200 + 900*p);
+      tone(420 + 160*p, 150, .5, .07 + .05*p);   // doppler tail
+    },
+    settle(){                               // the prop re-docks with its orbit
+      if (!ensure()) return;
+      tone(660, 662, .9, .05);
+      tone(990, 992, 1.2, .025);
+    }
+  };
+})();
+window.__sfx = sfx;
+const sfxBtn = document.getElementById("sfx-toggle");
+if (sfxBtn) sfxBtn.addEventListener("click", () => sfx.toggle());
+
 let heroVisible = false, heroAPI = null;
 (function initHero(){
   const canvas = document.getElementById("hero-canvas");
@@ -1850,15 +1968,51 @@ let heroVisible = false, heroAPI = null;
   dna.userData = { orbit:Math.PI*8/5, h:1.6, spin:.009 };
   props.add(dna);
 
+  /* every prop is grabbable — invisible hit-sphere + a physics state */
+  const grabbable = [];
+  props.children.forEach(p => {
+    const proxy = new THREE.Mesh(new THREE.SphereGeometry(1.0, 8, 6),
+      new THREE.MeshBasicMaterial({ visible:false }));
+    proxy.userData.owner = p;
+    p.add(proxy); grabbable.push(proxy);
+    Object.assign(p.userData, {
+      mode:"orbit", vel:new THREE.Vector3(), target:new THREE.Vector3(), tumX:0, tumZ:0
+    });
+  });
+
   const ORBIT_R = 3.6;
-  function placeProps(time, scatter){
+  const slotV = new THREE.Vector3(), springV = new THREE.Vector3();
+  function orbitSlot(u, time, scatter, out){
+    const a = u.orbit + time*.00014;
+    const r = ORBIT_R * (1 + scatter*1.4);
+    return out.set(Math.cos(a)*r, u.h - 1.1 + Math.sin(time*.001 + u.orbit*3)*.16, Math.sin(a)*r*.55);
+  }
+  function placeProps(time, scatter, dt){
     props.children.forEach(p => {
       const u = p.userData;
-      const a = u.orbit + time*.00014;
-      const r = ORBIT_R * (1 + scatter*1.4);
-      p.position.set(Math.cos(a)*r, u.h - 1.1 + Math.sin(time*.001 + u.orbit*3)*.16, Math.sin(a)*r*.55);
-      p.rotation.y += u.spin;
-      p.rotation.z = Math.sin(time*.0007 + u.orbit)*.1;
+      orbitSlot(u, time, scatter, slotV);
+      if (u.mode === "held"){
+        p.position.lerp(u.target, .32);                 // a touch of mass
+        p.rotation.y += u.spin*5;
+      } else if (u.mode === "free"){
+        springV.copy(slotV).sub(p.position);
+        u.vel.addScaledVector(springV, dt*1.9);          // homesick — eased back toward its orbit slot
+        u.vel.multiplyScalar(Math.exp(-dt*1.05));        // gentle space drag
+        p.position.addScaledVector(u.vel, dt);
+        p.rotation.y += u.spin + u.vel.length()*dt*.6;
+        p.rotation.x += u.tumX*dt; p.rotation.z += u.tumZ*dt;
+        u.tumX *= Math.exp(-dt*.8); u.tumZ *= Math.exp(-dt*.8);
+        if (springV.length() < .3 && u.vel.length() < .55){
+          u.mode = "orbit"; u.tumX = u.tumZ = 0;
+          sfx.settle();
+        }
+      } else {
+        p.position.copy(slotV);
+        p.rotation.y += u.spin;
+        // lerp the tilt home so a settling prop doesn't pop upright
+        p.rotation.z += (Math.sin(time*.0007 + u.orbit)*.1 - p.rotation.z)*.08;
+        p.rotation.x += (0 - p.rotation.x)*.08;
+      }
     });
   }
 
@@ -1892,6 +2046,93 @@ let heroVisible = false, heroAPI = null;
     mx = (e.clientX/innerWidth - .5)*2; my = (e.clientY/innerHeight - .5)*2;
   }, { passive:true });
 
+  /* ----- grab & throw: the props are loose ----- */
+  const heroSec = document.getElementById("hero");
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  const dragPlane = new THREE.Plane(), planeHit = new THREE.Vector3(), camDir = new THREE.Vector3();
+  const ringEl = document.querySelector(".cursor-ring");
+  let held = null;
+  const flicks = [];
+  function setRay(e){
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left)/r.width)*2 - 1, -((e.clientY - r.top)/r.height)*2 + 1);
+    ray.setFromCamera(ndc, camera);
+  }
+  function pickProp(e){
+    setRay(e);
+    const hit = ray.intersectObjects(grabbable, false)[0];
+    return hit ? hit.object.userData.owner : null;
+  }
+  function grabCursor(state){            // "grab" | "grabbing" | null
+    canvas.style.cursor = state === "grab" ? "grab" : state ? "grabbing" : "";
+    if (ringEl){
+      if (state){ ringEl.classList.add("is-hover"); ringEl.dataset.label = state === "grab" ? "grab" : "wheee"; }
+      else { ringEl.classList.remove("is-hover"); ringEl.dataset.label = "view"; }
+    }
+  }
+  heroSec.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    const p = pickProp(e);
+    if (!p) return;
+    held = p;
+    const u = p.userData;
+    u.mode = "held"; u.vel.set(0, 0, 0);
+    u.target.copy(p.position);
+    camera.getWorldDirection(camDir);
+    dragPlane.setFromNormalAndCoplanarPoint(camDir.negate(), p.position);
+    flicks.length = 0;
+    flicks.push({ t:performance.now(), x:p.position.x, y:p.position.y, z:p.position.z });
+    try{ heroSec.setPointerCapture(e.pointerId); }catch(_){}
+    grabCursor("grabbing");
+    sfx.grab();
+    e.preventDefault();
+  });
+  heroSec.addEventListener("pointermove", e => {
+    if (held){
+      setRay(e);
+      if (ray.ray.intersectPlane(dragPlane, planeHit)){
+        held.userData.target.copy(planeHit);
+        flicks.push({ t:performance.now(), x:planeHit.x, y:planeHit.y, z:planeHit.z });
+        if (flicks.length > 7) flicks.shift();
+      }
+    } else if (!TOUCH3D){
+      grabCursor(pickProp(e) ? "grab" : null);
+    }
+  }, { passive:true });
+  function release(){
+    if (!held) return;
+    const u = held.userData;
+    u.mode = "free";
+    const now = performance.now();
+    const recent = flicks.filter(f => now - f.t < 130);
+    if (recent.length >= 2){
+      const a = recent[0], b = recent[recent.length-1];
+      const span = Math.max(.016, (b.t - a.t)/1000);
+      u.vel.set((b.x-a.x)/span, (b.y-a.y)/span, (b.z-a.z)/span);
+      const sp = u.vel.length();
+      if (sp > 16) u.vel.multiplyScalar(16/sp);          // escape velocity is capped
+    }
+    u.tumX = (Math.random()-.5) * u.vel.length()*.9;
+    u.tumZ = (Math.random()-.5) * u.vel.length()*.9;
+    sfx.toss(u.vel.length()/16);
+    held = null;
+    grabCursor(null);
+  }
+  heroSec.addEventListener("pointerup", release);
+  heroSec.addEventListener("pointercancel", release);
+  // read-only debug hook (same spirit as __golfDebug)
+  window.__heroDebug = () => props.children.map(p => {
+    const v = p.position.clone().project(camera);
+    const r = canvas.getBoundingClientRect();
+    return { mode:p.userData.mode, vel:+p.userData.vel.length().toFixed(2),
+      sx:Math.round(r.left + (v.x+1)/2*r.width), sy:Math.round(r.top + (-v.y+1)/2*r.height) };
+  });
+  // on touch, hijack the scroll only when the finger actually lands on a prop
+  canvas.addEventListener("touchstart", e => {
+    const t = e.touches[0];
+    if (t && pickProp(t)) e.preventDefault();
+  }, { passive:false });
+
   function resize(){
     const w = canvas.clientWidth || canvas.parentElement.clientWidth;
     const h = canvas.clientHeight || canvas.parentElement.clientHeight;
@@ -1905,7 +2146,7 @@ let heroVisible = false, heroAPI = null;
 
   heroAPI = {
     render(dt, time){
-      placeProps(time, scrollP);
+      placeProps(time, scrollP, dt);
       updateClapper(dt, time);
       // dust drifts down through the beam
       const p = dustGeo.attributes.position.array;
