@@ -24,7 +24,7 @@ Everything lives in a single `index.html` (Three.js + GSAP via CDN — needs int
 |---|---|
 | Preloader | 3…2…1 film-leader countdown |
 | Hero | Three.js projector stage: volumetric beam, drifting dust, orbiting props (clapperboard that snaps, dumbbell, golf flag, shuttlecock, DNA helix) |
-| Act I | **The Awards Season** — photo cards with selectivity stats (Student Innovative Leader 1 of 2 / 20,000 · Chancellor’s 1 of 15 / 8,000 · Phi Beta Kappa Top 10%), then the festival wins with photos + demo links: Dots (LA Hacks · UCLA), ARMIE (Reality Hack · MIT), StreamFair (TartanHacks · CMU), C.O.R.E. (XR Hacks · Stanford) |
+| Act I | **The Awards Season** — “scene develops” cards: text + gold stat first, hover (tap on mobile) reveals the photo full-bleed with a spark orbiting the frame while the rest of the row dims. Awards: Student Innovative Leader 1 of 2 / 20,000 · Chancellor’s 1 of 15 / 8,000 · Phi Beta Kappa Top 10%. Festival wins: Dots (1st of 1,000 — Catalyst for Care + Fetch.ai 3rd), ARMIE (HM of 300 teams, MIT), StreamFair (1st of 800, Ripple track, CMU), C.O.R.E. (1st of 200, MoonLake track, Stanford) — each with demo links |
 | Act II | **Litos** — now filming, script page redacted (“NO SPOILERS”) |
 | Intermission | **The 19th Hole** — drag from the ball to aim, release to putt |
 | Act III | Research trilogy (horizontal reel): MIDL-accepted FMH detection, PPG accuracy, early wound detection |
