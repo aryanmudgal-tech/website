@@ -24,23 +24,28 @@ Everything lives in a single `index.html` (Three.js + GSAP via CDN — needs int
 |---|---|
 | Preloader | 3…2…1 film-leader countdown |
 | Hero | Three.js projector stage: volumetric beam, drifting dust, orbiting props (clapperboard that snaps, dumbbell, golf flag, shuttlecock, DNA helix) |
-| Opening credits | Directed by / Written by / Starring… you-know-who |
 | Act I | **Litos** — now filming, script page redacted (“NO SPOILERS”) |
 | Act II | Research trilogy (horizontal reel): MIDL-accepted FMH detection, PPG accuracy, early wound detection |
-| Act III | Filmography: Linde × Meta Layer Initiative, HCLTech |
-| Act IV | The Ensemble: Men In Green, Clean Campus, SUNY delegate (30k), Senator ($500k), civic platform |
+| Act III | Filmography with real titles: Software Engineer Intern (Linde · Meta Layer Initiative), Technical Analyst (HCLTech) |
+| Act IV | The Ensemble, mad simple: 30,000+ (SUNY Delegate), $500K+ (Senator), Men In Green, Clean Campus, Civic Platform |
 | Intermission | **The 19th Hole** — drag from the ball to aim, release to putt |
 | Behind the Scenes | Gym · Golf · Badminton · Acting & Mimicry (rotating impressions) |
-| Awards | Festival laurels + 4× hackathon-winner strip |
+| Awards | Festival laurels + hackathon wins with project names: Dots (LA Hacks · UCLA), ARyan (Reality Hack · MIT), StreamFair (TartanHacks · CMU), XR Hacks (Stanford) |
 | Closing credits | Rolling credits + casting call (contact) |
+
+Palette: premiere-night indigo with marquee gold, coral, electric cyan, neon pink,
+and bright green — each act carries its own accent color.
 
 🎬 Easter egg: type `action` anywhere.
 
 ## Editing content
 
 All copy is plain HTML in `index.html` — search for the section comments
-(`ACT I`, `AWARDS`, etc.). Two placeholders to fill in when ready:
+(`ACT I`, `AWARDS`, etc.). Placeholders to fill in when ready:
 
+- **Hackathon demo videos** — the three `btn-watch` links in the Awards strip
+  are `href="#"` until the real video URLs go in (a TODO comment marks the spot).
+  Until then, clicking shows a “trailer hits theaters soon” toast.
 - **LinkedIn / GitHub buttons** in the closing credits currently point at the
   generic homepages — drop in your profile URLs.
 - **Litos** copy is intentionally “under embargo” — replace when it launches.

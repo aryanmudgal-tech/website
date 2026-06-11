@@ -17,23 +17,25 @@
 /* ============================================================
    ARYAN MUDGAL — “A ONE-MAN SHOW”
    A portfolio staged as a film production.
-   Palette: projector-room black, warm tungsten gold, curtain red.
+   Palette: premiere-night indigo, marquee gold, neon accents.
    Type: Fraunces (display) · Instrument Sans (body) · IBM Plex Mono (slates)
    ============================================================ */
 :root{
-  --bg:        #0b0a07;
-  --bg-2:      #131008;
-  --bg-3:      #1c1810;
-  --ink:       #f4ecda;
-  --ink-dim:   #b9ad92;
-  --ink-faint: #7d745f;
-  --gold:      #e9b44c;
-  --gold-hi:   #ffd47e;
-  --red:       #c5283d;
-  --red-deep:  #8e1c2d;
-  --green:     #3e8e5a;
-  --line:      rgba(244,236,218,.14);
-  --line-soft: rgba(244,236,218,.07);
+  --bg:        #150f33;
+  --bg-2:      #1c1545;
+  --bg-3:      #261b58;
+  --ink:       #fff7e6;
+  --ink-dim:   #cfc2ec;
+  --ink-faint: #978ac0;
+  --gold:      #ffc445;
+  --gold-hi:   #ffdf8a;
+  --red:       #ff4d6d;
+  --red-deep:  #d6244a;
+  --green:     #3ddc84;
+  --cyan:      #44e0ff;
+  --pink:      #ff63c1;
+  --line:      rgba(255,247,230,.16);
+  --line-soft: rgba(255,247,230,.08);
   --font-d:    "Fraunces", Georgia, serif;
   --font-b:    "Instrument Sans", -apple-system, sans-serif;
   --font-m:    "IBM Plex Mono", ui-monospace, monospace;
@@ -53,7 +55,7 @@ body{
   cursor:none;
 }
 @media (pointer:coarse), (max-width:768px){ body{ cursor:auto; } }
-::selection{ background:var(--gold); color:#191407; }
+::selection{ background:var(--gold); color:#1d1240; }
 img, svg, canvas{ display:block; max-width:100%; }
 a{ color:inherit; }
 button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
@@ -63,7 +65,7 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 .grain{
   position:fixed; inset:-100px; z-index:120; pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  opacity:.055; animation:grain 0.9s steps(4) infinite;
+  opacity:.045; animation:grain 0.9s steps(4) infinite;
 }
 @keyframes grain{
   0%{ transform:translate(0,0) } 25%{ transform:translate(-38px,22px) }
@@ -72,7 +74,7 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 /* projector flicker on the whole stage — barely there, but there */
 .flicker{
   position:fixed; inset:0; z-index:119; pointer-events:none;
-  background:radial-gradient(ellipse at 50% 0%, rgba(255,212,126,.05), transparent 55%);
+  background:radial-gradient(ellipse at 50% 0%, rgba(255,223,138,.07), transparent 55%);
   animation:flicker 6.5s ease-in-out infinite;
 }
 @keyframes flicker{
@@ -85,17 +87,17 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 .cursor-dot{
   width:6px; height:6px; border-radius:50%;
   background:var(--gold-hi); margin:-3px 0 0 -3px;
-  box-shadow:0 0 12px rgba(255,212,126,.9);
+  box-shadow:0 0 12px rgba(255,223,138,.9);
 }
 .cursor-ring{
   width:38px; height:38px; margin:-19px 0 0 -19px; border-radius:50%;
-  border:1px solid rgba(233,180,76,.55);
+  border:1px solid rgba(255,196,69,.6);
   transition:width .28s var(--ease-out), height .28s var(--ease-out),
              margin .28s var(--ease-out), border-color .28s, background-color .28s;
 }
 .cursor-ring.is-hover{
   width:64px; height:64px; margin:-32px 0 0 -32px;
-  border-color:rgba(255,212,126,.95); background:rgba(233,180,76,.08);
+  border-color:rgba(255,223,138,.95); background:rgba(255,196,69,.1);
 }
 .cursor-ring.is-hover::after{
   content:attr(data-label);
@@ -109,16 +111,16 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 #preloader{
   position:fixed; inset:0; z-index:300; display:grid; place-items:center;
   background:
-    radial-gradient(circle at 50% 50%, #171307 0%, #0b0a07 70%);
+    radial-gradient(circle at 50% 50%, #221955 0%, #150f33 70%);
 }
 #preloader::before,#preloader::after{ /* film-leader crosshair lines */
-  content:""; position:absolute; background:rgba(244,236,218,.1);
+  content:""; position:absolute; background:rgba(255,247,230,.12);
 }
 #preloader::before{ inset:50% 0 auto 0; height:1px; }
 #preloader::after{ inset:0 auto 0 50%; width:1px; }
 .pre-stage{ position:relative; width:min(72vw,360px); aspect-ratio:1; display:grid; place-items:center; }
 .pre-ring{ position:absolute; inset:0; }
-.pre-ring circle{ fill:none; stroke:rgba(244,236,218,.18); stroke-width:1.5; }
+.pre-ring circle{ fill:none; stroke:rgba(255,247,230,.2); stroke-width:1.5; }
 .pre-ring .sweep{
   stroke:var(--gold); stroke-width:2.5;
   stroke-dasharray:1; stroke-dashoffset:1; pathLength:1;
@@ -145,7 +147,7 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
   border-bottom:1px solid transparent;
 }
 #topbar.is-scrolled{
-  background:rgba(11,10,7,.78); backdrop-filter:blur(14px);
+  background:rgba(21,15,51,.78); backdrop-filter:blur(14px);
   border-bottom-color:var(--line-soft);
 }
 .brand{
@@ -167,7 +169,7 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 #topbar nav a:hover{ color:var(--ink); }
 #topbar nav a:hover::after{ transform:scaleX(1); transform-origin:left; }
 #topbar nav a.nav-cta{
-  color:#191407; background:var(--gold); padding:10px 18px; border-radius:999px;
+  color:#1d1240; background:var(--gold); padding:10px 18px; border-radius:999px;
   transition:background .3s, transform .3s;
 }
 #topbar nav a.nav-cta:hover{ background:var(--gold-hi); transform:translateY(-1px); }
@@ -178,7 +180,7 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 .progress-strip{
   position:fixed; top:50%; right:14px; transform:translateY(-50%); z-index:99;
   width:18px; height:min(46vh,420px); border:1px solid var(--line);
-  border-radius:4px; overflow:hidden; background:rgba(11,10,7,.5);
+  border-radius:4px; overflow:hidden; background:rgba(21,15,51,.5);
 }
 .progress-strip::before,.progress-strip::after{ /* sprocket holes */
   content:""; position:absolute; top:4px; bottom:4px; width:3px;
@@ -188,7 +190,7 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 .progress-fill{
   position:absolute; left:6px; right:6px; top:0; height:0%;
   background:linear-gradient(var(--gold-hi),var(--gold)); border-radius:2px;
-  box-shadow:0 0 10px rgba(233,180,76,.5);
+  box-shadow:0 0 10px rgba(255,196,69,.55);
 }
 @media (max-width:900px){ .progress-strip{ display:none; } }
 
@@ -199,7 +201,7 @@ section{ position:relative; }
   display:inline-flex; align-items:center; gap:14px;
   font:500 11px/1 var(--font-m); letter-spacing:.22em; text-transform:uppercase;
   color:var(--ink-dim); border:1px solid var(--line); border-radius:4px;
-  padding:9px 14px; background:rgba(19,16,8,.6);
+  padding:9px 14px; background:rgba(28,21,69,.6);
 }
 .slate::before{
   content:""; width:16px; height:11px; flex:none;
@@ -216,7 +218,10 @@ section{ position:relative; }
 /* ============ HERO: the projector stage ============ */
 #hero{
   min-height:100svh; display:grid; place-items:center; overflow:hidden;
-  background:radial-gradient(ellipse 90% 60% at 50% -10%, #221a0b 0%, var(--bg) 60%);
+  background:
+    radial-gradient(ellipse 60% 44% at 18% 8%, rgba(255,99,193,.13), transparent 60%),
+    radial-gradient(ellipse 60% 44% at 84% 12%, rgba(68,224,255,.12), transparent 60%),
+    radial-gradient(ellipse 90% 60% at 50% -10%, #322470 0%, var(--bg) 62%);
 }
 #hero-canvas{ position:absolute; inset:0; width:100%; height:100%; }
 .hero-inner{
@@ -235,7 +240,7 @@ section{ position:relative; }
 .hero-title{
   margin:30px 0 10px;
   font-size:clamp(58px,12.5vw,176px); font-weight:560; letter-spacing:-.02em;
-  text-shadow:0 0 80px rgba(233,180,76,.25);
+  text-shadow:0 0 80px rgba(255,196,69,.4);
 }
 .hero-title .word{ display:inline-block; white-space:nowrap; }
 .hero-title .ch{ display:inline-block; will-change:transform; }
@@ -250,7 +255,7 @@ section{ position:relative; }
   font:400 11px/1 var(--font-m); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint);
 }
 .hero-meta span{ border:1px solid var(--line-soft); padding:8px 13px; border-radius:999px; }
-.hero-meta .live{ color:var(--gold); border-color:rgba(233,180,76,.4); display:inline-flex; align-items:center; gap:8px; }
+.hero-meta .live{ color:var(--gold); border-color:rgba(255,196,69,.45); display:inline-flex; align-items:center; gap:8px; }
 .hero-meta .live i{
   width:6px; height:6px; border-radius:50%; background:var(--red); display:inline-block;
   animation:blink 1.6s ease-in-out infinite;
@@ -281,40 +286,35 @@ section{ position:relative; }
   letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; padding-right:.8em;
 }
 .ticker-track span i{ font-style:normal; color:var(--gold); padding-left:.8em; }
+.ticker-track span:nth-child(4n+2) i{ color:var(--cyan); }
+.ticker-track span:nth-child(4n+3) i{ color:var(--pink); }
+.ticker-track span:nth-child(4n) i{ color:var(--green); }
 @keyframes ticker{ to{ transform:translateX(-50%);} }
-
-/* ---------- opening credits ---------- */
-#credits-open{ padding:clamp(110px,16vh,180px) 0; text-align:center; }
-.credit-line{ margin:clamp(26px,5vh,46px) 0; }
-.credit-line .role{
-  font:500 10px/1 var(--font-m); letter-spacing:.4em; text-transform:uppercase;
-  color:var(--ink-faint); display:block; margin-bottom:12px;
-}
-.credit-line .name{
-  font-family:var(--font-d); font-weight:520; letter-spacing:.01em;
-  font-size:clamp(26px,4.6vw,54px);
-}
-.credit-line .name.it{ font-style:italic; font-weight:380; color:var(--ink-dim); font-size:clamp(20px,3.2vw,34px); }
-.credit-truth{
-  margin-top:clamp(40px,8vh,70px); font:400 12px/2 var(--font-m);
-  letter-spacing:.18em; text-transform:uppercase; color:var(--gold);
-}
 
 /* ---------- act headers ---------- */
 .act{ padding:clamp(90px,14vh,160px) 0 clamp(60px,8vh,90px); }
 .act-head{ margin-bottom:clamp(40px,6vh,70px); }
+/* each act gets its own neon: gold → cyan → coral → green → pink */
+#act-research{ background:radial-gradient(ellipse 72% 46% at 85% 0%, rgba(68,224,255,.1), transparent 62%); }
+#act-research .sec-title .it, #act-research .slate em{ color:var(--cyan); }
+#act-work{ background:radial-gradient(ellipse 72% 46% at 12% 0%, rgba(255,77,109,.1), transparent 62%); }
+#act-work .sec-title .it, #act-work .slate em{ color:var(--red); }
+#act-leadership{ background:radial-gradient(ellipse 72% 46% at 85% 0%, rgba(61,220,132,.1), transparent 62%); }
+#act-leadership .sec-title .it, #act-leadership .slate em{ color:var(--green); }
+#bts{ background:radial-gradient(ellipse 72% 46% at 50% 0%, rgba(255,99,193,.09), transparent 62%); }
+#bts .sec-title .it, #bts .slate em{ color:var(--pink); }
 
 /* ============ ACT I — LITOS ============ */
 .feature-card{
   position:relative; border:1px solid var(--line); border-radius:18px;
   background:
-    radial-gradient(120% 140% at 85% -20%, rgba(233,180,76,.13), transparent 50%),
+    radial-gradient(120% 140% at 85% -20%, rgba(255,196,69,.2), transparent 50%),
     linear-gradient(160deg, var(--bg-3), var(--bg-2) 55%);
   padding:clamp(30px,5vw,64px); overflow:hidden;
 }
 .feature-card::before{ /* sweeping projector shine */
   content:""; position:absolute; inset:-50%;
-  background:linear-gradient(100deg, transparent 42%, rgba(255,212,126,.06) 50%, transparent 58%);
+  background:linear-gradient(100deg, transparent 42%, rgba(255,223,138,.09) 50%, transparent 58%);
   animation:shine 7s ease-in-out infinite;
 }
 @keyframes shine{ 0%,20%{ transform:translateX(-60%) } 60%,100%{ transform:translateX(60%) } }
@@ -323,7 +323,8 @@ section{ position:relative; }
 .now-filming{
   display:inline-flex; align-items:center; gap:10px;
   font:600 10px/1 var(--font-m); letter-spacing:.3em; text-transform:uppercase;
-  color:#1a0c0c; background:var(--red); padding:9px 14px; border-radius:4px;
+  color:#fff; background:var(--red); padding:9px 14px; border-radius:4px;
+  box-shadow:0 0 22px rgba(255,77,109,.45);
 }
 .now-filming i{ width:7px; height:7px; border-radius:50%; background:#ffe9e9; animation:blink 1.2s infinite; }
 .feature-title{
@@ -349,7 +350,7 @@ section{ position:relative; }
 /* the redacted script — hover only *almost* reveals it */
 .script-leak{
   position:relative; border:1px solid var(--line); border-radius:12px;
-  background:#0e0c08; padding:26px 26px 30px; transform:rotate(1.6deg);
+  background:#1a1247; padding:26px 26px 30px; transform:rotate(1.6deg);
   box-shadow:0 30px 60px rgba(0,0,0,.45);
 }
 .script-leak h4{
@@ -384,18 +385,21 @@ section{ position:relative; }
   padding:30px 30px 34px; display:flex; flex-direction:column;
   transition:transform .5s var(--ease-out), border-color .5s;
 }
-.poster:hover{ transform:translateY(-10px) rotate(-.4deg); border-color:rgba(233,180,76,.4); }
+.poster:hover{ transform:translateY(-10px) rotate(-.4deg); border-color:rgba(68,224,255,.5); }
 .poster .p-num{
   position:absolute; top:18px; right:22px;
   font-family:var(--font-d); font-style:italic; font-weight:300;
-  font-size:64px; color:rgba(244,236,218,.07); line-height:1;
+  font-size:64px; color:rgba(255,247,230,.09); line-height:1;
 }
 .poster .p-tag{
   display:inline-flex; align-self:flex-start; font:600 9px/1 var(--font-m);
   letter-spacing:.26em; text-transform:uppercase; padding:7px 11px; border-radius:4px;
-  color:#191407; background:var(--gold); margin-bottom:22px;
+  color:#1d1240; background:var(--gold); margin-bottom:22px;
 }
-.poster .p-tag.ongoing{ background:transparent; color:var(--gold); border:1px solid rgba(233,180,76,.5); }
+.poster .p-tag.ongoing{ background:transparent; color:var(--cyan); border:1px solid rgba(68,224,255,.55); }
+.poster:nth-child(1) .p-sub{ color:var(--red); }
+.poster:nth-child(2) .p-sub{ color:var(--gold); }
+.poster:nth-child(3) .p-sub{ color:var(--green); }
 .poster .p-art{ height:150px; margin-bottom:22px; display:grid; place-items:center; }
 .poster h3{ font-size:clamp(26px,2.6vw,34px); font-weight:560; letter-spacing:-.01em; margin-bottom:6px; }
 .poster .p-sub{
@@ -410,29 +414,29 @@ section{ position:relative; }
 /* poster artwork bits */
 .art-cells{ position:relative; width:150px; height:130px; }
 .art-cells span{
-  position:absolute; border-radius:50%; border:1.5px solid rgba(197,40,61,.8);
-  background:radial-gradient(circle at 35% 35%, rgba(197,40,61,.35), rgba(197,40,61,.06));
+  position:absolute; border-radius:50%; border:1.5px solid rgba(255,77,109,.85);
+  background:radial-gradient(circle at 35% 35%, rgba(255,77,109,.4), rgba(255,77,109,.07));
   animation:cellfloat 5s ease-in-out infinite;
 }
 .art-cells span:nth-child(1){ width:74px; height:74px; left:6px; top:22px; }
-.art-cells span:nth-child(2){ width:46px; height:46px; right:14px; top:8px; animation-delay:-1.6s; border-color:rgba(233,180,76,.85); background:radial-gradient(circle at 35% 35%, rgba(233,180,76,.3), rgba(233,180,76,.04)); }
+.art-cells span:nth-child(2){ width:46px; height:46px; right:14px; top:8px; animation-delay:-1.6s; border-color:rgba(255,196,69,.9); background:radial-gradient(circle at 35% 35%, rgba(255,196,69,.35), rgba(255,196,69,.05)); }
 .art-cells span:nth-child(3){ width:30px; height:30px; right:34px; bottom:6px; animation-delay:-3.1s; }
-.art-cells span:nth-child(4){ width:18px; height:18px; left:48px; bottom:14px; animation-delay:-2.2s; border-color:rgba(233,180,76,.85); }
+.art-cells span:nth-child(4){ width:18px; height:18px; left:48px; bottom:14px; animation-delay:-2.2s; border-color:rgba(255,196,69,.9); }
 @keyframes cellfloat{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-9px) } }
 .art-pulse svg{ width:200px; height:110px; overflow:visible; }
 .art-pulse .beat{
   fill:none; stroke:var(--gold); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;
   stroke-dasharray:340; stroke-dashoffset:340; animation:beatdraw 2.8s linear infinite;
-  filter:drop-shadow(0 0 6px rgba(233,180,76,.55));
+  filter:drop-shadow(0 0 6px rgba(255,196,69,.6));
 }
-.art-pulse .beat.ghost{ stroke:rgba(197,40,61,.5); animation-delay:-1.4s; stroke-width:1.6; filter:none; }
+.art-pulse .beat.ghost{ stroke:rgba(255,77,109,.55); animation-delay:-1.4s; stroke-width:1.6; filter:none; }
 @keyframes beatdraw{ 0%{ stroke-dashoffset:340 } 60%{ stroke-dashoffset:0 } 100%{ stroke-dashoffset:-340 } }
 .art-rings{ position:relative; width:130px; height:130px; display:grid; place-items:center; }
 .art-rings i{
-  position:absolute; border-radius:50%; border:1.5px solid rgba(62,142,90,.8);
+  position:absolute; border-radius:50%; border:1.5px solid rgba(61,220,132,.85);
   animation:ringheal 3.2s var(--ease-out) infinite;
 }
-.art-rings i:nth-child(1){ width:30px; height:30px; border-color:var(--red); background:rgba(197,40,61,.25); animation:none; }
+.art-rings i:nth-child(1){ width:30px; height:30px; border-color:var(--red); background:rgba(255,77,109,.3); animation:none; }
 .art-rings i:nth-child(2){ width:60px; height:60px; }
 .art-rings i:nth-child(3){ width:92px; height:92px; animation-delay:.5s; }
 .art-rings i:nth-child(4){ width:124px; height:124px; animation-delay:1s; }
@@ -454,13 +458,13 @@ section{ position:relative; }
   padding:clamp(26px,4vh,42px) 6px; border-bottom:1px solid var(--line);
   position:relative; transition:background .4s; align-items:baseline;
 }
-.filmo-row:hover{ background:rgba(233,180,76,.04); }
+.filmo-row:hover{ background:rgba(255,196,69,.06); }
 .filmo-row::before{
   content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
   background:var(--gold); transform:scaleY(0); transform-origin:top; transition:transform .4s var(--ease-out);
 }
 .filmo-row:hover::before{ transform:scaleY(1); }
-.filmo-year{ font:500 12px/2 var(--font-m); letter-spacing:.16em; color:var(--gold); text-transform:uppercase; }
+.filmo-year{ font:500 12px/2 var(--font-m); letter-spacing:.16em; color:var(--red); text-transform:uppercase; }
 .filmo-main h3{ font-size:clamp(24px,3.2vw,40px); font-weight:560; letter-spacing:-.01em; }
 .filmo-main .org{
   font:500 11px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase;
@@ -477,40 +481,51 @@ section{ position:relative; }
   .filmo-tags{ flex-direction:row; flex-wrap:wrap; align-items:flex-start; justify-content:flex-start; }
 }
 
-/* ============ ACT IV — the ensemble ============ */
+/* ============ ACT IV — the ensemble (mad simple: one role, one line, one big number) ============ */
 .ensemble{ display:grid; grid-template-columns:repeat(6,1fr); gap:18px; }
+.ens-card, .bts-card{ --acc:var(--gold); --acc-soft:rgba(255,196,69,.16); }
+.c-cyan{ --acc:var(--cyan); --acc-soft:rgba(68,224,255,.15); }
+.c-green{ --acc:var(--green); --acc-soft:rgba(61,220,132,.15); }
+.c-pink{ --acc:var(--pink); --acc-soft:rgba(255,99,193,.15); }
+.c-red{ --acc:var(--red); --acc-soft:rgba(255,77,109,.15); }
 .ens-card{
-  border:1px solid var(--line); border-radius:14px; padding:26px 24px 28px;
+  border:1px solid var(--line); border-radius:16px; padding:30px 26px;
   background:linear-gradient(170deg, var(--bg-3), var(--bg-2) 70%);
   position:relative; overflow:hidden; transition:transform .4s var(--ease-out), border-color .4s;
 }
-.ens-card:hover{ transform:translateY(-6px); border-color:rgba(233,180,76,.45); }
+.ens-card::before{ content:""; position:absolute; top:0; left:0; right:0; height:4px; background:var(--acc); }
+.ens-card::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(80% 55% at 50% 0%, var(--acc-soft), transparent 70%);
+}
+.ens-card:hover{ transform:translateY(-6px); border-color:var(--acc); }
 .ens-card.span3{ grid-column:span 3; } .ens-card.span2{ grid-column:span 2; }
+.ens-card > *{ position:relative; z-index:1; }
 .ens-kicker{
   font:600 9px/1 var(--font-m); letter-spacing:.28em; text-transform:uppercase;
-  color:var(--gold); display:block; margin-bottom:14px;
+  color:var(--acc, var(--gold)); display:block; margin-bottom:14px;
 }
-.ens-card h3{ font-size:clamp(21px,2.3vw,28px); font-weight:560; margin-bottom:10px; }
-.ens-card p{ color:var(--ink-dim); font-size:14.5px; }
+.ens-card h3{ font-size:clamp(22px,2.4vw,30px); font-weight:560; margin-bottom:8px; }
+.ens-card p{ color:var(--ink-dim); font-size:14.5px; max-width:40ch; }
 .ens-stat{
-  font-family:var(--font-d); font-weight:340; font-size:clamp(40px,4.6vw,62px);
-  letter-spacing:-.02em; color:var(--ink); line-height:1; margin:8px 0 6px;
-  font-variant-numeric:tabular-nums;
+  font-family:var(--font-d); font-weight:420; font-size:clamp(46px,5vw,70px);
+  letter-spacing:-.02em; color:var(--acc); line-height:1; margin:2px 0 16px;
+  font-variant-numeric:tabular-nums; text-shadow:0 0 36px var(--acc-soft);
 }
-.ens-stat sup{ font-size:.45em; color:var(--gold); font-style:italic; }
-.ens-stat-label{
-  font:400 10px/1.6 var(--font-m); letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint);
-}
+.ens-stat.word{ font-size:clamp(30px,3.2vw,42px); font-style:italic; font-weight:460; }
+.ens-stat sup{ font-size:.45em; font-style:italic; }
 @media (max-width:900px){ .ens-card.span3,.ens-card.span2{ grid-column:span 6; } }
 
 /* ============ INTERMISSION — the game ============ */
 #intermission{
   padding:clamp(90px,14vh,160px) 0;
   background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(197,40,61,.1), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 22% 0%, rgba(255,77,109,.14), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 78% 0%, rgba(61,220,132,.13), transparent 60%),
     var(--bg-2);
   border-block:1px solid var(--line);
 }
+#intermission .sec-title .it{ color:var(--green); }
 .inter-head{ text-align:center; margin-bottom:46px; }
 .inter-head .sec-title{ margin-top:18px; }
 .curtain-rule{ /* little theater-curtain scallop */
@@ -522,8 +537,8 @@ section{ position:relative; }
   position:relative; width:min(960px,94vw); margin:0 auto;
   aspect-ratio:16/10.4; border-radius:18px; overflow:hidden;
   border:1px solid var(--line);
-  background:#0d130d;
-  box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 8px rgba(19,16,8,.75), 0 0 0 9px var(--line-soft);
+  background:#14274a;
+  box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 8px rgba(28,21,69,.85), 0 0 0 9px var(--line-soft);
 }
 @media (max-width:640px){ #game-wrap{ aspect-ratio:4/4.6; } }
 #game-canvas{ position:absolute; inset:0; width:100%; height:100%; touch-action:none; }
@@ -533,7 +548,7 @@ section{ position:relative; }
 }
 .hud-chip{
   font:500 11px/1 var(--font-m); letter-spacing:.16em; text-transform:uppercase;
-  background:rgba(11,10,7,.72); border:1px solid var(--line); border-radius:8px;
+  background:rgba(21,15,51,.75); border:1px solid var(--line); border-radius:8px;
   padding:10px 14px; color:var(--ink); backdrop-filter:blur(6px);
 }
 .hud-chip b{ color:var(--gold); font-weight:500; }
@@ -545,7 +560,7 @@ section{ position:relative; }
 }
 #game-start{
   position:absolute; inset:0; z-index:7; display:grid; place-items:center;
-  background:rgba(11,10,7,.66); backdrop-filter:blur(5px); transition:opacity .5s, visibility .5s;
+  background:rgba(21,15,51,.66); backdrop-filter:blur(5px); transition:opacity .5s, visibility .5s;
 }
 #game-start.is-hidden{ opacity:0; visibility:hidden; }
 .start-card{ text-align:center; padding:20px; }
@@ -553,8 +568,9 @@ section{ position:relative; }
 .start-card p{ color:var(--ink-dim); max-width:44ch; margin:0 auto 24px; font-size:15px; }
 .btn-gold{
   display:inline-block; font:600 12px/1 var(--font-m); letter-spacing:.22em; text-transform:uppercase;
-  color:#191407; background:var(--gold); padding:16px 30px; border-radius:999px;
+  color:#1d1240; background:var(--gold); padding:16px 30px; border-radius:999px;
   transition:transform .3s var(--ease-snap), background .3s; text-decoration:none;
+  box-shadow:0 0 30px rgba(255,196,69,.3);
 }
 .btn-gold:hover{ transform:translateY(-2px) scale(1.03); background:var(--gold-hi); }
 .game-foot{
@@ -573,8 +589,12 @@ section{ position:relative; }
   background:linear-gradient(180deg, var(--bg-3), var(--bg-2));
   transition:transform .4s var(--ease-out), border-color .4s;
 }
-.bts-card:hover{ transform:translateY(-8px) rotate(-.5deg); border-color:rgba(233,180,76,.4); }
-.bts-stage{ height:170px; display:grid; place-items:center; border-bottom:1px solid var(--line-soft); position:relative; overflow:hidden; }
+.bts-card:hover{ transform:translateY(-8px) rotate(-.5deg); border-color:var(--acc); }
+.bts-stage{
+  height:170px; display:grid; place-items:center; border-bottom:1px solid var(--line-soft);
+  position:relative; overflow:hidden;
+  background:radial-gradient(75% 70% at 50% 100%, var(--acc-soft), transparent 75%);
+}
 .bts-body{ padding:20px 22px 26px; }
 .bts-body .ens-kicker{ margin-bottom:8px; }
 .bts-body h3{ font-size:22px; font-weight:560; margin-bottom:8px; }
@@ -622,44 +642,66 @@ section{ position:relative; }
 /* acting: the two masks */
 .anim-act{ width:150px; height:96px; position:relative; display:flex; gap:18px; align-items:center; justify-content:center; }
 .mask{ width:54px; height:68px; border-radius:48% 48% 46% 46%; position:relative; animation:maskbob 3.4s ease-in-out infinite; }
-.mask.joy{ background:linear-gradient(165deg, var(--gold), #b07f24); }
-.mask.woe{ background:linear-gradient(165deg, #d8cdb4, #8e8265); animation-delay:-1.7s; }
+.mask.joy{ background:linear-gradient(165deg, var(--gold), #cf8f1e); }
+.mask.woe{ background:linear-gradient(165deg, #e4d9f7, #9d8cc9); animation-delay:-1.7s; }
 .mask::before,.mask::after{ content:""; position:absolute; top:24px; width:11px; height:7px; background:var(--bg); border-radius:50%; }
 .mask::before{ left:11px; } .mask::after{ right:11px; }
 .mask .mouth{ position:absolute; left:50%; transform:translateX(-50%); width:24px; height:12px; border:3px solid var(--bg); border-radius:50%; }
 .mask.joy .mouth{ bottom:12px; border-top-color:transparent; border-left-color:transparent; border-right-color:transparent; }
 .mask.woe .mouth{ bottom:8px; border-bottom-color:transparent; border-left-color:transparent; border-right-color:transparent; }
 @keyframes maskbob{ 0%,100%{ transform:translateY(0) rotate(-4deg) } 50%{ transform:translateY(-9px) rotate(4deg) } }
-.impression{ color:var(--gold); font-style:italic; transition:opacity .3s; }
+.impression{ color:var(--pink); font-style:italic; transition:opacity .3s; }
 
 /* ============ AWARDS — festival laurels ============ */
-#awards{ background:var(--bg-2); border-block:1px solid var(--line); }
+#awards{
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255,196,69,.1), transparent 62%),
+    var(--bg-2);
+  border-block:1px solid var(--line);
+}
 .laurel-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:60px; }
 @media (max-width:880px){ .laurel-grid{ grid-template-columns:1fr; } }
 .laurel{
   border:1px solid var(--line); border-radius:14px; padding:38px 26px 32px; text-align:center;
-  background:radial-gradient(90% 70% at 50% 0%, rgba(233,180,76,.07), transparent 70%);
+  background:radial-gradient(90% 70% at 50% 0%, rgba(255,196,69,.12), transparent 70%);
   transition:transform .4s var(--ease-out), border-color .4s;
 }
-.laurel:hover{ transform:translateY(-6px); border-color:rgba(233,180,76,.45); }
+.laurel:hover{ transform:translateY(-6px); border-color:rgba(255,196,69,.5); }
 .laurel svg{ width:150px; margin:0 auto 18px; overflow:visible; }
 .laurel svg path{ fill:none; stroke:var(--gold); stroke-width:2.8; stroke-linecap:round; }
 .laurel-sel{ font:600 9px/1.8 var(--font-m); letter-spacing:.32em; text-transform:uppercase; color:var(--gold); }
 .laurel h3{ font-size:clamp(20px,2vw,25px); font-weight:560; margin:8px 0 6px; }
 .laurel p{ font:400 11px/1.8 var(--font-m); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); }
 .hack-strip{ border-top:1px solid var(--line); }
+.hack-head{
+  font:500 11px/1 var(--font-m); letter-spacing:.3em; text-transform:uppercase;
+  color:var(--ink-faint); padding:26px 6px 14px;
+}
+.hack-head b{ color:var(--gold); font-weight:600; }
 .hack-row{
   display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:clamp(14px,3vw,40px);
   padding:22px 6px; border-bottom:1px solid var(--line); transition:background .35s;
 }
-.hack-row:hover{ background:rgba(233,180,76,.05); }
+.hack-row:hover{ background:rgba(255,196,69,.06); }
 .hack-row .w{
-  font:700 10px/1 var(--font-m); letter-spacing:.3em; color:#191407; background:var(--gold);
+  font:700 10px/1 var(--font-m); letter-spacing:.3em; color:#1d1240; background:var(--gold);
   padding:8px 12px; border-radius:4px; text-transform:uppercase;
+  box-shadow:0 0 18px rgba(255,196,69,.35);
 }
 .hack-row h4{ font-family:var(--font-d); font-size:clamp(20px,3vw,32px); font-weight:540; letter-spacing:-.01em; }
-.hack-row .where{ font:400 11px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint); white-space:nowrap; }
-@media (max-width:640px){ .hack-row{ grid-template-columns:auto 1fr; } .hack-row .where{ grid-column:2; justify-self:start; } }
+.hack-row h4 em{ font-style:italic; font-weight:380; color:var(--ink-dim); font-size:.62em; padding-left:.5em; }
+.hack-row .where{ font:400 11px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint); white-space:nowrap; display:block; margin-top:7px; }
+.btn-watch{
+  display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+  font:600 10px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase;
+  color:var(--cyan); border:1px solid rgba(68,224,255,.5); padding:11px 17px; border-radius:999px;
+  text-decoration:none; transition:background .3s, transform .3s, box-shadow .3s;
+}
+.btn-watch:hover{ background:rgba(68,224,255,.14); transform:translateY(-2px); box-shadow:0 0 22px rgba(68,224,255,.25); }
+@media (max-width:640px){
+  .hack-row{ grid-template-columns:auto 1fr; }
+  .hack-row .btn-watch{ grid-column:2; justify-self:start; }
+}
 
 /* ============ CLOSING CREDITS + CONTACT ============ */
 #credits-end{ padding:clamp(110px,16vh,190px) 0 60px; text-align:center; overflow:hidden; }
@@ -695,7 +737,7 @@ footer b{ color:var(--ink-dim); font-weight:500; }
 #toast{
   position:fixed; bottom:26px; left:50%; transform:translate(-50%,140%); z-index:250;
   font:500 12px/1 var(--font-m); letter-spacing:.18em; text-transform:uppercase;
-  background:var(--gold); color:#191407; padding:14px 22px; border-radius:999px;
+  background:var(--gold); color:#1d1240; padding:14px 22px; border-radius:999px;
   transition:transform .5s var(--ease-snap); pointer-events:none; white-space:nowrap;
 }
 #toast.is-on{ transform:translate(-50%,0); }
@@ -770,17 +812,6 @@ footer b{ color:var(--ink-dim); font-weight:500; }
     <span>Mimic<i>✦</i></span><span>Builder<i>✦</i></span>
   </div>
 </div>
-
-<!-- ════════ OPENING CREDITS ════════ -->
-<section id="credits-open">
-  <div class="wrap">
-    <div class="credit-line"><span class="role">Directed by</span><span class="name">Aryan Mudgal</span></div>
-    <div class="credit-line"><span class="role">Written by</span><span class="name">Aryan Mudgal</span></div>
-    <div class="credit-line"><span class="role">Starring</span><span class="name">Aryan Mudgal</span></div>
-    <div class="credit-line"><span class="role">Stunts · mostly emotional</span><span class="name it">also Aryan Mudgal</span></div>
-    <p class="credit-truth">Based on a true story. All of it actually happened.</p>
-  </div>
-</section>
 
 <!-- ════════ ACT I : LITOS ════════ -->
 <section id="act-litos" class="act">
@@ -872,27 +903,18 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       <article class="filmo-row">
         <span class="filmo-year">2025 — Now</span>
         <div class="filmo-main">
-          <h3>The Remote Control Room</h3>
-          <span class="org">Linde · via Meta Layer Initiative</span>
-          <p>Built a browser extension and ML weather-detection pipeline for Linde’s remote plant operations — so teams running gas plants from afar can see conditions sooner and predict faster. The control room grew a sixth sense.</p>
+          <h3>Software Engineer Intern</h3>
+          <span class="org">Linde · via Meta Layer Initiative (CA startup)</span>
+          <p>Browser extension + ML weather detection for Linde’s remote plant operations — teams running gas plants from afar see conditions sooner and predict faster.</p>
         </div>
         <div class="filmo-tags"><span>ML Engineering</span><span>Browser Extension</span><span>Forecasting</span></div>
       </article>
       <article class="filmo-row">
-        <span class="filmo-year">California</span>
-        <div class="filmo-main">
-          <h3>The West Coast Arc</h3>
-          <span class="org">Meta Layer Initiative · Startup</span>
-          <p>Engineering at a California startup that ships fast and asks questions in the retro. Wore the hats nobody else wanted; some of them fit.</p>
-        </div>
-        <div class="filmo-tags"><span>Startup</span><span>Full-stack</span><span>Applied ML</span></div>
-      </article>
-      <article class="filmo-row">
         <span class="filmo-year">Earlier</span>
         <div class="filmo-main">
-          <h3>The Forecast</h3>
+          <h3>Technical Analyst</h3>
           <span class="org">HCLTech</span>
-          <p>Modeled where the AI boom is actually heading and where the company should place its bets — market prediction meeting investment strategy, with charts that made executives sit forward.</p>
+          <p>Modeled where the AI boom is heading and where the company should place its bets — market prediction meets investment strategy.</p>
         </div>
         <div class="filmo-tags"><span>Market Analysis</span><span>AI Strategy</span><span>Research</span></div>
       </article>
@@ -905,34 +927,39 @@ footer b{ color:var(--ink-dim); font-weight:500; }
   <div class="wrap">
     <div class="act-head">
       <span class="slate">Act IV · <em>The Ensemble</em></span>
-      <h2 class="sec-title">Things I built for <span class="it">other people</span></h2>
-      <p class="sec-intro">The subplot that matters most. Communities, budgets, and a habit of volunteering for the hard part.</p>
+      <h2 class="sec-title">The <span class="it">off-screen</span> roles</h2>
+      <p class="sec-intro">Student government, two non-profits, one civic platform. The short version:</p>
     </div>
     <div class="ensemble">
-      <article class="ens-card span3">
-        <span class="ens-kicker">Co-founder · Non-profit</span>
-        <h3>Men In Green</h3>
-        <p>Early health diagnosis for rural communities — including army-fitness screening, so people know where they stand before the recruiter tells them. Healthcare that shows up first.</p>
-      </article>
-      <article class="ens-card span3">
-        <span class="ens-kicker">Founder · NGO</span>
-        <h3>Clean Campus</h3>
-        <p>An NGO built from scratch to keep campuses clean — proof that “someone should do something” works better as “I’ll do it.”</p>
-      </article>
-      <article class="ens-card span2">
-        <span class="ens-kicker">SUNY Delegate</span>
+      <article class="ens-card c-cyan span3">
+        <span class="ens-kicker">Student Government · SUNY-wide</span>
         <div class="ens-stat" data-count="30000">0</div>
-        <p class="ens-stat-label">students represented</p>
+        <h3>SUNY Delegate</h3>
+        <p>The elected voice for 30,000+ students across the SUNY system.</p>
       </article>
-      <article class="ens-card span2">
-        <span class="ens-kicker">Student Senator</span>
+      <article class="ens-card span3">
+        <span class="ens-kicker">Student Government · Senate</span>
         <div class="ens-stat" data-count="500000" data-prefix="$">0</div>
-        <p class="ens-stat-label">budget stewarded</p>
+        <h3>Student Senator</h3>
+        <p>Stewarded a $500K+ student budget — every dollar voted on.</p>
       </article>
-      <article class="ens-card span2">
-        <span class="ens-kicker">Civic Builder</span>
-        <div class="ens-stat"><sup>↑</sup>1</div>
-        <p class="ens-stat-label">civic platform shipped — students post campus issues, the campus reacts. democracy, with an upvote button.</p>
+      <article class="ens-card c-green span2">
+        <span class="ens-kicker">Non-profit</span>
+        <div class="ens-stat word">Co-founder</div>
+        <h3>Men In Green</h3>
+        <p>Early health screening for rural communities.</p>
+      </article>
+      <article class="ens-card c-pink span2">
+        <span class="ens-kicker">Non-profit</span>
+        <div class="ens-stat word">Founder</div>
+        <h3>Clean Campus</h3>
+        <p>Built from scratch to keep campuses clean.</p>
+      </article>
+      <article class="ens-card c-red span2">
+        <span class="ens-kicker">Side quest</span>
+        <div class="ens-stat word">Built &amp; shipped</div>
+        <h3>Civic Platform</h3>
+        <p>Students post campus issues; the campus fixes them.</p>
       </article>
     </div>
   </div>
@@ -976,7 +1003,7 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       <p class="sec-intro">The character work. This is where the plot twists get written.</p>
     </div>
     <div class="bts-grid">
-      <article class="bts-card">
+      <article class="bts-card c-red">
         <div class="bts-stage"><div class="anim-gym" aria-hidden="true"><div class="bar"></div><div class="plate"></div><div class="plate in"></div><div class="plate"></div><div class="plate in"></div></div></div>
         <div class="bts-body">
           <span class="ens-kicker">The 5AM Scene</span>
@@ -984,7 +1011,7 @@ footer b{ color:var(--ink-dim); font-weight:500; }
           <p>Call time is 5AM, the co-star is iron, and the script is always the same: one more rep than yesterday.</p>
         </div>
       </article>
-      <article class="bts-card">
+      <article class="bts-card c-green">
         <div class="bts-stage"><div class="anim-golf" aria-hidden="true"><div class="turf"></div><div class="hole"></div><div class="flagpole"></div><div class="flag"></div><div class="gball"></div></div></div>
         <div class="bts-body">
           <span class="ens-kicker">Wide Shot · Exterior</span>
@@ -992,7 +1019,7 @@ footer b{ color:var(--ink-dim); font-weight:500; }
           <p>Eighteen chances to practice patience, physics, and forgiving yourself in public. You already played my favorite hole above.</p>
         </div>
       </article>
-      <article class="bts-card">
+      <article class="bts-card c-cyan">
         <div class="bts-stage"><div class="anim-bad" aria-hidden="true"><div class="net"></div><div class="racket l"></div><div class="racket r"></div><div class="shuttle"></div></div></div>
         <div class="bts-body">
           <span class="ens-kicker">Action Sequence</span>
@@ -1000,7 +1027,7 @@ footer b{ color:var(--ink-dim); font-weight:500; }
           <p>The fastest racquet sport on earth, and the only place I make split-second decisions with zero code review.</p>
         </div>
       </article>
-      <article class="bts-card">
+      <article class="bts-card c-pink">
         <div class="bts-stage"><div class="anim-act" aria-hidden="true"><div class="mask joy"><div class="mouth"></div></div><div class="mask woe"><div class="mouth"></div></div></div></div>
         <div class="bts-body">
           <span class="ens-kicker">The Method</span>
@@ -1050,10 +1077,27 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       </article>
     </div>
     <div class="hack-strip">
-      <div class="hack-row"><span class="w">Winner</span><h4>LA Hacks</h4><span class="where">UCLA</span></div>
-      <div class="hack-row"><span class="w">Winner</span><h4>Reality Hack</h4><span class="where">MIT</span></div>
-      <div class="hack-row"><span class="w">Winner</span><h4>XR Hacks</h4><span class="where">Stanford</span></div>
-      <div class="hack-row"><span class="w">Winner</span><h4>TartanHacks</h4><span class="where">Carnegie Mellon</span></div>
+      <p class="hack-head"><b>4× hackathon winner</b> — now with trailers</p>
+      <!-- TODO: paste the real video URLs into the three btn-watch hrefs below -->
+      <div class="hack-row">
+        <span class="w">Winner</span>
+        <div><h4>Dots <em>at LA Hacks</em></h4><span class="where">UCLA</span></div>
+        <a class="btn-watch" href="#" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
+      </div>
+      <div class="hack-row">
+        <span class="w">Winner</span>
+        <div><h4>ARyan <em>at Reality Hack</em></h4><span class="where">MIT</span></div>
+        <a class="btn-watch" href="#" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
+      </div>
+      <div class="hack-row">
+        <span class="w">Winner</span>
+        <div><h4>StreamFair <em>at TartanHacks</em></h4><span class="where">Carnegie Mellon</span></div>
+        <a class="btn-watch" href="#" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
+      </div>
+      <div class="hack-row">
+        <span class="w">Winner</span>
+        <div><h4>XR Hacks</h4><span class="where">Stanford</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1177,11 +1221,6 @@ footer b{ color:var(--ink-dim); font-weight:500; }
 
   /* ---------- scroll choreography ---------- */
   if (hasGsap && !REDUCED && typeof ScrollTrigger !== "undefined"){
-    // opening credits: each card fades up like a title card
-    $$("#credits-open .credit-line, #credits-open .credit-truth").forEach(el => {
-      gsap.from(el, { opacity:0, y:46, scale:.97, duration:1, ease:"power3.out",
-        scrollTrigger:{ trigger:el, start:"top 86%", once:true } });
-    });
     // act headers
     $$(".act-head").forEach(h => {
       gsap.from(h.children, { opacity:0, y:34, duration:.9, ease:"power3.out", stagger:.12,
@@ -1285,6 +1324,15 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       setTimeout(() => toast.classList.remove("is-on"), 1800);
     }
   });
+
+  /* ---------- trailer buttons whose links aren't in yet ---------- */
+  $$(".btn-watch").forEach(b => b.addEventListener("click", e => {
+    if (b.getAttribute("href") !== "#") return;
+    e.preventDefault();
+    toast.textContent = "🎞 Trailer hits theaters soon";
+    toast.classList.add("is-on");
+    setTimeout(() => { toast.classList.remove("is-on"); toast.textContent = "🎬 ACTION!"; }, 1600);
+  }));
 })();
 </script>
 <script type="module">
@@ -1337,28 +1385,30 @@ let heroVisible = false, heroAPI = null;
   const camera = new THREE.PerspectiveCamera(42, 1, .1, 80);
   camera.position.set(0, 1.3, 11);
 
-  scene.add(new THREE.AmbientLight(0x9a8a6a, .55));
-  const key = new THREE.DirectionalLight(0xffd9a0, 1.6);
+  scene.add(new THREE.AmbientLight(0xb3a4e0, .75));
+  const key = new THREE.DirectionalLight(0xffd9a0, 1.8);
   key.position.set(4, 8, 6); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xc5283d, .9);
+  const rim = new THREE.DirectionalLight(0xff4d8a, 1.15);
   rim.position.set(-6, 2, -5); scene.add(rim);
-  const under = new THREE.PointLight(0xe9b44c, 14, 18, 1.6);
+  const rim2 = new THREE.DirectionalLight(0x44e0ff, .7);
+  rim2.position.set(6, 1, -6); scene.add(rim2);
+  const under = new THREE.PointLight(0xffc445, 16, 18, 1.6);
   under.position.set(0, -1, 2); scene.add(under);
 
   // stage floor
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(10, 48), matte(0x0d0b07, .95, 0));
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(10, 48), matte(0x181040, .95, 0));
   floor.rotation.x = -Math.PI/2; floor.position.y = -2.5; scene.add(floor);
   const pool = new THREE.Mesh(new THREE.CircleGeometry(3.4, 48),
-    new THREE.MeshBasicMaterial({ color:0xffd47e, transparent:true, opacity:.06, blending:THREE.AdditiveBlending }));
+    new THREE.MeshBasicMaterial({ color:0xffd47e, transparent:true, opacity:.09, blending:THREE.AdditiveBlending }));
   pool.rotation.x = -Math.PI/2; pool.position.y = -2.49; scene.add(pool);
 
   // projector beam + dust
-  const beamMat = new THREE.MeshBasicMaterial({ color:0xffd47e, transparent:true, opacity:.05,
+  const beamMat = new THREE.MeshBasicMaterial({ color:0xffd47e, transparent:true, opacity:.07,
     blending:THREE.AdditiveBlending, side:THREE.DoubleSide, depthWrite:false });
   const beam = new THREE.Mesh(new THREE.ConeGeometry(3.4, 9.6, 36, 1, true), beamMat);
   beam.position.set(0, 2.3, -1); scene.add(beam);
   const beam2 = new THREE.Mesh(new THREE.ConeGeometry(1.7, 9.6, 24, 1, true), beamMat.clone());
-  beam2.material.opacity = .05; beam2.position.copy(beam.position); scene.add(beam2);
+  beam2.material.opacity = .07; beam2.position.copy(beam.position); scene.add(beam2);
 
   const DUST = 240;
   const dustPos = new Float32Array(DUST*3), dustSeed = new Float32Array(DUST);
@@ -1370,7 +1420,7 @@ let heroVisible = false, heroAPI = null;
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
   const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color:0xffe7b0, size:.05,
-    transparent:true, opacity:.65, depthWrite:false, blending:THREE.AdditiveBlending }));
+    transparent:true, opacity:.85, depthWrite:false, blending:THREE.AdditiveBlending }));
   scene.add(dust);
 
   /* ----- the props of a life, orbiting ----- */
@@ -1403,13 +1453,13 @@ let heroVisible = false, heroAPI = null;
 
   // ⛳ golf flag
   const golf = new THREE.Group();
-  const tuft = new THREE.Mesh(new THREE.CylinderGeometry(.5,.55,.06,28), matte(0x3e8e5a,.85));
+  const tuft = new THREE.Mesh(new THREE.CylinderGeometry(.5,.55,.06,28), matte(0x2eb86c,.85));
   golf.add(tuft);
   const gBall = new THREE.Mesh(new THREE.SphereGeometry(.09,18,14), matte(0xf4ecda,.35));
   gBall.position.set(.26,.1,.1); golf.add(gBall);
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(.016,.016,1.15,8), matte(0xe6dec9,.4));
   pole.position.y = .6; golf.add(pole);
-  const flagG = new THREE.Mesh(new THREE.BoxGeometry(.36,.2,.012), matte(0xc5283d,.6));
+  const flagG = new THREE.Mesh(new THREE.BoxGeometry(.36,.2,.012), matte(0xff4d6d,.6));
   flagG.position.set(.19,1.06,0); golf.add(flagG);
   golf.userData = { orbit:Math.PI*4/5, h:2.1, spin:.005, flag:flagG };
   props.add(golf);
@@ -1421,14 +1471,14 @@ let heroVisible = false, heroAPI = null;
   const skirt = new THREE.Mesh(new THREE.ConeGeometry(.3,.52,14,1,true),
     new THREE.MeshStandardMaterial({ color:0xe9e1cd, roughness:.7, side:THREE.DoubleSide, transparent:true, opacity:.92 }));
   skirt.position.y = .02; shuttle.add(skirt);
-  const band = new THREE.Mesh(new THREE.TorusGeometry(.15,.022,8,20), matte(0xe9b44c,.4,.4));
+  const band = new THREE.Mesh(new THREE.TorusGeometry(.15,.022,8,20), matte(0xffc445,.4,.4));
   band.rotation.x = Math.PI/2; band.position.y = -.14; shuttle.add(band);
   shuttle.userData = { orbit:Math.PI*6/5, h:1.1, spin:-.007 };
   props.add(shuttle);
 
   // 🧬 DNA helix (the research strand)
   const dna = new THREE.Group();
-  const gold = matte(0xe9b44c,.4,.5), cream = matte(0xf4ecda,.5,.1), rungM = matte(0x8d8470,.6);
+  const gold = matte(0xffc445,.4,.5), cream = matte(0xf4ecda,.5,.1), rungM = matte(0x9d92c4,.6);
   for (let i=0;i<13;i++){
     const t = i/12 * Math.PI*2.4, y = i*.115 - .72;
     const a = new THREE.Vector3(Math.cos(t)*.3, y, Math.sin(t)*.3);
@@ -1506,8 +1556,8 @@ let heroVisible = false, heroAPI = null;
         if (p[i*3+1] < -2.4) p[i*3+1] = 7.0;
       }
       dustGeo.attributes.position.needsUpdate = true;
-      beam.material.opacity  = .05 * (1-scrollP) * (1 + Math.sin(time*.004)*.18);
-      beam2.material.opacity = .05 * (1-scrollP);
+      beam.material.opacity  = .07 * (1-scrollP) * (1 + Math.sin(time*.004)*.18);
+      beam2.material.opacity = .07 * (1-scrollP);
       if (golf.userData.flag) golf.userData.flag.rotation.y = Math.sin(time*.003)*.3;
       camera.position.x += (mx*.7 - camera.position.x)*.04;
       camera.position.y += (1.3 - my*.45 + scrollP*1.6 - camera.position.y)*.04;
@@ -1564,22 +1614,22 @@ let gameVisible = false, gameAPI = null, gameInited = false;
     renderer.setPixelRatio(clamp(devicePixelRatio, 1, 1.6));
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0d130d);
-    scene.fog = new THREE.Fog(0x0d130d, 16, 30);
+    scene.background = new THREE.Color(0x14274a);
+    scene.fog = new THREE.Fog(0x14274a, 16, 30);
     camera = new THREE.PerspectiveCamera(38, 1, .1, 60);
 
-    scene.add(new THREE.AmbientLight(0xbcc7b6, .75));
-    const sun = new THREE.DirectionalLight(0xfff1d0, 2.1);
+    scene.add(new THREE.AmbientLight(0xd6e2ff, .9));
+    const sun = new THREE.DirectionalLight(0xfff1d0, 2.2);
     sun.position.set(-5, 11, 5); sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
     sun.shadow.camera.left = -7; sun.shadow.camera.right = 7;
     sun.shadow.camera.top = 6; sun.shadow.camera.bottom = -6;
     scene.add(sun);
-    const warm = new THREE.DirectionalLight(0xe9b44c, .5);
+    const warm = new THREE.DirectionalLight(0xffc445, .55);
     warm.position.set(6, 4, -5); scene.add(warm);
 
     // turf + mowing stripes
-    const turf = new THREE.Mesh(new THREE.BoxGeometry(11, .2, 6.6), matte(0x2e7d4f, .92));
+    const turf = new THREE.Mesh(new THREE.BoxGeometry(11, .2, 6.6), matte(0x33a05e, .92));
     turf.position.y = -.1; turf.receiveShadow = true; scene.add(turf);
     for (let i=0;i<8;i++){
       if (i%2) continue;
@@ -1589,7 +1639,7 @@ let gameVisible = false, gameAPI = null, gameInited = false;
       scene.add(s);
     }
     // walls
-    const wallM = matte(0x32261a, .8);
+    const wallM = matte(0x3a2a73, .8);
     [[0,-3.4,11.6,.5],[0,3.4,11.6,.5],[-5.55,0,.5,6.6],[5.55,0,.5,6.6]].forEach(([x,z,w,d]) => {
       const wall = new THREE.Mesh(new THREE.BoxGeometry(w, .42, d), wallM);
       wall.position.set(x, .11, z); wall.castShadow = true; wall.receiveShadow = true; scene.add(wall);
@@ -1597,7 +1647,7 @@ let gameVisible = false, gameAPI = null, gameInited = false;
     // gold trim on top of the walls — the marquee touch
     [[0,-3.4,11.6,.1],[0,3.4,11.6,.1],[-5.55,0,.1,6.6],[5.55,0,.1,6.6]].forEach(([x,z,w,d]) => {
       const trim = new THREE.Mesh(new THREE.BoxGeometry(w, .03, d),
-        new THREE.MeshStandardMaterial({ color:0xe9b44c, roughness:.35, metalness:.6 }));
+        new THREE.MeshStandardMaterial({ color:0xffc445, roughness:.35, metalness:.6 }));
       trim.position.set(x, .335, z); scene.add(trim);
     });
 
@@ -1617,7 +1667,7 @@ let gameVisible = false, gameAPI = null, gameInited = false;
     rimRing.rotation.x = -Math.PI/2; rimRing.position.y = .007; cupGroup.add(rimRing);
     const fPole = new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,1.3,8), matte(0xe6dec9,.4));
     fPole.position.y = .65; fPole.castShadow = true; cupGroup.add(fPole);
-    const fFlag = new THREE.Mesh(new THREE.BoxGeometry(.4,.24,.015), matte(0xc5283d,.55));
+    const fFlag = new THREE.Mesh(new THREE.BoxGeometry(.4,.24,.015), matte(0xff4d6d,.55));
     fFlag.position.set(.21, 1.18, 0); cupGroup.add(fFlag);
     cupGroup.userData.flag = fFlag;
 
@@ -1762,7 +1812,7 @@ let gameVisible = false, gameAPI = null, gameInited = false;
   }
   function burstConfetti(at){
     const N = 90, pos = new Float32Array(N*3), velA = [], col = new Float32Array(N*3);
-    const palette = [new THREE.Color(0xe9b44c), new THREE.Color(0xc5283d), new THREE.Color(0xf4ecda)];
+    const palette = [new THREE.Color(0xffc445), new THREE.Color(0xff4d6d), new THREE.Color(0x44e0ff)];
     for (let i=0;i<N;i++){
       pos[i*3]=at.x; pos[i*3+1]=.1; pos[i*3+2]=at.z;
       const a = Math.random()*Math.PI*2, s = 1.2 + Math.random()*2.4;
