@@ -24,14 +24,14 @@ Everything lives in a single `index.html` (Three.js + GSAP via CDN — needs int
 |---|---|
 | Preloader | 3…2…1 film-leader countdown |
 | Hero | Three.js projector stage: volumetric beam, drifting dust, orbiting props (clapperboard that snaps, dumbbell, golf flag, shuttlecock, DNA helix) |
-| Act I | **Litos** — now filming, script page redacted (“NO SPOILERS”) |
-| Act II | Research trilogy (horizontal reel): MIDL-accepted FMH detection, PPG accuracy, early wound detection |
-| Act III | Filmography with real titles: Software Engineer Intern (Linde · Meta Layer Initiative), Technical Analyst (HCLTech) |
-| Act IV | The Ensemble, mad simple: 30,000+ (SUNY Delegate), $500K+ (Senator), Men In Green, Clean Campus, Civic Platform |
+| Act I | **The Awards Season** — photo cards with selectivity stats (Student Innovative Leader 1 of 2 / 20,000 · Chancellor’s 1 of 15 / 8,000 · Phi Beta Kappa Top 10%), then the festival wins with photos + demo links: Dots (LA Hacks · UCLA), ARMIE (Reality Hack · MIT), StreamFair (TartanHacks · CMU), C.O.R.E. (XR Hacks · Stanford) |
+| Act II | **Litos** — now filming, script page redacted (“NO SPOILERS”) |
 | Intermission | **The 19th Hole** — drag from the ball to aim, release to putt |
+| Act III | Research trilogy (horizontal reel): MIDL-accepted FMH detection, PPG accuracy, early wound detection |
+| Act IV | The Ensemble: 30,000+ (SUNY Delegate), $500K+ (Senator), Men In Green, Clean Campus (100K+ impressions), Civic Platform (30K+ students) |
+| Act V | Filmography with real titles: Software Engineer Intern (Linde · Meta Layer Initiative), Technical Analyst (HCLTech) |
 | Behind the Scenes | Gym · Golf · Badminton · Acting & Mimicry (rotating impressions) |
-| Awards | Festival laurels + hackathon wins with project names: Dots (LA Hacks · UCLA), ARyan (Reality Hack · MIT), StreamFair (TartanHacks · CMU), XR Hacks (Stanford) |
-| Closing credits | Rolling credits + casting call (contact) |
+| Closing credits | Rolling credits (3,000+ on LinkedIn) + casting call (contact) |
 
 Palette: premiere-night indigo with marquee gold, coral, electric cyan, neon pink,
 and bright green — each act carries its own accent color.
@@ -41,11 +41,11 @@ and bright green — each act carries its own accent color.
 ## Editing content
 
 All copy is plain HTML in `index.html` — search for the section comments
-(`ACT I`, `AWARDS`, etc.). Placeholders to fill in when ready:
+(`ACT I`, `ACT II`, etc.). Photos used by the site live in `assets/`
+(web-sized JPEGs); the 26MB originals stay local in `Pictures/` (gitignored).
 
-- **Hackathon demo videos** — the three `btn-watch` links in the Awards strip
-  are `href="#"` until the real video URLs go in (a TODO comment marks the spot).
-  Until then, clicking shows a “trailer hits theaters soon” toast.
+Placeholders to fill in when ready:
+
 - **LinkedIn / GitHub buttons** in the closing credits currently point at the
   generic homepages — drop in your profile URLs.
 - **Litos** copy is intentionally “under embargo” — replace when it launches.

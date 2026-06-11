@@ -659,38 +659,55 @@ section{ position:relative; }
     var(--bg-2);
   border-block:1px solid var(--line);
 }
-.laurel-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:60px; }
-@media (max-width:880px){ .laurel-grid{ grid-template-columns:1fr; } }
-.laurel{
-  border:1px solid var(--line); border-radius:14px; padding:38px 26px 32px; text-align:center;
-  background:radial-gradient(90% 70% at 50% 0%, rgba(255,196,69,.12), transparent 70%);
+.award-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+@media (max-width:880px){ .award-grid{ grid-template-columns:1fr; } }
+.award-card{
+  border:1px solid var(--line); border-radius:16px; overflow:hidden;
+  background:linear-gradient(180deg, var(--bg-3), var(--bg-2) 75%);
   transition:transform .4s var(--ease-out), border-color .4s;
 }
-.laurel:hover{ transform:translateY(-6px); border-color:rgba(255,196,69,.5); }
-.laurel svg{ width:150px; margin:0 auto 18px; overflow:visible; }
-.laurel svg path{ fill:none; stroke:var(--gold); stroke-width:2.8; stroke-linecap:round; }
+.award-card:hover{ transform:translateY(-8px); border-color:rgba(255,196,69,.55); }
+.award-photo{ aspect-ratio:3/2; overflow:hidden; border-bottom:1px solid var(--line-soft); }
+.award-photo img{ width:100%; height:100%; object-fit:cover; transition:transform .6s var(--ease-out); }
+.award-card:hover .award-photo img{ transform:scale(1.06); }
+.award-body{ padding:22px 24px 26px; }
 .laurel-sel{ font:600 9px/1.8 var(--font-m); letter-spacing:.32em; text-transform:uppercase; color:var(--gold); }
-.laurel h3{ font-size:clamp(20px,2vw,25px); font-weight:560; margin:8px 0 6px; }
-.laurel p{ font:400 11px/1.8 var(--font-m); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); }
-.hack-strip{ border-top:1px solid var(--line); }
-.hack-head{
+.award-body h3{ font-size:clamp(20px,2vw,25px); font-weight:560; margin:6px 0 2px; }
+.award-stat{
+  font-family:var(--font-d); font-weight:460; font-size:clamp(42px,4.4vw,58px);
+  letter-spacing:-.02em; color:var(--gold); line-height:1.05; margin:10px 0 8px;
+  text-shadow:0 0 34px rgba(255,196,69,.3); font-variant-numeric:tabular-nums;
+}
+.award-stat i{ font-style:italic; font-weight:380; font-size:.42em; color:var(--ink-dim); }
+.award-sub{ font:400 10.5px/1.7 var(--font-m); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); }
+.wins-head{
   font:500 11px/1 var(--font-m); letter-spacing:.3em; text-transform:uppercase;
-  color:var(--ink-faint); padding:26px 6px 14px;
+  color:var(--ink-faint); margin:clamp(46px,8vh,72px) 0 22px; padding-top:28px;
+  border-top:1px solid var(--line);
 }
-.hack-head b{ color:var(--gold); font-weight:600; }
-.hack-row{
-  display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:clamp(14px,3vw,40px);
-  padding:22px 6px; border-bottom:1px solid var(--line); transition:background .35s;
+.wins-head b{ color:var(--gold); font-weight:600; }
+.win-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+@media (max-width:880px){ .win-grid{ grid-template-columns:1fr; } }
+.win-card{
+  border:1px solid var(--line); border-radius:16px; overflow:hidden;
+  background:linear-gradient(180deg, var(--bg-3), var(--bg-2) 75%);
+  transition:transform .4s var(--ease-out), border-color .4s;
+  display:flex; flex-direction:column;
 }
-.hack-row:hover{ background:rgba(255,196,69,.06); }
-.hack-row .w{
+.win-card:hover{ transform:translateY(-8px); border-color:rgba(68,224,255,.5); }
+.win-photo{ position:relative; aspect-ratio:16/9; overflow:hidden; border-bottom:1px solid var(--line-soft); }
+.win-photo img{ width:100%; height:100%; object-fit:cover; transition:transform .6s var(--ease-out); }
+.win-card:hover .win-photo img{ transform:scale(1.05); }
+.w{
   font:700 10px/1 var(--font-m); letter-spacing:.3em; color:#1d1240; background:var(--gold);
   padding:8px 12px; border-radius:4px; text-transform:uppercase;
-  box-shadow:0 0 18px rgba(255,196,69,.35);
+  box-shadow:0 0 18px rgba(255,196,69,.45);
 }
-.hack-row h4{ font-family:var(--font-d); font-size:clamp(20px,3vw,32px); font-weight:540; letter-spacing:-.01em; }
-.hack-row h4 em{ font-style:italic; font-weight:380; color:var(--ink-dim); font-size:.62em; padding-left:.5em; }
-.hack-row .where{ font:400 11px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint); white-space:nowrap; display:block; margin-top:7px; }
+.win-photo .w{ position:absolute; top:14px; left:14px; }
+.win-body{ padding:20px 24px 26px; display:flex; flex-direction:column; align-items:flex-start; flex:1; }
+.win-body h4{ font-family:var(--font-d); font-size:clamp(24px,2.6vw,32px); font-weight:540; letter-spacing:-.01em; }
+.win-body .where{ font:400 11px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint); margin:8px 0 12px; }
+.win-body p{ color:var(--ink-dim); font-size:14.5px; margin-bottom:18px; flex:1; }
 .btn-watch{
   display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
   font:600 10px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase;
@@ -698,10 +715,6 @@ section{ position:relative; }
   text-decoration:none; transition:background .3s, transform .3s, box-shadow .3s;
 }
 .btn-watch:hover{ background:rgba(68,224,255,.14); transform:translateY(-2px); box-shadow:0 0 22px rgba(68,224,255,.25); }
-@media (max-width:640px){
-  .hack-row{ grid-template-columns:auto 1fr; }
-  .hack-row .btn-watch{ grid-column:2; justify-self:start; }
-}
 
 /* ============ CLOSING CREDITS + CONTACT ============ */
 #credits-end{ padding:clamp(110px,16vh,190px) 0 60px; text-align:center; overflow:hidden; }
@@ -771,11 +784,11 @@ footer b{ color:var(--ink-dim); font-weight:500; }
 <header id="topbar">
   <a class="brand" href="#hero" data-hover="top">A<span class="dot">·</span>M <small>pictures</small></a>
   <nav aria-label="Acts">
-    <a href="#act-litos" data-hover="act i">Act I</a>
-    <a href="#act-research" data-hover="act ii">Act II</a>
-    <a href="#act-work" data-hover="act iii">Act III</a>
+    <a href="#awards" data-hover="act i">Awards</a>
+    <a href="#act-litos" data-hover="act ii">Litos</a>
     <a href="#intermission" data-hover="play">Intermission</a>
-    <a href="#awards" data-hover="laurels">Awards</a>
+    <a href="#act-research" data-hover="act iii">Research</a>
+    <a href="#act-work" data-hover="act v">Work</a>
     <a class="nav-cta" href="#credits-end" data-hover="contact">Contact</a>
   </nav>
 </header>
@@ -813,11 +826,90 @@ footer b{ color:var(--ink-dim); font-weight:500; }
   </div>
 </div>
 
-<!-- ════════ ACT I : LITOS ════════ -->
+<!-- ════════ ACT I : THE AWARDS SEASON ════════ -->
+<section id="awards" class="act">
+  <div class="wrap">
+    <div class="act-head">
+      <span class="slate">Act I · The Awards Season · <em>Receipts attached</em></span>
+      <h2 class="sec-title">Critically <span class="it">acclaimed</span></h2>
+      <p class="sec-intro">Every claim on this site comes with a number, a photo, or a tape. Starting with these three:</p>
+    </div>
+    <div class="award-grid">
+      <article class="award-card">
+        <figure class="award-photo"><img src="assets/award-leader.jpg" alt="Aryan holding the Most Innovative Student Leader award at the University at Buffalo" loading="lazy"></figure>
+        <div class="award-body">
+          <span class="laurel-sel">Grand Jury Prize</span>
+          <h3>Student Innovative Leader</h3>
+          <div class="award-stat">1 <i>of</i> 2</div>
+          <p class="award-sub">chosen among 20,000 students</p>
+        </div>
+      </article>
+      <article class="award-card">
+        <figure class="award-photo"><img src="assets/award-chancellor.jpg" alt="Aryan receiving the SUNY Chancellor's Award for Student Excellence" loading="lazy"></figure>
+        <div class="award-body">
+          <span class="laurel-sel">Official Selection</span>
+          <h3>SUNY Chancellor’s Award</h3>
+          <div class="award-stat">1 <i>of</i> 15</div>
+          <p class="award-sub">among 8,000 students</p>
+        </div>
+      </article>
+      <article class="award-card">
+        <figure class="award-photo"><img src="assets/award-pbk.jpg" alt="Aryan being inducted into Phi Beta Kappa" loading="lazy"></figure>
+        <div class="award-body">
+          <span class="laurel-sel">Lifetime Selection</span>
+          <h3>Phi Beta Kappa</h3>
+          <div class="award-stat">Top 10<i>%</i></div>
+          <p class="award-sub">of the class · America’s oldest honor society</p>
+        </div>
+      </article>
+    </div>
+    <p class="wins-head"><b>The festival wins</b> — 4× hackathon winner, demos attached</p>
+    <div class="win-grid">
+      <article class="win-card">
+        <figure class="win-photo"><img src="assets/hack-dots.jpg" alt="Team Dots with their prizes at LA Hacks 2026, UCLA" loading="lazy"><span class="w">Winner</span></figure>
+        <div class="win-body">
+          <h4>Dots</h4>
+          <span class="where">LA Hacks · UCLA</span>
+          <p>Took the win at UCLA’s flagship hackathon — one of the biggest hacker floors on the West Coast.</p>
+          <a class="btn-watch" href="https://devpost.com/software/dots-y5r21j" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
+        </div>
+      </article>
+      <article class="win-card">
+        <figure class="win-photo"><img src="assets/hack-armie.jpg" alt="Team ARMIE at MIT Reality Hack" loading="lazy"><span class="w">Winner</span></figure>
+        <div class="win-body">
+          <h4>ARMIE</h4>
+          <span class="where">Reality Hack · MIT</span>
+          <p>Augmented reality meets a robot arm — built and demoed at the world’s biggest XR hackathon.</p>
+          <a class="btn-watch" href="https://devpost.com/software/armie" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
+        </div>
+      </article>
+      <article class="win-card">
+        <figure class="win-photo"><img src="assets/hack-streamfair.jpg" alt="StreamFair being presented on stage" loading="lazy"><span class="w">Winner</span></figure>
+        <div class="win-body">
+          <h4>StreamFair</h4>
+          <span class="where">TartanHacks · Carnegie Mellon</span>
+          <p>Won at Carnegie Mellon — then took the stage again at a YC hackathon. The tape’s from that night.</p>
+          <a class="btn-watch" href="https://drive.google.com/file/d/12grQ7uR837u36IkN1WaILOC0SHycm2rh/view?usp=sharing" target="_blank" rel="noopener" data-hover="watch">▶ Watch the YC demo</a>
+        </div>
+      </article>
+      <article class="win-card">
+        <figure class="win-photo"><img src="assets/hack-core.jpg" alt="The winning C.O.R.E. team at Stanford XR Hacks with their prizes" loading="lazy"><span class="w">Winner</span></figure>
+        <div class="win-body">
+          <h4>C.O.R.E.</h4>
+          <span class="where">XR Hacks · Stanford</span>
+          <p>Top spot at Stanford’s XR hackathon. The PS5 in the photo was the trophy.</p>
+          <a class="btn-watch" href="https://devpost.com/software/c-o-r-e" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ ACT II : LITOS ════════ -->
 <section id="act-litos" class="act">
   <div class="wrap">
     <div class="act-head">
-      <span class="slate">Act I · Scene 01 · <em>Now Filming</em></span>
+      <span class="slate">Act II · <em>Now Filming</em></span>
       <h2 class="sec-title">The <span class="it">current</span> obsession</h2>
       <p class="sec-intro">Every story needs a present tense. This is mine — the thing I think about in the shower, at the gym, and on the back nine.</p>
     </div>
@@ -845,10 +937,39 @@ footer b{ color:var(--ink-dim); font-weight:500; }
   </div>
 </section>
 
-<!-- ════════ ACT II : RESEARCH REEL ════════ -->
+<!-- ════════ INTERMISSION : THE 19TH HOLE ════════ -->
+<section id="intermission">
+  <div class="inter-head wrap">
+    <div class="curtain-rule" aria-hidden="true"></div>
+    <span class="slate">Intermission · <em>Playable</em></span>
+    <h2 class="sec-title">The <span class="it">19th</span> Hole</h2>
+    <p class="sec-intro" style="margin-inline:auto">Every great film has an intermission. Mine has golf. Three holes, built from my life — drag from the ball to aim, release to putt.</p>
+  </div>
+  <div id="game-wrap">
+    <canvas id="game-canvas"></canvas>
+    <div class="game-hud" aria-live="polite">
+      <span class="hud-chip">Hole <b id="hud-hole">1</b>/3 · Par <b id="hud-par">2</b></span>
+      <span class="hud-chip">Strokes <b id="hud-strokes">0</b> · Total <b id="hud-total">0</b></span>
+    </div>
+    <div id="game-msg" aria-hidden="true"></div>
+    <div id="game-start">
+      <div class="start-card">
+        <h3>“Quiet on the set… and, putt.”</h3>
+        <p>Hole 1 is a warm-up. Hole 2 is leg day. Hole 3 has a badminton net, because of course it does.</p>
+        <button class="btn-gold" id="btn-play" data-hover="play">▶ Roll Camera</button>
+      </div>
+    </div>
+  </div>
+  <div class="game-foot">
+    <span id="game-tip">Drag from the ball · pull further for power</span>
+    <button id="btn-reset" data-hover="reset">↺ Restart round</button>
+  </div>
+</section>
+
+<!-- ════════ ACT III : RESEARCH REEL ════════ -->
 <section id="act-research" class="act">
   <div class="wrap act-head">
-    <span class="slate">Act II · Scenes 02–04 · <em>The Research Trilogy</em></span>
+    <span class="slate">Act III · <em>The Research Trilogy</em></span>
     <h2 class="sec-title">Science, but make it <span class="it">cinema</span></h2>
     <p class="sec-intro">Three medical-AI stories. One accepted at MIDL, two filming now. All about catching what humans miss — earlier.</p>
   </div>
@@ -891,37 +1012,6 @@ footer b{ color:var(--ink-dim); font-weight:500; }
   </div>
 </section>
 
-<!-- ════════ ACT III : FILMOGRAPHY ════════ -->
-<section id="act-work" class="act">
-  <div class="wrap">
-    <div class="act-head">
-      <span class="slate">Act III · <em>Previously On…</em></span>
-      <h2 class="sec-title">The <span class="it">filmography</span></h2>
-      <p class="sec-intro">Selected industry work. Each role shipped something real for people who needed it yesterday.</p>
-    </div>
-    <div class="filmo">
-      <article class="filmo-row">
-        <span class="filmo-year">2025 — Now</span>
-        <div class="filmo-main">
-          <h3>Software Engineer Intern</h3>
-          <span class="org">Linde · via Meta Layer Initiative (CA startup)</span>
-          <p>Browser extension + ML weather detection for Linde’s remote plant operations — teams running gas plants from afar see conditions sooner and predict faster.</p>
-        </div>
-        <div class="filmo-tags"><span>ML Engineering</span><span>Browser Extension</span><span>Forecasting</span></div>
-      </article>
-      <article class="filmo-row">
-        <span class="filmo-year">Earlier</span>
-        <div class="filmo-main">
-          <h3>Technical Analyst</h3>
-          <span class="org">HCLTech</span>
-          <p>Modeled where the AI boom is heading and where the company should place its bets — market prediction meets investment strategy.</p>
-        </div>
-        <div class="filmo-tags"><span>Market Analysis</span><span>AI Strategy</span><span>Research</span></div>
-      </article>
-    </div>
-  </div>
-</section>
-
 <!-- ════════ ACT IV : THE ENSEMBLE ════════ -->
 <section id="act-leadership" class="act">
   <div class="wrap">
@@ -950,47 +1040,49 @@ footer b{ color:var(--ink-dim); font-weight:500; }
         <p>Early health screening for rural communities.</p>
       </article>
       <article class="ens-card c-pink span2">
-        <span class="ens-kicker">Non-profit</span>
-        <div class="ens-stat word">Founder</div>
+        <span class="ens-kicker">Non-profit · Founder</span>
+        <div class="ens-stat" data-count="100000">0</div>
         <h3>Clean Campus</h3>
-        <p>Built from scratch to keep campuses clean.</p>
+        <p>Social impressions for the movement — 1,500+ followers and counting.</p>
       </article>
       <article class="ens-card c-red span2">
-        <span class="ens-kicker">Side quest</span>
-        <div class="ens-stat word">Built &amp; shipped</div>
+        <span class="ens-kicker">Built &amp; shipped</span>
+        <div class="ens-stat" data-count="30000">0</div>
         <h3>Civic Platform</h3>
-        <p>Students post campus issues; the campus fixes them.</p>
+        <p>A website for 30,000+ students — post a campus issue, watch it get fixed.</p>
       </article>
     </div>
   </div>
 </section>
 
-<!-- ════════ INTERMISSION : THE 19TH HOLE ════════ -->
-<section id="intermission">
-  <div class="inter-head wrap">
-    <div class="curtain-rule" aria-hidden="true"></div>
-    <span class="slate">Intermission · <em>Playable</em></span>
-    <h2 class="sec-title">The <span class="it">19th</span> Hole</h2>
-    <p class="sec-intro" style="margin-inline:auto">Every great film has an intermission. Mine has golf. Three holes, built from my life — drag from the ball to aim, release to putt.</p>
-  </div>
-  <div id="game-wrap">
-    <canvas id="game-canvas"></canvas>
-    <div class="game-hud" aria-live="polite">
-      <span class="hud-chip">Hole <b id="hud-hole">1</b>/3 · Par <b id="hud-par">2</b></span>
-      <span class="hud-chip">Strokes <b id="hud-strokes">0</b> · Total <b id="hud-total">0</b></span>
+<!-- ════════ ACT V : FILMOGRAPHY ════════ -->
+<section id="act-work" class="act">
+  <div class="wrap">
+    <div class="act-head">
+      <span class="slate">Act V · <em>Previously On…</em></span>
+      <h2 class="sec-title">The <span class="it">filmography</span></h2>
+      <p class="sec-intro">Selected industry work. Each role shipped something real for people who needed it yesterday.</p>
     </div>
-    <div id="game-msg" aria-hidden="true"></div>
-    <div id="game-start">
-      <div class="start-card">
-        <h3>“Quiet on the set… and, putt.”</h3>
-        <p>Hole 1 is a warm-up. Hole 2 is leg day. Hole 3 has a badminton net, because of course it does.</p>
-        <button class="btn-gold" id="btn-play" data-hover="play">▶ Roll Camera</button>
-      </div>
+    <div class="filmo">
+      <article class="filmo-row">
+        <span class="filmo-year">2025 — Now</span>
+        <div class="filmo-main">
+          <h3>Software Engineer Intern</h3>
+          <span class="org">Linde · via Meta Layer Initiative (CA startup)</span>
+          <p>Browser extension + ML weather detection for Linde’s remote plant operations — teams running gas plants from afar see conditions sooner and predict faster.</p>
+        </div>
+        <div class="filmo-tags"><span>ML Engineering</span><span>Browser Extension</span><span>Forecasting</span></div>
+      </article>
+      <article class="filmo-row">
+        <span class="filmo-year">Earlier</span>
+        <div class="filmo-main">
+          <h3>Technical Analyst</h3>
+          <span class="org">HCLTech</span>
+          <p>Modeled where the AI boom is heading and where the company should place its bets — market prediction meets investment strategy.</p>
+        </div>
+        <div class="filmo-tags"><span>Market Analysis</span><span>AI Strategy</span><span>Research</span></div>
+      </article>
     </div>
-  </div>
-  <div class="game-foot">
-    <span id="game-tip">Drag from the ball · pull further for power</span>
-    <button id="btn-reset" data-hover="reset">↺ Restart round</button>
   </div>
 </section>
 
@@ -1039,69 +1131,6 @@ footer b{ color:var(--ink-dim); font-weight:500; }
   </div>
 </section>
 
-<!-- ════════ AWARDS : FESTIVAL LAURELS ════════ -->
-<section id="awards" class="act">
-  <div class="wrap">
-    <div class="act-head">
-      <span class="slate">The Festival Circuit · <em>Laurels</em></span>
-      <h2 class="sec-title">Critically <span class="it">acclaimed</span></h2>
-      <p class="sec-intro">What the academy (well — the academies) had to say.</p>
-    </div>
-    <div class="laurel-grid">
-      <article class="laurel">
-        <svg viewBox="0 0 150 80" aria-hidden="true">
-          <path d="M30 70 C12 60 6 38 12 18 C20 34 22 50 36 62 M24 44 C20 36 20 26 24 18 M33 56 C28 49 26 40 28 31 M44 67 C38 62 34 55 33 47"/>
-          <path d="M120 70 C138 60 144 38 138 18 C130 34 128 50 114 62 M126 44 C130 36 130 26 126 18 M117 56 C122 49 124 40 122 31 M106 67 C112 62 116 55 117 47"/>
-        </svg>
-        <span class="laurel-sel">Official Selection</span>
-        <h3>Phi Beta Kappa</h3>
-        <p>America’s oldest honor society</p>
-      </article>
-      <article class="laurel">
-        <svg viewBox="0 0 150 80" aria-hidden="true">
-          <path d="M30 70 C12 60 6 38 12 18 C20 34 22 50 36 62 M24 44 C20 36 20 26 24 18 M33 56 C28 49 26 40 28 31 M44 67 C38 62 34 55 33 47"/>
-          <path d="M120 70 C138 60 144 38 138 18 C130 34 128 50 114 62 M126 44 C130 36 130 26 126 18 M117 56 C122 49 124 40 122 31 M106 67 C112 62 116 55 117 47"/>
-        </svg>
-        <span class="laurel-sel">Grand Jury Prize</span>
-        <h3>SUNY Chancellor’s Award</h3>
-        <p>Student Excellence · SUNY</p>
-      </article>
-      <article class="laurel">
-        <svg viewBox="0 0 150 80" aria-hidden="true">
-          <path d="M30 70 C12 60 6 38 12 18 C20 34 22 50 36 62 M24 44 C20 36 20 26 24 18 M33 56 C28 49 26 40 28 31 M44 67 C38 62 34 55 33 47"/>
-          <path d="M120 70 C138 60 144 38 138 18 C130 34 128 50 114 62 M126 44 C130 36 130 26 126 18 M117 56 C122 49 124 40 122 31 M106 67 C112 62 116 55 117 47"/>
-        </svg>
-        <span class="laurel-sel">Audience Award</span>
-        <h3>Student Innovative Leader</h3>
-        <p>Leadership · Innovation</p>
-      </article>
-    </div>
-    <div class="hack-strip">
-      <p class="hack-head"><b>4× hackathon winner</b> — now with trailers</p>
-      <!-- TODO: paste the real video URLs into the three btn-watch hrefs below -->
-      <div class="hack-row">
-        <span class="w">Winner</span>
-        <div><h4>Dots <em>at LA Hacks</em></h4><span class="where">UCLA</span></div>
-        <a class="btn-watch" href="#" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
-      </div>
-      <div class="hack-row">
-        <span class="w">Winner</span>
-        <div><h4>ARyan <em>at Reality Hack</em></h4><span class="where">MIT</span></div>
-        <a class="btn-watch" href="#" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
-      </div>
-      <div class="hack-row">
-        <span class="w">Winner</span>
-        <div><h4>StreamFair <em>at TartanHacks</em></h4><span class="where">Carnegie Mellon</span></div>
-        <a class="btn-watch" href="#" target="_blank" rel="noopener" data-hover="watch">▶ Watch the demo</a>
-      </div>
-      <div class="hack-row">
-        <span class="w">Winner</span>
-        <div><h4>XR Hacks</h4><span class="where">Stanford</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ════════ CLOSING CREDITS + CONTACT ════════ -->
 <section id="credits-end">
   <div class="wrap">
@@ -1111,6 +1140,7 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       <div class="roll-row"><span class="r">Founder ×2</span><span class="n">Aryan Mudgal</span></div>
       <div class="roll-row"><span class="r">Senator</span><span class="n">Aryan Mudgal</span></div>
       <div class="roll-row"><span class="r">Golfer · aspiring scratch</span><span class="n">Aryan Mudgal</span></div>
+      <div class="roll-row"><span class="r">The Following</span><span class="n">3,000+ <em>on LinkedIn</em></span></div>
       <div class="roll-row"><span class="r">Catering</span><span class="n"><em>also Aryan</em></span></div>
       <div class="roll-row"><span class="r">Special Thanks</span><span class="n"><em>coffee &amp; Buffalo winters</em></span></div>
     </div>
@@ -1205,7 +1235,7 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       requestAnimationFrame(follow);
     })();
     document.addEventListener("mouseover", e => {
-      const t = e.target.closest("a,button,[data-hover],.poster,.bts-card,.laurel");
+      const t = e.target.closest("a,button,[data-hover],.poster,.bts-card,.award-card,.win-card");
       if (t){ ring.classList.add("is-hover"); ring.dataset.label = t.dataset.hover || "view"; }
       else ring.classList.remove("is-hover");
     });
@@ -1268,17 +1298,10 @@ footer b{ color:var(--ink-dim); font-weight:500; }
         onUpdate(){ el.textContent = prefix + Math.round(o.v).toLocaleString("en-US"); },
         onComplete(){ el.innerHTML = prefix + target.toLocaleString("en-US") + "<sup>+</sup>"; } });
     });
-    // bts + laurels + hack rows
-    $$(".bts-card, .laurel, .hack-row").forEach((c,i) => {
+    // bts + award + festival-win cards
+    $$(".bts-card, .award-card, .win-card").forEach((c,i) => {
       gsap.from(c, { opacity:0, y:40, duration:.75, ease:"power3.out",
         scrollTrigger:{ trigger:c, start:"top 90%", once:true } });
-    });
-    // laurel branches draw themselves
-    $$(".laurel svg path").forEach(p => {
-      const L = p.getTotalLength();
-      p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
-      gsap.to(p, { strokeDashoffset:0, duration:1.5, ease:"power2.inOut",
-        scrollTrigger:{ trigger:p.closest(".laurel"), start:"top 88%", once:true } });
     });
     // closing credits roll
     gsap.from(".roll-row", { opacity:0, y:30, duration:.7, ease:"power2.out", stagger:.1,
