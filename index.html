@@ -10,37 +10,42 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <style>
 /* ============================================================
-   ARYAN MUDGAL — “A ONE-MAN SHOW”
-   A portfolio staged as a film production.
-   Palette: premiere-night indigo, marquee gold, neon accents.
-   Type: Fraunces (display) · Instrument Sans (body) · IBM Plex Mono (slates)
+   ARYAN MUDGAL — “A ONE-MAN SHOW · LIVE”
+   A portfolio staged as a live premiere. You carry the spotlight.
+   Palette: deep premiere-black, marquee gold, velvet crimson, neon accents.
+   Type: Bodoni Moda (display Didone) · Instrument Sans (body) · IBM Plex Mono (slates)
    ============================================================ */
 :root{
-  --bg:        #150f33;
-  --bg-2:      #1c1545;
-  --bg-3:      #261b58;
+  /* deeper premiere-black base — the house lights are down */
+  --bg:        #0c0a22;
+  --bg-2:      #140e30;
+  --bg-3:      #1d1550;
   --ink:       #fff7e6;
   --ink-dim:   #cfc2ec;
   --ink-faint: #978ac0;
   --gold:      #ffc445;
-  --gold-hi:   #ffdf8a;
+  --gold-hi:   #ffe6a0;
   --red:       #ff4d6d;
   --red-deep:  #d6244a;
+  --velvet:    #6e0f26;   /* stage-curtain crimson */
+  --velvet-hi: #a3163a;
   --green:     #3ddc84;
   --cyan:      #44e0ff;
   --pink:      #ff63c1;
   --line:      rgba(255,247,230,.16);
   --line-soft: rgba(255,247,230,.08);
-  --font-d:    "Fraunces", Georgia, serif;
+  --spot:      rgba(255,214,142,1);   /* the follow-spot's warmth */
+  --font-d:    "Bodoni Moda", "Times New Roman", Georgia, serif;
   --font-b:    "Instrument Sans", -apple-system, sans-serif;
   --font-m:    "IBM Plex Mono", ui-monospace, monospace;
   --ease-out:  cubic-bezier(.22,1,.36,1);
   --ease-snap: cubic-bezier(.7,-0.2,.25,1.3);
+  --mx: 50vw; --my: 40vh;   /* live pointer, driven by JS */
 }
 *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
 html{ scroll-behavior:smooth; }
@@ -59,7 +64,12 @@ body{
 img, svg, canvas{ display:block; max-width:100%; }
 a{ color:inherit; }
 button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
-h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
+h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; font-optical-sizing:auto; }
+/* keyboard focus is always visible — a gold ring, on-brand */
+:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; border-radius:3px; }
+/* every button/link presses in a hair — physical feedback */
+a[href], button, .btn-gold, .btn-ghost, .btn-watch, .nav-cta{ transition-property:transform,background,color,border-color,box-shadow,opacity; }
+a[href]:active, button:active{ transform:translateY(1px) scale(.985); }
 
 /* ---------- film grain over everything ---------- */
 .grain{
@@ -80,6 +90,29 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 @keyframes flicker{
   0%,100%{ opacity:.55 } 42%{ opacity:.8 } 43%{ opacity:.5 } 45%{ opacity:.75 }
   70%{ opacity:.6 } 71%{ opacity:.85 }
+}
+
+/* ---------- THE FOLLOW-SPOT — a warm light you carry across the dark stage ----------
+   Screen-blended so it only ADDS light. Text everywhere stays fully readable. */
+.spotlight{
+  position:fixed; inset:0; z-index:6; pointer-events:none; mix-blend-mode:screen;
+  background:radial-gradient(circle 360px at var(--mx) var(--my),
+    rgba(255,214,142,.20), rgba(255,196,69,.085) 36%, transparent 70%);
+  opacity:0; transition:opacity 1.1s ease;
+}
+.spotlight.is-lit{ opacity:1; }
+/* the house lights are down — a soft theatre vignette pulls the edges into shadow.
+   only ever darkens the background, so contrast on light text can only improve. */
+.vignette{
+  position:fixed; inset:0; z-index:5; pointer-events:none;
+  background:radial-gradient(135% 105% at 50% 40%, transparent 50%, rgba(3,2,12,.6) 100%);
+}
+@media (pointer:coarse),(max-width:768px){
+  .spotlight{ background:radial-gradient(120% 58% at 50% 4%, rgba(255,214,142,.13), transparent 60%); }
+}
+@media (prefers-reduced-motion:reduce){
+  .spotlight{ transition:none;
+    background:radial-gradient(120% 72% at 50% 30%, rgba(255,214,142,.12), transparent 66%); }
 }
 
 /* ---------- custom cursor: a little spotlight ---------- */
@@ -107,36 +140,50 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 }
 @media (pointer:coarse), (max-width:768px){ .cursor-dot,.cursor-ring{ display:none; } }
 
-/* ---------- preloader: film leader countdown ---------- */
-#preloader{
-  position:fixed; inset:0; z-index:300; display:grid; place-items:center;
+/* ---------- preloader: THE CURTAIN RAISE ---------- */
+#preloader{ position:fixed; inset:0; z-index:300; overflow:hidden; pointer-events:none; background:transparent; }
+/* two velvet panels overlap at center, then part */
+.curtain{
+  position:absolute; top:0; bottom:0; width:52%; z-index:2;
   background:
-    radial-gradient(circle at 50% 50%, #221955 0%, #150f33 70%);
+    linear-gradient(90deg, rgba(0,0,0,.55), transparent 14%, transparent 86%, rgba(0,0,0,.6)),
+    repeating-linear-gradient(90deg,
+      var(--velvet) 0, var(--velvet-hi) 3.4%, var(--velvet) 6.8%, #48091a 10.2%, var(--velvet) 13.6%);
+  box-shadow:inset 0 50px 100px rgba(0,0,0,.45), inset 0 -40px 90px rgba(0,0,0,.55);
+  transition:transform 1.25s var(--ease-out); will-change:transform;
 }
-#preloader::before,#preloader::after{ /* film-leader crosshair lines */
-  content:""; position:absolute; background:rgba(255,247,230,.12);
+.curtain.left{ left:0; transform-origin:left; }
+.curtain.right{ right:0; transform-origin:right; }
+/* the pelmet across the top, scalloped hem, gold underline; lifts on the raise */
+.valance{
+  position:absolute; top:0; left:0; right:0; height:86px; z-index:3;
+  background:repeating-linear-gradient(90deg,
+    var(--velvet-hi) 0, var(--velvet) 3.8%, #48091a 7.6%, var(--velvet-hi) 11.4%);
+  box-shadow:0 8px 26px rgba(0,0,0,.5), inset 0 -2px 0 var(--gold);
+  transition:transform 1.1s var(--ease-out); will-change:transform;
 }
-#preloader::before{ inset:50% 0 auto 0; height:1px; }
-#preloader::after{ inset:0 auto 0 50%; width:1px; }
-.pre-stage{ position:relative; width:min(72vw,360px); aspect-ratio:1; display:grid; place-items:center; }
-.pre-ring{ position:absolute; inset:0; }
-.pre-ring circle{ fill:none; stroke:rgba(255,247,230,.2); stroke-width:1.5; }
-.pre-ring .sweep{
-  stroke:var(--gold); stroke-width:2.5;
-  stroke-dasharray:1; stroke-dashoffset:1; pathLength:1;
-  transform:rotate(-90deg); transform-origin:center;
+.valance::after{
+  content:""; position:absolute; left:0; right:0; bottom:-17px; height:18px;
+  background:radial-gradient(circle at 22px 0, var(--velvet) 21px, transparent 22px);
+  background-size:44px 18px; background-repeat:repeat-x;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));
 }
-.pre-count{
-  font-family:var(--font-d); font-weight:300; font-size:clamp(96px,28vw,180px);
-  font-variant-numeric:tabular-nums; color:var(--ink); line-height:1;
+/* the title card, fades out just before the raise */
+.marquee-card{
+  position:absolute; inset:0; z-index:4; display:grid; place-content:center; text-align:center;
+  gap:8px; padding:24px; transition:opacity .6s ease, transform .8s var(--ease-out);
 }
-.pre-label{
-  position:absolute; bottom:-72px; left:50%; transform:translateX(-50%);
-  font:500 11px/1.7 var(--font-m); letter-spacing:.34em; text-transform:uppercase;
-  color:var(--ink-dim); white-space:nowrap; text-align:center;
-}
-.pre-label b{ color:var(--gold); font-weight:500; }
-#preloader.is-done{ transition:opacity .7s ease, visibility .7s; opacity:0; visibility:hidden; }
+.marquee-card .mc-top{ font:500 12px/1 var(--font-m); letter-spacing:.42em; text-transform:uppercase; color:var(--gold); }
+.marquee-card .mc-mid{ font-family:var(--font-d); font-style:italic; font-weight:400; font-size:clamp(15px,2vw,19px); color:var(--ink-faint); }
+.marquee-card .mc-name{ font-family:var(--font-d); font-weight:700; font-size:clamp(38px,8vw,86px); letter-spacing:-.01em; color:var(--ink); text-shadow:0 0 60px rgba(255,196,69,.4); margin:4px 0; }
+.marquee-card .mc-sub{ font:500 10px/1 var(--font-m); letter-spacing:.4em; text-transform:uppercase; color:var(--ink-faint); }
+/* raise choreography */
+#preloader.card-out .marquee-card{ opacity:0; transform:translateY(-14px) scale(.97); }
+#preloader.is-parting .curtain.left{ transform:translateX(-101%) scaleX(.9); }
+#preloader.is-parting .curtain.right{ transform:translateX(101%) scaleX(.9); }
+#preloader.is-parting .valance{ transform:translateY(-100%); }
+#preloader.is-done{ transition:opacity .6s ease, visibility .6s; opacity:0; visibility:hidden; }
+@media (prefers-reduced-motion:reduce){ .curtain,.valance,.marquee-card{ transition:none; } }
 
 /* ---------- top bar ---------- */
 #topbar{
@@ -168,6 +215,8 @@ h1,h2,h3,h4{ font-family:var(--font-d); font-weight:600; line-height:1.04; }
 }
 #topbar nav a:hover{ color:var(--ink); }
 #topbar nav a:hover::after{ transform:scaleX(1); transform-origin:left; }
+#topbar nav a.is-current{ color:var(--gold-hi); }
+#topbar nav a.is-current::after{ transform:scaleX(1); transform-origin:left; }
 #topbar nav a.nav-cta{
   color:#1d1240; background:var(--gold); padding:10px 18px; border-radius:999px;
   transition:background .3s, transform .3s;
@@ -239,8 +288,8 @@ section{ position:relative; }
 .hero-kicker::after{ background:linear-gradient(90deg,var(--gold),transparent); }
 .hero-title{
   margin:30px 0 10px;
-  font-size:clamp(58px,12.5vw,176px); font-weight:560; letter-spacing:-.02em;
-  text-shadow:0 0 80px rgba(255,196,69,.4);
+  font-size:clamp(58px,12.5vw,178px); font-weight:660; letter-spacing:-.008em;
+  text-shadow:0 0 80px rgba(255,196,69,.42), 0 8px 40px rgba(0,0,0,.5);
 }
 .hero-title .word{ display:inline-block; white-space:nowrap; }
 .hero-title .ch{ display:inline-block; will-change:transform; }
@@ -286,16 +335,29 @@ section{ position:relative; }
 @keyframes cue{ 0%{ transform:scaleY(0); transform-origin:top } 45%{ transform:scaleY(1); transform-origin:top }
   55%{ transform:scaleY(1); transform-origin:bottom } 100%{ transform:scaleY(0); transform-origin:bottom } }
 
-/* ---------- marquee ticker ---------- */
+/* ---------- THE MARQUEE — Broadway signage with chasing bulbs ---------- */
 .ticker{
-  border-block:1px solid var(--line); background:var(--bg-2);
-  overflow:hidden; padding:16px 0; position:relative; z-index:4;
+  position:relative; z-index:4; overflow:hidden; padding:30px 0;
+  background:linear-gradient(180deg, #1b1032, #100a26);
+  border-block:2px solid var(--velvet-hi);
+  box-shadow:inset 0 0 70px rgba(0,0,0,.55), 0 0 44px rgba(110,15,38,.22);
 }
+/* two rows of running bulbs, top and bottom */
+.ticker::before, .ticker::after{
+  content:""; position:absolute; left:0; right:0; height:10px; z-index:5; pointer-events:none;
+  background:radial-gradient(circle at 9px 50%, var(--gold-hi) 2.4px, rgba(255,196,69,.3) 3.3px, transparent 4.2px);
+  background-size:22px 100%;
+  filter:drop-shadow(0 0 4px rgba(255,196,69,.7));
+  animation:bulbs .9s linear infinite;
+}
+.ticker::before{ top:6px; }
+.ticker::after{ bottom:6px; animation-direction:reverse; }
+@keyframes bulbs{ to{ background-position:22px 0; } }
 .ticker-track{ display:flex; gap:0; width:max-content; animation:ticker 26s linear infinite; }
 .ticker:hover .ticker-track{ animation-play-state:paused; }
 .ticker-track span{
-  font-family:var(--font-d); font-size:clamp(16px,2vw,22px); font-weight:480;
-  letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; padding-right:.8em;
+  font-family:var(--font-d); font-size:clamp(16px,2vw,23px); font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; padding-right:.8em;
 }
 .ticker-track span i{ font-style:normal; color:var(--gold); padding-left:.8em; }
 .ticker-track span:nth-child(4n+2) i{ color:var(--cyan); }
@@ -935,20 +997,23 @@ footer b{ color:var(--ink-dim); font-weight:500; }
 </style>
 </head>
 <body>
+<div class="vignette" aria-hidden="true"></div>
+<div class="spotlight" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 <div class="flicker" aria-hidden="true"></div>
 <div class="cursor-dot" aria-hidden="true"></div>
 <div class="cursor-ring" aria-hidden="true" data-label="view"></div>
 
-<!-- ════════ PRELOADER : film leader ════════ -->
+<!-- ════════ PRELOADER : the curtain raise ════════ -->
 <div id="preloader" role="status" aria-label="Loading">
-  <div class="pre-stage">
-    <svg class="pre-ring" viewBox="0 0 100 100" aria-hidden="true">
-      <circle cx="50" cy="50" r="47"/>
-      <circle class="sweep" cx="50" cy="50" r="47"/>
-    </svg>
-    <div class="pre-count">3</div>
-    <div class="pre-label">An <b>Aryan Mudgal</b> Production<br>· Buffalo, NY ·</div>
+  <div class="curtain left" aria-hidden="true"></div>
+  <div class="curtain right" aria-hidden="true"></div>
+  <div class="valance" aria-hidden="true"></div>
+  <div class="marquee-card">
+    <span class="mc-top">A · M Pictures</span>
+    <span class="mc-mid">presents</span>
+    <span class="mc-name">A One-Man Show</span>
+    <span class="mc-sub">Live · Buffalo, NY</span>
   </div>
 </div>
 
@@ -1490,35 +1555,27 @@ footer b{ color:var(--ink-dim); font-weight:500; }
   const hasGsap = typeof gsap !== "undefined";
   if (hasGsap && typeof ScrollTrigger !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
-  /* ---------- preloader: 3…2…1 film leader ---------- */
-  const pre = $("#preloader"), count = $(".pre-count"), sweep = $(".pre-ring .sweep");
+  /* ---------- preloader: the curtain raise ---------- */
+  const pre = $("#preloader");
   let leaderStarted = false;
   function runLeader(){
     if (leaderStarted) return; leaderStarted = true;
-    if (REDUCED){ finishLeader(); return; }
-    let n = 3;
-    const stepMs = 620;
-    const tick = () => {
-      count.textContent = n;
-      if (sweep){
-        sweep.style.transition = "none"; sweep.style.strokeDashoffset = 1;
-        void sweep.getBoundingClientRect();
-        sweep.style.transition = `stroke-dashoffset ${stepMs}ms linear`;
-        sweep.style.strokeDashoffset = 0;
-      }
-      n--;
-      if (n >= 1) setTimeout(tick, stepMs);
-      else setTimeout(finishLeader, stepMs + 80);
-    };
-    tick();
+    if (REDUCED || !pre){ finishLeader(); return; }
+    setTimeout(() => pre.classList.add("card-out"), 850);        // dim the title card
+    setTimeout(() => {                                            // part the curtains…
+      pre.classList.add("is-parting");
+      document.dispatchEvent(new CustomEvent("show:open"));       // …and raise the letters as the stage appears
+    }, 1300);
+    setTimeout(() => { pre.classList.add("is-done"); setTimeout(() => pre.remove(), 800); }, 2450);
   }
-  function finishLeader(){
+  function finishLeader(){          // reduced-motion / fallback path: just fade out
+    if (!pre) return;
     pre.classList.add("is-done");
     document.dispatchEvent(new CustomEvent("show:open"));
-    setTimeout(() => pre.remove(), 900);
+    setTimeout(() => pre.remove(), 800);
   }
   window.addEventListener("load", runLeader);
-  setTimeout(() => { if (document.body.contains(pre) && !pre.classList.contains("is-done")) runLeader(); }, 4200); // safety net
+  setTimeout(() => { if (pre && document.body.contains(pre) && !pre.classList.contains("is-done")) runLeader(); }, 4200); // safety net
 
   /* ---------- hero title: split & raise the letters ---------- */
   $$(".hero-title .word").forEach(w => {
@@ -1533,17 +1590,23 @@ footer b{ color:var(--ink-dim); font-weight:500; }
     gsap.from(".grab-hint",     { opacity:0, duration:1.2, ease:"power2.out", delay:1.4 });
   }, { once:true });
 
-  /* ---------- custom cursor ---------- */
+  /* ---------- custom cursor + the follow-spot ---------- */
+  const spot = $(".spotlight"), root = document.documentElement;
+  if (spot && (TOUCH || REDUCED)) spot.classList.add("is-lit");   // static glow where a follow-light can't
   if (!TOUCH){
     const dot = $(".cursor-dot"), ring = $(".cursor-ring");
-    let rx = innerWidth/2, ry = innerHeight/2, tx = rx, ty = ry;
+    let rx = innerWidth/2, ry = innerHeight/2, tx = rx, ty = ry, lit = false;
     addEventListener("mousemove", e => {
       tx = e.clientX; ty = e.clientY;
       dot.style.transform = `translate(${tx}px,${ty}px)`;
+      if (!lit && spot){ lit = true; spot.classList.add("is-lit"); }   // the house lights find you
     }, { passive:true });
     (function follow(){
       rx += (tx - rx) * .16; ry += (ty - ry) * .16;
       ring.style.transform = `translate(${rx}px,${ry}px)`;
+      // the spot lags the cursor a touch — it has the weight of a real stage light
+      root.style.setProperty("--mx", rx + "px");
+      root.style.setProperty("--my", ry + "px");
       requestAnimationFrame(follow);
     })();
     document.addEventListener("mouseover", e => {
@@ -1560,6 +1623,21 @@ footer b{ color:var(--ink-dim); font-weight:500; }
     const max = document.documentElement.scrollHeight - innerHeight;
     if (fill && max > 0) fill.style.height = (scrollY / max * 100) + "%";
   }, { passive:true });
+
+  /* ---------- nav scroll-spy: light the current act ---------- */
+  (function(){
+    const links = $$('#topbar nav a[href^="#"]').filter(a => !a.classList.contains("nav-cta"));
+    const map = new Map();
+    links.forEach(a => { const id = a.getAttribute("href").slice(1); if (document.getElementById(id)) map.set(id, a); });
+    const secs = [...map.keys()].map(id => document.getElementById(id));
+    if (!secs.length || !("IntersectionObserver" in window)) return;
+    let current = null;
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) current = e.target.id; });
+      map.forEach((a, id) => a.classList.toggle("is-current", id === current));
+    }, { rootMargin:"-45% 0px -50% 0px", threshold:0 });
+    secs.forEach(s => io.observe(s));
+  })();
 
   /* ---------- scroll choreography ---------- */
   if (hasGsap && !REDUCED && typeof ScrollTrigger !== "undefined"){
@@ -1620,6 +1698,14 @@ footer b{ color:var(--ink-dim); font-weight:500; }
       scrollTrigger:{ trigger:".cred-frame", start:"top 82%", once:true } });
     gsap.from(".sequel, .sequel-sub, .contact-row", { opacity:0, y:40, duration:1, ease:"power3.out", stagger:.15,
       scrollTrigger:{ trigger:".sequel", start:"top 85%", once:true } });
+  }
+  /* reduced-motion / no-GSAP: show the real ensemble numbers immediately (the count-up
+     only runs above, so without it these would be stuck reading "0") */
+  if (REDUCED || !hasGsap || typeof ScrollTrigger === "undefined"){
+    $$(".ens-stat[data-count]").forEach(el => {
+      const target = +el.dataset.count, prefix = el.dataset.prefix || "";
+      el.innerHTML = prefix + target.toLocaleString("en-US") + "<sup>+</sup>";
+    });
   }
 
   /* ---------- award/win cards: pre-fetch panel photos near the section ---------- */
