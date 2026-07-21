@@ -1,0 +1,41 @@
+---
+import { researchItems } from "../data/portfolio";
+
+const featuredResearch = researchItems.find((item) => item.featured) ?? researchItems[0];
+const ongoingResearch = researchItems.filter((item) => item !== featuredResearch);
+---
+
+<section id="research" class="section section--research" aria-labelledby="research-title">
+  <div class="shell">
+    <header class="section-heading reveal">
+      <h2 id="research-title">Research for earlier, better signals</h2>
+      <p>Applied medical AI focused on the moments when a faint signal can change the next clinical decision.</p>
+    </header>
+
+    <div class="research-layout">
+      <article class="research-feature reveal">
+        <p class="research-status">{featuredResearch.status}</p>
+        <h3>{featuredResearch.title}</h3>
+        <p class="research-subject">{featuredResearch.subject}</p>
+        <p>{featuredResearch.summary}</p>
+        <ul class="inline-list" role="list" aria-label={`${featuredResearch.title} capabilities`}>
+          {featuredResearch.capabilities.map((capability) => <li>{capability}</li>)}
+        </ul>
+      </article>
+
+      <div class="research-notes">
+        {ongoingResearch.map((item) => (
+          <article class="research-note reveal">
+            <p class="meta">{item.status}</p>
+            <h3>{item.title}</h3>
+            <p class="research-subject">{item.subject}</p>
+            <p>{item.summary}</p>
+            <ul class="inline-list" role="list" aria-label={`${item.title} capabilities`}>
+              {item.capabilities.map((capability) => <li>{capability}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

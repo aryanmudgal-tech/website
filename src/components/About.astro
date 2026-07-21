@@ -1,0 +1,37 @@
+---
+import { currentWork, interests, places } from "../data/portfolio";
+---
+
+<section id="about" class="section section--about shell" aria-labelledby="about-title">
+  <div class="about-current reveal">
+    <div>
+      <p class="meta">Current work</p>
+      <h2 id="about-title">Building {currentWork.name}</h2>
+    </div>
+    <div class="about-current__copy">
+      <p class="about-current__lead">{currentWork.note}</p>
+      <dl>
+        <div><dt>Role</dt><dd>{currentWork.role}</dd></div>
+        <div><dt>Status</dt><dd>{currentWork.status}</dd></div>
+        <div><dt>Next</dt><dd>{currentWork.next}</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="about-human reveal">
+    <div>
+      <h3>Outside the work</h3>
+      <ul class="interest-list" role="list">
+        {interests.map((interest) => <li>{interest}</li>)}
+      </ul>
+    </div>
+    <div class="about-human__note">
+      <p>
+        Family, friends, hackathon teammates, lab partners, mentors, and the communities that trusted me all shaped this work.
+      </p>
+      <ul class="place-list" role="list" aria-label="Places that shaped the work">
+        {places.map((place) => <li>{place}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>

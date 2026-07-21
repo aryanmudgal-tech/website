@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteNav from "../components/SiteNav.astro";
+import Hero from "../components/Hero.astro";
+import Experience from "../components/Experience.astro";
+import Projects from "../components/Projects.astro";
+import Trajectory from "../components/Trajectory.astro";
+import Research from "../components/Research.astro";
+import Leadership from "../components/Leadership.astro";
+import Recognition from "../components/Recognition.astro";
+import About from "../components/About.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+---
+
+<BaseLayout>
+  <SiteNav />
+  <main id="main-content">
+    <Hero />
+    <Experience />
+    <Projects />
+    <Trajectory />
+    <Research />
+    <Leadership />
+    <Recognition />
+    <About />
+  </main>
+  <SiteFooter />
+</BaseLayout>

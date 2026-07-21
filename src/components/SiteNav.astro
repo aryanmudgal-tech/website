@@ -1,0 +1,19 @@
+---
+import { navItems } from "../data/portfolio";
+---
+
+<header class="site-header">
+  <div class="site-header__inner shell">
+    <a class="wordmark" href="#top" aria-label="Aryan Mudgal, back to top">
+      <span aria-hidden="true">AM</span>
+      <span>Aryan Mudgal</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul role="list">
+        {navItems.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
