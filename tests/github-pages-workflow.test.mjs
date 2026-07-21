@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -23,4 +24,20 @@ test("GitHub Pages deploys Astro's compiled static output", () => {
   assert.match(workflow, /path:\s*\.\/dist\/client/);
   assert.match(workflow, /actions\/deploy-pages@v4/);
   assert.match(astroConfig, /base:\s*process\.env\.BASE_URL\s*\|\|\s*"\/"/);
+});
+
+test("GitHub Pages build prefixes every public image with the repository base path", () => {
+  execFileSync("npm", ["run", "build"], {
+    cwd: root,
+    env: { ...process.env, BASE_URL: "/website" },
+    stdio: "pipe",
+  });
+
+  const index = read("dist/client/index.html");
+  const page404 = read("dist/client/404.html");
+
+  assert.doesNotMatch(index, /(?:src|href)="\/assets\//);
+  assert.match(index, /src="\/website\/assets\/award-leader\.jpg"/);
+  assert.match(index, /src="\/website\/assets\/hack-dots\.jpg"/);
+  assert.match(page404, /href="\/website\/favicon\.svg"/);
 });

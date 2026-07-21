@@ -74,7 +74,7 @@ test("built images reserve space and contain meaningful alternatives", () => {
     assert.match(image, /\bheight="\d+"/);
     assert.match(image, /\balt="[^"]{12,}"/);
   }
-  assert.match(html, /src="\/assets\/award-leader\.jpg"[^>]*fetchpriority="high"/);
+  assert.match(html, /src="(?:\/website)?\/assets\/award-leader\.jpg"[^>]*fetchpriority="high"/);
 });
 
 test("built trajectory has one initial selection and complete fallback labels", () => {
@@ -104,7 +104,7 @@ test("built 404 page offers a route home", () => {
   const html = read(client("404.html"));
 
   assert.match(html, /Page not found/);
-  assert.match(html, /href="\/"/);
+  assert.match(html, /href="(?:\/website)?\/"/);
   assert.match(html, /Return home/);
 });
 

@@ -1,5 +1,7 @@
 ---
 import { recognitions } from "../data/portfolio";
+import { publicAssetUrl } from "../lib/site-url";
+
 ---
 
 <section id="recognition" class="section section--recognition" aria-labelledby="recognition-title">
@@ -14,7 +16,7 @@ import { recognitions } from "../data/portfolio";
         <article class:list={["recognition-item", `recognition-item--${index + 1}`, "reveal"]}>
           <figure>
             <img
-              src={recognition.image}
+              src={publicAssetUrl(recognition.image)}
               width={recognition.imageWidth}
               height={recognition.imageHeight}
               alt={recognition.imageAlt}

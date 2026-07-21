@@ -1,5 +1,6 @@
 ---
 import { projects } from "../data/portfolio";
+import { publicAssetUrl } from "../lib/site-url";
 
 const leadProject = projects.find((project) => project.lead) ?? projects[0];
 const supportingProjects = projects.filter((project) => project !== leadProject);
@@ -15,7 +16,7 @@ const supportingProjects = projects.filter((project) => project !== leadProject)
     <article class="project-lead reveal">
       <figure class="project-lead__media">
         <img
-          src={leadProject.image}
+          src={publicAssetUrl(leadProject.image)}
           width={leadProject.imageWidth}
           height={leadProject.imageHeight}
           alt={leadProject.imageAlt}
@@ -54,7 +55,7 @@ const supportingProjects = projects.filter((project) => project !== leadProject)
         <article class:list={["project-tile", `project-tile--${index + 1}`, "reveal"]}>
           <figure>
             <img
-              src={project.image}
+              src={publicAssetUrl(project.image)}
               width={project.imageWidth}
               height={project.imageHeight}
               alt={project.imageAlt}

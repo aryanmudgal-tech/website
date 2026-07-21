@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { publicAssetUrl } from "../lib/site-url";
 
 interface Props {
   title?: string;
@@ -44,7 +45,7 @@ const personSchema = {
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href={publicAssetUrl("favicon.svg")} type="image/svg+xml" />
     <title>{title}</title>
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
   </head>

@@ -1,5 +1,7 @@
 ---
 import { links, proofPoints } from "../data/portfolio";
+import { publicAssetUrl } from "../lib/site-url";
+
 ---
 
 <section class="hero" aria-labelledby="hero-title">
@@ -26,7 +28,7 @@ import { links, proofPoints } from "../data/portfolio";
   </div>
   <figure class="hero__figure">
     <img
-      src="/assets/award-leader.jpg"
+      src={publicAssetUrl("assets/award-leader.jpg")}
       width="1195"
       height="793"
       alt="Aryan holding the Award for Innovative Student Leadership at the University at Buffalo"
