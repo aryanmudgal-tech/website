@@ -22,8 +22,8 @@ Help a recruiter or hiring manager understand Aryan Mudgal's experience, project
 
 1. Remove the Building Litos current-work panel and all Litos data. Keep the personal "Outside the work" content and the About navigation destination.
 2. Remove PPG Signal Accuracy from Research and Career Path.
-3. Career Path uses the columns 2022, 2023, 2024, 2025, and 2026. Remove the empty Now column.
-4. Represent SUNY Delegate as a 2022-2025 tenure, positioned at the 2022 start of that tenure.
+3. Career Path uses the columns 2023, 2024, 2025, and 2026. Remove the 2022 and empty Now columns.
+4. Represent SUNY Delegate as a 2022-2025 tenure, positioned in the 2024 column.
 5. Place Student Senator in 2023.
 6. Place Fetal-maternal hemorrhage detection in 2025.
 7. Replace the combined University and SUNY honors event with two distinct 2026 events:
@@ -87,7 +87,7 @@ Hierarchy comes from weight, size, sentence case, restrained letter spacing, and
 
 - Maintain one `h1`, ordered headings, a working skip link, meaningful alt text, visible focus, and WCAG AA intent.
 - The About section retains a valid `aria-labelledby` relationship after the Litos panel is removed.
-- The five-column Career Path remains readable on large screens and falls back to the chronological list at 72rem and below.
+- The four-column Career Path remains readable on large screens and falls back to the chronological list at 72rem and below.
 - No new framework, animation package, font download, client runtime, or external dependency is introduced.
 - Animate only transform and opacity.
 - Preserve system light/dark preference and reduced-motion behavior.

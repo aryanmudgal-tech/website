@@ -34,7 +34,7 @@ The static production site is generated in `dist/client/`, with a small asset-se
 | Hero and proof band | Establishes Aryan's direction and five credibility signals in the first viewport |
 | Work | Shows the Linde, Meta Layer Initiative, and HCLTech experience in recruiter-first order |
 | Projects | Presents Dots, ARMIE, StreamFair, and W.O.D. with visible proof links |
-| Trajectory | Connects work, builds, research, leadership, and recognition from 2022 through 2026 in one keyboard-operable interaction |
+| Trajectory | Connects work, builds, research, leadership, and recognition across 2023 through 2026 in one keyboard-operable interaction |
 | Research | Separates the MIDL-accepted work from an ongoing medical-AI project |
 | Leadership | Gives student representation, budget, nonprofit, and civic work clear scale |
 | Recognition | Pairs the three institutional honors with real photographs and exact selection data |

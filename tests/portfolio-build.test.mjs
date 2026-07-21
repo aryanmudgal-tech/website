@@ -80,10 +80,13 @@ test("built images reserve space and contain meaningful alternatives", () => {
 test("built trajectory has one initial selection and complete fallback labels", () => {
   const html = read(client("index.html"));
   const tabs = html.match(/<button\b[^>]*role="tab"[^>]*>/g) ?? [];
+  const axis = html.match(/<div class="trajectory-axis"[^>]*>([\s\S]*?)<\/div>/)?.[1] ?? "";
+  const columns = [...axis.matchAll(/<span>(.*?)<\/span>/g)].map((match) => match[1]);
 
   assert.equal(tabs.length, 12);
   assert.equal(tabs.filter((tab) => tab.includes('aria-selected="true"')).length, 1);
   assert.ok((html.match(/class="trajectory-event__outcome"/g) ?? []).length >= tabs.length);
+  assert.deepEqual(columns, ["", "2023", "2024", "2025", "2026"]);
   for (const period of ["2022-2025", "2023", "2024", "2025", "2026"]) {
     assert.ok(html.includes(period), `built trajectory is missing ${period}`);
   }

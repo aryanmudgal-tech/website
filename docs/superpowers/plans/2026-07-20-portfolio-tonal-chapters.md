@@ -15,7 +15,7 @@
 - Remove Litos and PPG Signal Accuracy from served content.
 - Use `W.O.D.` as the only visible title for that project.
 - Use the exact award titles `Award for Innovative Student Leadership` and `SUNY Chancellor's Award for Student Excellence`, both labeled 2026.
-- Use 2022, 2023, 2024, 2025, and 2026 Career Path columns with no Now column.
+- Use 2023, 2024, 2025, and 2026 Career Path columns with no 2022 or Now column.
 - Use no visible monospace font, no new dependency, no gradient, no glow, no scroll listener, no em dash or en dash, and no theatre-era pattern.
 - Keep the final Sites deployment owner-only/private.
 - Preserve unrelated untracked `.agents/`, `.claude/skills/`, `Pictures/`, and `skills-lock.json` files.
@@ -31,7 +31,7 @@
 - `src/components/Trajectory.astro`: full-width Career Path chapter wrapper and preserved tab interaction.
 - `src/components/Leadership.astro`: full-width Leadership chapter wrapper.
 - `src/components/Recognition.astro`: visible award years.
-- `src/styles/global.css`: humanist typography, chapter surfaces, active navigation, five-column Career Path, motion and responsive behavior.
+- `src/styles/global.css`: humanist typography, chapter surfaces, active navigation, four-column Career Path, motion and responsive behavior.
 - `tests/portfolio-source.test.mjs`: source contract for corrected content and anti-slop rules.
 - `tests/portfolio-build.test.mjs`: built HTML contract for corrected content and navigation enhancement.
 - `README.md`: current content and interaction description.
@@ -82,18 +82,18 @@ Expected: FAIL on stale content, missing chapter tokens, remaining mono stack, a
 Use:
 
 ```ts
-column: "2022" | "2023" | "2024" | "2025" | "2026";
+column: "2023" | "2024" | "2025" | "2026";
 ```
 
 and:
 
 ```ts
-export const trajectoryColumns = ["2022", "2023", "2024", "2025", "2026"] as const;
+export const trajectoryColumns = ["2023", "2024", "2025", "2026"] as const;
 ```
 
 - [ ] **Step 2: Rebuild Career Path in chronological DOM order**
 
-Place Delegate first with `period: "2022-2025"` and `column: "2022"`; Senator in 2023; HCLTech in 2024; Meta Layer, W.O.D., and FMH in 2025; then all 2026 builds, both separate awards, and Linde. Remove PPG.
+Place Delegate first with `period: "2022-2025"` and `column: "2024"`; Senator in 2023; HCLTech in 2024; Meta Layer, W.O.D., and FMH in 2025; then all 2026 builds, both separate awards, and Linde. Remove PPG.
 
 - [ ] **Step 3: Correct projects, research, and recognition data**
 
@@ -128,7 +128,7 @@ Expected: content assertions pass; visual and navigation assertions may still fa
 - Modify: `src/styles/global.css`
 
 **Interfaces:**
-- Consumes: existing section classes and Task 2's five Career Path columns.
+- Consumes: existing section classes and Task 2's four Career Path columns.
 - Produces: full-width chapter surfaces and a single-family humanist typography system.
 
 - [ ] **Step 1: Make chapter backgrounds full-width**
@@ -161,7 +161,7 @@ Apply each token to its matching full-width section. Add a restrained top-edge r
 
 - [ ] **Step 5: Update the Career Path grid**
 
-Change both axis and cell grids from four to five equal year columns. Use a 72rem fallback to the chronological list so five columns remain legible at laptop widths.
+Use four equal year columns for both the axis and event-cell grids. Keep the 72rem fallback to the chronological list.
 
 - [ ] **Step 6: Run source tests and verify visual assertions pass**
 

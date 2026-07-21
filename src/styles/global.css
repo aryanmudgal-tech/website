@@ -876,7 +876,7 @@ h3 {
 
 .trajectory-axis {
   display: grid;
-  grid-template-columns: 6.5rem repeat(5, minmax(0, 1fr));
+  grid-template-columns: 6.5rem repeat(4, minmax(0, 1fr));
   color: var(--muted);
   font-family: var(--font-sans);
   font-size: 0.68rem;
@@ -906,7 +906,7 @@ h3 {
 
 .trajectory-lane__cells {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .trajectory-cell {

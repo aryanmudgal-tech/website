@@ -100,12 +100,17 @@ test("core proof and supported content are preserved", () => {
 test("requested portfolio corrections are exact and stale content is absent", () => {
   const data = read("src/data/portfolio.ts");
   const about = read("src/components/About.astro");
+  const css = read("src/styles/global.css");
 
-  assert.match(data, /trajectoryColumns\s*=\s*\["2022",\s*"2023",\s*"2024",\s*"2025",\s*"2026"\]/);
+  assert.match(data, /trajectoryColumns\s*=\s*\["2023",\s*"2024",\s*"2025",\s*"2026"\]/);
   assert.match(
     data,
-    /period:\s*"2022-2025",\s*column:\s*"2022",\s*lane:\s*"Leadership",\s*title:\s*"SUNY Delegate"/s,
+    /period:\s*"2022-2025",\s*column:\s*"2024",\s*lane:\s*"Leadership",\s*title:\s*"SUNY Delegate"/s,
   );
+  assert.match(data, /column:\s*"2023"\s*\|\s*"2024"\s*\|\s*"2025"\s*\|\s*"2026"/);
+  assert.doesNotMatch(data, /trajectoryColumns\s*=\s*\[[^\]]*"2022"/);
+  assert.match(css, /\.trajectory-axis\s*\{[^}]*repeat\(4,/s);
+  assert.match(css, /\.trajectory-lane__cells\s*\{[^}]*repeat\(4,/s);
   assert.match(
     data,
     /period:\s*"2023",\s*column:\s*"2023",\s*lane:\s*"Leadership",\s*title:\s*"Student Senator"/s,

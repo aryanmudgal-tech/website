@@ -38,7 +38,7 @@ export type Project = {
 export type TrajectoryEvent = {
   id: string;
   period: string;
-  column: "2022" | "2023" | "2024" | "2025" | "2026";
+  column: "2023" | "2024" | "2025" | "2026";
   lane: "Work" | "Build" | "Research" | "Leadership" | "Recognition";
   title: string;
   outcome: string;
@@ -196,7 +196,7 @@ export const projects: readonly Project[] = [
   },
 ];
 
-export const trajectoryColumns = ["2022", "2023", "2024", "2025", "2026"] as const;
+export const trajectoryColumns = ["2023", "2024", "2025", "2026"] as const;
 
 export const trajectoryLanes = ["Work", "Build", "Research", "Leadership", "Recognition"] as const;
 
@@ -204,7 +204,7 @@ export const trajectoryEvents: readonly TrajectoryEvent[] = [
   {
     id: "delegate",
     period: "2022-2025",
-    column: "2022",
+    column: "2024",
     lane: "Leadership",
     title: "SUNY Delegate",
     outcome: "Represented 30,000+ students.",
