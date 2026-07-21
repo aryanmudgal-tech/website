@@ -1,6 +1,6 @@
 # Aryan Mudgal portfolio
 
-A proof-first portfolio for recruiters and hiring managers. The site presents professional experience, selected builds, research, leadership, recognition, current work, and contact information in a fast editorial scan with optional depth.
+A proof-first portfolio for recruiters and hiring managers. The site presents professional experience, selected builds, research, leadership, recognition, personal context, and contact information in a fast editorial scan with optional depth.
 
 ## Run locally
 
@@ -33,12 +33,12 @@ The static production site is generated in `dist/client/`, with a small asset-se
 |---|---|
 | Hero and proof band | Establishes Aryan's direction and five credibility signals in the first viewport |
 | Work | Shows the Linde, Meta Layer Initiative, and HCLTech experience in recruiter-first order |
-| Projects | Presents Dots, ARMIE, StreamFair, and C.O.R.E. with visible proof links |
-| Trajectory | Connects work, builds, research, and leadership through one keyboard-operable interaction |
-| Research | Separates the MIDL-accepted work from two ongoing medical-AI projects |
+| Projects | Presents Dots, ARMIE, StreamFair, and W.O.D. with visible proof links |
+| Trajectory | Connects work, builds, research, leadership, and recognition from 2022 through 2026 in one keyboard-operable interaction |
+| Research | Separates the MIDL-accepted work from an ongoing medical-AI project |
 | Leadership | Gives student representation, budget, nonprofit, and civic work clear scale |
 | Recognition | Pairs the three institutional honors with real photographs and exact selection data |
-| About | Covers Litos, personal interests, locations, and collaborator gratitude |
+| About | Covers personal interests, locations, and collaborator gratitude |
 | Contact | Provides direct email, LinkedIn, and GitHub paths |
 
 ## Editing content
@@ -61,4 +61,4 @@ Photographs are sourced from `assets/` and copied to `public/assets/` for the st
 
 ## Project notes
 
-The implementation specification is in `docs/superpowers/specs/2026-07-20-portfolio-editorial-atlas-design.md`. The corresponding build plan is in `docs/superpowers/plans/2026-07-20-portfolio-editorial-atlas.md`.
+The current refinement specification is in `docs/superpowers/specs/2026-07-20-portfolio-tonal-chapters-design.md`. The corresponding build plan is in `docs/superpowers/plans/2026-07-20-portfolio-tonal-chapters.md`.

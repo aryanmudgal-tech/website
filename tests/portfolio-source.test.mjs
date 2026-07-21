@@ -76,15 +76,14 @@ test("core proof and supported content are preserved", () => {
     "Dots",
     "ARMIE",
     "StreamFair",
-    "C.O.R.E.",
+    "W.O.D.",
     "$500K+",
     "30,000+",
     "100,000+",
     "1,500+",
-    "Student Innovative Leader",
-    "SUNY Chancellor's Award",
+    "Award for Innovative Student Leadership",
+    "SUNY Chancellor's Award for Student Excellence",
     "Phi Beta Kappa",
-    "Litos",
     "Gym",
     "Golf",
     "Badminton",
@@ -96,6 +95,46 @@ test("core proof and supported content are preserved", () => {
   assert.doesNotMatch(data, /\bpublished\b/i);
   assert.doesNotMatch(data, /4(?:x|×)\s+hackathon\s+winner/i);
   assert.doesNotMatch(data, /3,000\+\s+followers/i);
+});
+
+test("requested portfolio corrections are exact and stale content is absent", () => {
+  const data = read("src/data/portfolio.ts");
+  const about = read("src/components/About.astro");
+
+  assert.match(data, /trajectoryColumns\s*=\s*\["2022",\s*"2023",\s*"2024",\s*"2025",\s*"2026"\]/);
+  assert.match(
+    data,
+    /period:\s*"2022-2025",\s*column:\s*"2022",\s*lane:\s*"Leadership",\s*title:\s*"SUNY Delegate"/s,
+  );
+  assert.match(
+    data,
+    /period:\s*"2023",\s*column:\s*"2023",\s*lane:\s*"Leadership",\s*title:\s*"Student Senator"/s,
+  );
+  assert.match(
+    data,
+    /period:\s*"2025",\s*column:\s*"2025",\s*lane:\s*"Research",\s*title:\s*"Fetal-maternal hemorrhage detection"/s,
+  );
+  assert.ok(
+    (data.match(/title:\s*"Award for Innovative Student Leadership"/g) ?? []).length >= 2,
+    "the exact innovative leadership award title must appear in Career Path and Recognition",
+  );
+  assert.ok(
+    (data.match(/title:\s*"SUNY Chancellor's Award for Student Excellence"/g) ?? []).length >= 2,
+    "the exact Chancellor's Award title must appear in Career Path and Recognition",
+  );
+  assert.ok((data.match(/year:\s*"2026"/g) ?? []).length >= 2, "both requested awards must show 2026");
+  assert.match(about, /<h2 id="about-title">Outside the work<\/h2>/);
+
+  for (const stale of [
+    /C\.O\.R\.E\. \/ W\.O\.D\./i,
+    /University and SUNY honors/i,
+    /PPG signal accuracy/i,
+    /Building Litos/i,
+    /name:\s*"Litos"/i,
+    /column:\s*"Now"/,
+  ]) {
+    assert.doesNotMatch(sourceBundle(), stale);
+  }
 });
 
 test("trajectory is progressive, selected server-side, and keyboard operable", () => {
@@ -110,6 +149,10 @@ test("trajectory is progressive, selected server-side, and keyboard operable", (
   for (const key of ["ArrowLeft", "ArrowRight", "Home", "End"]) {
     assert.ok(source.includes(key), `trajectory must handle ${key}`);
   }
+  assert.match(
+    source,
+    /\.sort\(\s*\(left, right\) => Number\(left\.dataset\.order\) - Number\(right\.dataset\.order\),?\s*\)/,
+  );
   assert.match(source, /classList\.add\("trajectory-ready"\)/);
   assert.match(source, /class="trajectory-fallback"/);
   assert.match(source, /trajectory-fallback__detail/);
@@ -138,13 +181,59 @@ test("visual system includes responsive, focus, theme, and motion safeguards", (
   assert.match(css, /:focus-visible/);
   assert.match(css, /min-height:\s*100dvh/);
   assert.match(css, /@media\s*\(max-width:\s*47\.99rem\)/);
-  assert.match(css, /@media\s*\(max-width:\s*64rem\)[\s\S]*?\.trajectory-ready\s+\.trajectory-enhanced\s*\{[^}]*display:\s*none/);
+  assert.match(css, /@media\s*\(max-width:\s*72rem\)[\s\S]*?\.trajectory-ready\s+\.trajectory-enhanced\s*\{[^}]*display:\s*none/);
   for (const state of [".wordmark:hover", ".site-nav a:active", ".site-footer__meta a:hover"]) {
     assert.ok(css.includes(state), `missing interaction feedback: ${state}`);
   }
   assert.doesNotMatch(css, /(?:linear|radial|conic)-gradient/i);
   assert.doesNotMatch(css, /cursor:\s*none/i);
   assert.doesNotMatch(css, /animation-iteration-count:\s*infinite/i);
+});
+
+test("tonal chapters and humanist typography replace the robotic mono system", () => {
+  const css = read("src/styles/global.css");
+
+  for (const token of [
+    "--chapter-work",
+    "--chapter-projects",
+    "--chapter-trajectory",
+    "--chapter-research",
+    "--chapter-leadership",
+    "--chapter-recognition",
+    "--chapter-about",
+  ]) {
+    assert.ok((css.match(new RegExp(`${token}:`, "g")) ?? []).length >= 2, `${token} must exist in light and dark themes`);
+  }
+
+  for (const roboticFont of [/--font-mono/i, /SFMono/i, /Consolas/i, /Liberation Mono/i, /\bmonospace\b/i]) {
+    assert.doesNotMatch(css, roboticFont);
+  }
+
+  for (const selector of [
+    ".section--work",
+    ".section--projects",
+    ".section--trajectory",
+    ".section--research",
+    ".section--leadership",
+    ".section--recognition",
+    ".section--about",
+  ]) {
+    assert.ok(css.includes(selector), `missing tonal chapter selector: ${selector}`);
+  }
+
+  assert.match(css, /\.recognition-item__year\s*\{/);
+});
+
+test("primary navigation exposes the current section without scroll listeners", () => {
+  const nav = read("src/components/SiteNav.astro");
+  const css = read("src/styles/global.css");
+
+  assert.match(nav, /IntersectionObserver/);
+  assert.match(nav, /aria-current/);
+  assert.match(nav, /astro:after-swap/);
+  assert.match(nav, /setCurrent\(current\?\.\[0\] \?\? null\)/);
+  assert.match(css, /\.site-nav a\[aria-current="location"\]/);
+  assert.doesNotMatch(nav, /window\.addEventListener\(["']scroll["']/);
 });
 
 test("served source rejects theatre-era and heavy-runtime patterns", () => {

@@ -24,6 +24,7 @@ import { recognitions } from "../data/portfolio";
           </figure>
           <div class="recognition-item__copy">
             <p class="recognition-item__value">{recognition.value}</p>
+            {recognition.year && <p class="recognition-item__year">{recognition.year}</p>}
             <h3>{recognition.title}</h3>
             <p>{recognition.context}</p>
           </div>

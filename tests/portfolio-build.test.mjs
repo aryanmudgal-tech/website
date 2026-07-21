@@ -32,8 +32,23 @@ test("built homepage exposes semantic recruiter content", () => {
 test("built homepage keeps proof visible and links actionable", () => {
   const html = read(client("index.html"));
 
-  for (const fact of ["Linde", "MIDL-accepted", "Dots", "ARMIE", "StreamFair", "C.O.R.E.", "$500K+", "30,000+"]) {
+  for (const fact of [
+    "Linde",
+    "MIDL-accepted",
+    "Dots",
+    "ARMIE",
+    "StreamFair",
+    "W.O.D.",
+    "$500K+",
+    "30,000+",
+    "Award for Innovative Student Leadership",
+    "SUNY Chancellor's Award for Student Excellence",
+  ]) {
     assert.ok(html.includes(fact), `built page is missing ${fact}`);
+  }
+
+  for (const stale of ["C.O.R.E. / W.O.D.", "University and SUNY honors", "PPG signal accuracy", "Building Litos"]) {
+    assert.equal(html.includes(stale), false, `built page still contains stale content: ${stale}`);
   }
 
   assert.doesNotMatch(html, /href=(?:""|'')/);
@@ -66,9 +81,20 @@ test("built trajectory has one initial selection and complete fallback labels", 
   const html = read(client("index.html"));
   const tabs = html.match(/<button\b[^>]*role="tab"[^>]*>/g) ?? [];
 
-  assert.ok(tabs.length >= 9);
+  assert.equal(tabs.length, 12);
   assert.equal(tabs.filter((tab) => tab.includes('aria-selected="true"')).length, 1);
   assert.ok((html.match(/class="trajectory-event__outcome"/g) ?? []).length >= tabs.length);
+  for (const period of ["2022-2025", "2023", "2024", "2025", "2026"]) {
+    assert.ok(html.includes(period), `built trajectory is missing ${period}`);
+  }
+});
+
+test("built navigation contains current-section progressive enhancement", () => {
+  const html = read(client("index.html"));
+
+  assert.match(html, /IntersectionObserver/);
+  assert.match(html, /aria-current/);
+  assert.doesNotMatch(html, /addEventListener\(["']scroll["']/);
 });
 
 test("built 404 page offers a route home", () => {

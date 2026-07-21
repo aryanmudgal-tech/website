@@ -2,30 +2,32 @@
 import { experiences } from "../data/portfolio";
 ---
 
-<section id="work" class="section section--work shell" aria-labelledby="work-title">
-  <header class="section-heading reveal">
-    <h2 id="work-title">Professional experience</h2>
-    <p>
-      Three roles, moving from market strategy to human-AI product infrastructure and deployed industrial machine learning.
-    </p>
-  </header>
+<section id="work" class="section section--work" aria-labelledby="work-title">
+  <div class="shell">
+    <header class="section-heading reveal">
+      <h2 id="work-title">Professional experience</h2>
+      <p>
+        Three roles, moving from market strategy to human-AI product infrastructure and deployed industrial machine learning.
+      </p>
+    </header>
 
-  <ol class="experience-list" role="list">
-    {experiences.map((experience, index) => (
-      <li class:list={["experience", { "experience--featured": experience.featured }, "reveal"]}>
-        <div class="experience__index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
-        <div class="experience__identity">
-          <p class="meta">{experience.period}</p>
-          <h3>{experience.company}</h3>
-          <p class="experience__role">{experience.role}</p>
-        </div>
-        <div class="experience__outcome">
-          <p>{experience.summary}</p>
-          <ul class="inline-list" role="list" aria-label={`${experience.company} capabilities`}>
-            {experience.capabilities.map((capability) => <li>{capability}</li>)}
-          </ul>
-        </div>
-      </li>
-    ))}
-  </ol>
+    <ol class="experience-list" role="list">
+      {experiences.map((experience, index) => (
+        <li class:list={["experience", { "experience--featured": experience.featured }, "reveal"]}>
+          <div class="experience__index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
+          <div class="experience__identity">
+            <p class="meta">{experience.period}</p>
+            <h3>{experience.company}</h3>
+            <p class="experience__role">{experience.role}</p>
+          </div>
+          <div class="experience__outcome">
+            <p>{experience.summary}</p>
+            <ul class="inline-list" role="list" aria-label={`${experience.company} capabilities`}>
+              {experience.capabilities.map((capability) => <li>{capability}</li>)}
+            </ul>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
 </section>

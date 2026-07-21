@@ -38,7 +38,7 @@ export type Project = {
 export type TrajectoryEvent = {
   id: string;
   period: string;
-  column: "2024" | "2025" | "2026" | "Now";
+  column: "2022" | "2023" | "2024" | "2025" | "2026";
   lane: "Work" | "Build" | "Research" | "Leadership" | "Recognition";
   title: string;
   outcome: string;
@@ -63,6 +63,7 @@ export type LeadershipItem = {
 
 export type Recognition = {
   title: string;
+  year?: string;
   value: string;
   context: string;
   image: string;
@@ -177,7 +178,7 @@ export const projects: readonly Project[] = [
     linkLabel: "Watch the StreamFair demo",
   },
   {
-    name: "C.O.R.E. / W.O.D.",
+    name: "W.O.D.",
     event: "XR Hacks, Stanford, Nov 2025",
     recognition: "1st, Best Creation on MoonLake",
     problem:
@@ -195,11 +196,31 @@ export const projects: readonly Project[] = [
   },
 ];
 
-export const trajectoryColumns = ["2024", "2025", "2026", "Now"] as const;
+export const trajectoryColumns = ["2022", "2023", "2024", "2025", "2026"] as const;
 
 export const trajectoryLanes = ["Work", "Build", "Research", "Leadership", "Recognition"] as const;
 
 export const trajectoryEvents: readonly TrajectoryEvent[] = [
+  {
+    id: "delegate",
+    period: "2022-2025",
+    column: "2022",
+    lane: "Leadership",
+    title: "SUNY Delegate",
+    outcome: "Represented 30,000+ students.",
+    detail:
+      "The role required turning concerns from a large student community into clear priorities and an accountable public voice.",
+  },
+  {
+    id: "senator",
+    period: "2023",
+    column: "2023",
+    lane: "Leadership",
+    title: "Student Senator",
+    outcome: "Stewarded a $500K+ student budget.",
+    detail:
+      "The work paired representation with resource decisions, weighing where student funding could create the most practical value.",
+  },
   {
     id: "hcl",
     period: "2024",
@@ -225,10 +246,20 @@ export const trajectoryEvents: readonly TrajectoryEvent[] = [
     period: "Nov 2025",
     column: "2025",
     lane: "Build",
-    title: "C.O.R.E. / W.O.D.",
+    title: "W.O.D.",
     outcome: "Won the MoonLake track at Stanford XR Hacks.",
     detail:
       "The two-person team built a playable historical VR world with MoonLake's environment tools and won Best Creation on MoonLake.",
+  },
+  {
+    id: "fmh",
+    period: "2025",
+    column: "2025",
+    lane: "Research",
+    title: "Fetal-maternal hemorrhage detection",
+    outcome: "Medical AI work accepted at MIDL.",
+    detail:
+      "The research applies deep learning to detecting a faint fetal signal within maternal blood samples, where missing a small trace can matter.",
   },
   {
     id: "armie",
@@ -261,14 +292,24 @@ export const trajectoryEvents: readonly TrajectoryEvent[] = [
       "The team focused applied AI on spatial accessibility and left UCLA with both the Catalyst for Care win and Fetch.ai third place.",
   },
   {
-    id: "recognition",
-    period: "Apr-May 2026",
+    id: "innovative-student-leadership",
+    period: "2026",
     column: "2026",
     lane: "Recognition",
-    title: "University and SUNY honors",
-    outcome: "Selected for two institution-wide honors.",
+    title: "Award for Innovative Student Leadership",
+    outcome: "Selected as 1 of 2 among 20,000 students.",
     detail:
-      "Named Student Innovative Leader, 1 of 2 among 20,000 students, and received the SUNY Chancellor's Award, 1 of 15 among 8,000 students.",
+      "Chosen among 20,000 students for university innovation and leadership.",
+  },
+  {
+    id: "suny-chancellors-award",
+    period: "2026",
+    column: "2026",
+    lane: "Recognition",
+    title: "SUNY Chancellor's Award for Student Excellence",
+    outcome: "Selected as 1 of 15 among 8,000 students.",
+    detail:
+      "Selected among 8,000 students for SUNY's highest student honor.",
   },
   {
     id: "linde",
@@ -279,46 +320,6 @@ export const trajectoryEvents: readonly TrajectoryEvent[] = [
     outcome: "Shipped predictive support for industrial operators.",
     detail:
       "The system distilled live plant signals into forecasts and prioritized alerts, then evolved through direct feedback from a licensed partner team.",
-  },
-  {
-    id: "fmh",
-    period: "Current",
-    column: "Now",
-    lane: "Research",
-    title: "Fetal-maternal hemorrhage detection",
-    outcome: "Medical AI work accepted at MIDL.",
-    detail:
-      "The research applies deep learning to detecting a faint fetal signal within maternal blood samples, where missing a small trace can matter.",
-  },
-  {
-    id: "ppg",
-    period: "Current",
-    column: "Now",
-    lane: "Research",
-    title: "PPG signal accuracy",
-    outcome: "Ongoing work on more reliable wearable vitals.",
-    detail:
-      "This work asks how derived health readings can become more trustworthy when the underlying optical signal is noisy.",
-  },
-  {
-    id: "delegate",
-    period: "Current",
-    column: "Now",
-    lane: "Leadership",
-    title: "SUNY Delegate",
-    outcome: "Represented 30,000+ students.",
-    detail:
-      "The role required turning concerns from a large student community into clear priorities and an accountable public voice.",
-  },
-  {
-    id: "senator",
-    period: "Current",
-    column: "Now",
-    lane: "Leadership",
-    title: "Student Senator",
-    outcome: "Stewarded a $500K+ student budget.",
-    detail:
-      "The work paired representation with resource decisions, weighing where student funding could create the most practical value.",
   },
 ];
 
@@ -331,14 +332,6 @@ export const researchItems: readonly ResearchItem[] = [
       "Deep-learning research focused on detecting fetal-maternal hemorrhage from a signal that is easy to miss and costly to overlook.",
     capabilities: ["Medical imaging", "Deep learning", "Peer review"],
     featured: true,
-  },
-  {
-    status: "Ongoing research",
-    title: "PPG signal accuracy",
-    subject: "Making wearable vital estimates more trustworthy.",
-    summary:
-      "Research on improving the reliability of vitals derived from photoplethysmography signals.",
-    capabilities: ["Biosignals", "Wearables", "Signal quality"],
   },
   {
     status: "Ongoing research",
@@ -385,16 +378,18 @@ export const leadershipItems: readonly LeadershipItem[] = [
 
 export const recognitions: readonly Recognition[] = [
   {
-    title: "Student Innovative Leader",
+    title: "Award for Innovative Student Leadership",
+    year: "2026",
     value: "1 of 2",
     context: "Chosen among 20,000 students for university innovation and leadership.",
     image: "/assets/award-leader.jpg",
     imageWidth: 1195,
     imageHeight: 793,
-    imageAlt: "Aryan holding the Student Innovative Leader award at the University at Buffalo",
+    imageAlt: "Aryan holding the Award for Innovative Student Leadership at the University at Buffalo",
   },
   {
-    title: "SUNY Chancellor's Award",
+    title: "SUNY Chancellor's Award for Student Excellence",
+    year: "2026",
     value: "1 of 15",
     context: "Selected among 8,000 students for SUNY's highest student honor.",
     image: "/assets/award-chancellor.jpg",
@@ -412,14 +407,6 @@ export const recognitions: readonly Recognition[] = [
     imageAlt: "Aryan being inducted into Phi Beta Kappa",
   },
 ];
-
-export const currentWork = {
-  name: "Litos",
-  role: "Founder and builder",
-  status: "In production",
-  note: "In production now. Product details remain intentionally undisclosed.",
-  next: "More when it is ready",
-} as const;
 
 export const interests = ["Gym", "Golf", "Badminton", "Acting and mimicry"] as const;
 

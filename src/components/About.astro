@@ -1,26 +1,11 @@
 ---
-import { currentWork, interests, places } from "../data/portfolio";
+import { interests, places } from "../data/portfolio";
 ---
 
-<section id="about" class="section section--about shell" aria-labelledby="about-title">
-  <div class="about-current reveal">
+<section id="about" class="section section--about" aria-labelledby="about-title">
+  <div class="about-human shell reveal">
     <div>
-      <p class="meta">Current work</p>
-      <h2 id="about-title">Building {currentWork.name}</h2>
-    </div>
-    <div class="about-current__copy">
-      <p class="about-current__lead">{currentWork.note}</p>
-      <dl>
-        <div><dt>Role</dt><dd>{currentWork.role}</dd></div>
-        <div><dt>Status</dt><dd>{currentWork.status}</dd></div>
-        <div><dt>Next</dt><dd>{currentWork.next}</dd></div>
-      </dl>
-    </div>
-  </div>
-
-  <div class="about-human reveal">
-    <div>
-      <h3>Outside the work</h3>
+      <h2 id="about-title">Outside the work</h2>
       <ul class="interest-list" role="list">
         {interests.map((interest) => <li>{interest}</li>)}
       </ul>
