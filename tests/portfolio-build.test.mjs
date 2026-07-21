@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -101,4 +101,11 @@ test("Sites worker delegates requests to the static asset binding", async () => 
   const wrangler = JSON.parse(read("dist/server/wrangler.json"));
   assert.equal(wrangler.main, "index.js");
   assert.equal(wrangler.assets.directory, "../client");
+});
+
+test("production package has no stale static files beside client and server", () => {
+  assert.equal(existsSync(join(root, "dist", "index.html")), false);
+  assert.equal(existsSync(join(root, "dist", "404.html")), false);
+  assert.equal(existsSync(join(root, "dist", "assets")), false);
+  assert.equal(existsSync(join(root, "dist", "_astro")), false);
 });
