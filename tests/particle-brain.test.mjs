@@ -13,6 +13,9 @@ test("brain particles are deterministic for identical options", () => {
   const first = createBrainModel(modelOptions);
   const second = createBrainModel(modelOptions);
 
+  assert.equal(first.length, modelOptions.count);
+  assert.equal(second.length, modelOptions.count);
+  assert.ok(first.length >= 20, "the deterministic sample requires at least twenty particles");
   assert.deepEqual(first.slice(0, 20), second.slice(0, 20));
 });
 

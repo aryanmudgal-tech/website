@@ -11,13 +11,40 @@ const client = (relativePath) => `dist/client/${relativePath}`;
 test("built homepage exposes semantic recruiter content", () => {
   const html = read(client("index.html"));
   const canvases = html.match(/<canvas\b[^>]*>/g) ?? [];
+  const description = "Aryan Mudgal builds applied AI systems across industrial operations, human-AI interaction, and healthcare.";
+  const themeColors = [...html.matchAll(/<meta name="theme-color" content="([^"]+)"[^>]*>/g)].map((match) => match[1]);
+  const schemaText = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? "";
 
   assert.match(html, /<title>Aryan Mudgal \| Engineer and researcher<\/title>/);
-  assert.match(html, /<meta name="description"/);
-  assert.match(html, /<meta property="og:title"/);
+  assert.ok(html.includes(`<meta name="description" content="${description}">`));
+  assert.match(html, /<meta property="og:type" content="website"/);
+  assert.match(html, /<meta property="og:title" content="Aryan Mudgal \| Engineer and researcher"/);
+  assert.ok(html.includes(`<meta property="og:description" content="${description}">`));
   assert.match(html, /<meta name="twitter:card" content="summary"/);
+  assert.match(html, /<meta name="twitter:title" content="Aryan Mudgal \| Engineer and researcher"/);
+  assert.ok(html.includes(`<meta name="twitter:description" content="${description}">`));
+  assert.ok(themeColors.length >= 1);
+  assert.deepEqual([...new Set(themeColors)], ["#000000"]);
   assert.doesNotMatch(html, /http:\/\/localhost/);
-  assert.match(html, /application\/ld\+json/);
+  assert.match(html, /<link rel="icon" href="(?:\/website)?\/favicon\.svg" type="image\/svg\+xml"/);
+  assert.notEqual(schemaText, "", "built page must expose Person JSON-LD");
+  assert.deepEqual(JSON.parse(schemaText), {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Aryan Mudgal",
+    email: "mailto:aryanmudgal4493@gmail.com",
+    jobTitle: "Software engineer and researcher",
+    sameAs: [
+      "https://www.linkedin.com/in/aryan-mudgal",
+      "https://github.com/aryanmudgal-tech",
+    ],
+    knowsAbout: [
+      "Applied artificial intelligence",
+      "Machine learning",
+      "Human-AI interaction",
+      "Medical AI",
+    ],
+  });
   assert.match(html, /class="skip-link" href="#main-content"/);
   assert.match(html, /<header[^>]*>/);
   assert.match(html, /<nav[^>]*aria-label="Primary"/);
@@ -64,6 +91,18 @@ test("built homepage keeps proof visible and links actionable", () => {
     assert.equal(html.includes(stale), false, `built page still contains stale content: ${stale}`);
   }
 
+  for (const url of [
+    "mailto:aryanmudgal4493@gmail.com",
+    "https://www.linkedin.com/in/aryan-mudgal",
+    "https://github.com/aryanmudgal-tech",
+    "https://devpost.com/software/dots-y5r21j",
+    "https://devpost.com/software/armie",
+    "https://drive.google.com/file/d/12grQ7uR837u36IkN1WaILOC0SHycm2rh/view?usp=sharing",
+    "https://devpost.com/software/c-o-r-e",
+  ]) {
+    assert.ok(html.includes(`href="${url}"`), `built page is missing exact public URL: ${url}`);
+  }
+
   assert.doesNotMatch(html, /href=(?:""|'')/);
   assert.doesNotMatch(html, /href=(?:"#"|'#')/);
   assert.doesNotMatch(html, /<script[^>]+src=/i);
@@ -87,11 +126,27 @@ test("built images reserve space and contain meaningful alternatives", () => {
     assert.match(image, /\bheight="\d+"/);
     assert.match(image, /\balt="[^"]{12,}"/);
   }
+  for (const asset of [
+    "award-leader.jpg",
+    "hack-dots.jpg",
+    "hack-armie.jpg",
+    "hack-streamfair.jpg",
+    "hack-core.jpg",
+    "award-chancellor.jpg",
+    "award-pbk.jpg",
+  ]) {
+    assert.match(html, new RegExp(`src="(?:/website)?/assets/${asset.replace(".", "\\.")}"`));
+  }
   assert.match(html, /src="(?:\/website)?\/assets\/award-leader\.jpg"[^>]*fetchpriority="high"/);
 });
 
 test("built trajectory keeps every chronological label in server-rendered HTML", () => {
   const html = read(client("index.html"));
+  const trajectorySection = html.match(/<section\b[^>]*id="trajectory"[^>]*>([\s\S]*?)<\/section>/)?.[1] ?? "";
+  const chronology = trajectorySection.match(/<ol\b[^>]*>([\s\S]*?)<\/ol>/)?.[1] ?? "";
+
+  assert.notEqual(trajectorySection, "", "built page must contain the #trajectory section");
+  assert.notEqual(chronology, "", "#trajectory must contain the chronological list");
 
   for (const label of [
     "SUNY Delegate",
@@ -107,10 +162,10 @@ test("built trajectory keeps every chronological label in server-rendered HTML",
     "SUNY Chancellor's Award for Student Excellence",
     "Linde",
   ]) {
-    assert.ok(html.includes(label), `built trajectory is missing ${label}`);
+    assert.ok(chronology.includes(label), `built trajectory list is missing ${label}`);
   }
   for (const period of ["2022-2025", "2023", "2024", "2025", "2026"]) {
-    assert.ok(html.includes(period), `built trajectory is missing ${period}`);
+    assert.ok(chronology.includes(period), `built trajectory list is missing ${period}`);
   }
 });
 
