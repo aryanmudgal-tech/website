@@ -4,6 +4,8 @@
   --text: #ffffff;
   --text-secondary: #bdbdbd;
   --text-quiet: #8d8d92;
+  --reading-surface: rgb(0 0 0 / 0.9);
+  --reading-surface-strong: rgb(0 0 0 / 0.96);
   --iris: #8052ff;
   --saffron: #ffb829;
   --font-display: "Helvetica Neue", "Avenir Next", Arial, sans-serif;

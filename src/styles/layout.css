@@ -162,6 +162,8 @@ main,
   display: grid;
   gap: 1.35rem;
   margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  background: var(--reading-surface);
 }
 
 .section-heading > p,
@@ -203,8 +205,8 @@ main,
   gap: clamp(1.35rem, 2.7vw, 2.25rem);
   align-content: center;
   align-self: center;
-  padding: clamp(1.25rem, 2.5vw, 2.25rem);
-  background: rgb(0 0 0 / 0.7);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  background: var(--reading-surface);
 }
 
 .hero h1 {
@@ -299,14 +301,16 @@ main,
 }
 
 .experience-list,
+.work-evidence,
 .project-lead,
 .project-tile,
 .research-feature,
 .research-notes,
+.nested-chapter,
 .leadership-mosaic,
 .recognition-item,
 .about-human {
-  background: rgb(0 0 0 / 0.8);
+  background: var(--reading-surface);
 }
 
 .experience-list {
@@ -319,7 +323,6 @@ main,
   gap: 0.8rem;
   margin-bottom: clamp(1.25rem, 3vw, 2.5rem);
   padding: clamp(0.75rem, 1.5vw, 1rem);
-  background: rgb(0 0 0 / 0.8);
 }
 
 .work-evidence img {
@@ -348,7 +351,7 @@ main,
   grid-template-columns: 2rem minmax(10rem, 0.72fr) minmax(0, 1.28fr);
   gap: clamp(1rem, 2.5vw, 2.5rem);
   padding: clamp(1.5rem, 3vw, 2.6rem);
-  background: rgb(0 0 0 / 0.78);
+  background: var(--reading-surface-strong);
 }
 
 .experience + .experience {
@@ -553,6 +556,10 @@ main,
   align-content: end;
 }
 
+.research-note {
+  background: var(--reading-surface-strong);
+}
+
 .research-status {
   width: fit-content;
   color: var(--saffron);
@@ -611,6 +618,7 @@ main,
   align-content: start;
   padding-left: 1rem;
   border-left: 1px solid rgb(128 82 255 / 0.65);
+  background: var(--reading-surface-strong);
 }
 
 .trajectory-node__meta {
@@ -651,7 +659,7 @@ main,
   align-content: end;
   gap: 0.65rem;
   padding: clamp(1.3rem, 2.7vw, 2.25rem);
-  background: rgb(0 0 0 / 0.82);
+  background: var(--reading-surface-strong);
 }
 
 .leadership-item__value {
@@ -703,6 +711,7 @@ main,
   gap: 0.6rem;
   align-content: end;
   padding: 0.75rem;
+  background: var(--reading-surface-strong);
 }
 
 .recognition-item__value {
@@ -769,7 +778,7 @@ main,
 }
 
 .site-footer {
-  background: rgb(0 0 0 / 0.92);
+  background: var(--reading-surface-strong);
 }
 
 .site-footer__inner {
@@ -853,11 +862,10 @@ main,
   .project-tile,
   .research-feature,
   .research-notes,
-  .trajectory-node,
   .leadership-mosaic,
   .recognition-item,
   .about-human {
-    background: rgb(0 0 0 / 0.88);
+    background: var(--reading-surface);
   }
 
   .section-heading,
@@ -995,13 +1003,12 @@ main,
   .research-feature,
   .research-layout,
   .research-notes,
-  .trajectory-node,
   .nested-chapter,
   .leadership-mosaic,
   .recognition-item,
   .recognition-strip,
   .about-human {
-    background: rgb(0 0 0 / 0.94);
+    background: var(--reading-surface);
   }
 
   .section-heading,
@@ -1024,7 +1031,7 @@ main,
     grid-row: 1;
     min-width: 0;
     padding: 1.25rem;
-    background: rgb(0 0 0 / 0.9);
+    background: var(--reading-surface);
   }
 
   .hero h1 {
