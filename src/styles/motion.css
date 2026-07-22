@@ -44,7 +44,7 @@
     transform 220ms var(--ease-out);
 }
 
-@supports (animation-timeline: scroll()) {
+@supports (animation-timeline: scroll()) and (animation-range: 0 10rem) {
   @media (prefers-reduced-motion: no-preference) and (min-width: 48.01rem) {
     .site-header {
       animation: nav-strip linear both;

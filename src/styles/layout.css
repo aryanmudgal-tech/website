@@ -1098,7 +1098,8 @@ main,
     border-left: 0;
   }
 
-  .about-human {
+  .story-chapter > .about-human {
+    display: grid;
     grid-template-columns: 1fr;
     gap: 3rem;
   }

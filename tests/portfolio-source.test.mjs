@@ -618,6 +618,43 @@ test("navigation has a black fallback and a supported transparent-at-top state",
   );
 });
 
+test("hero gives the email action primary Electric Iris emphasis", () => {
+  const hero = read("src/components/Hero.astro");
+
+  assert.match(
+    hero,
+    /<a class="action action--primary" href=\{links\.email\}>Email Aryan<\/a>/,
+  );
+  assert.match(
+    hero,
+    /<a class="action action--text" href="#work">View experience<\/a>/,
+  );
+  assert.ok(
+    hero.indexOf(">Email Aryan</a>") < hero.indexOf(">View experience</a>"),
+    "the primary email action must appear before the secondary experience action",
+  );
+});
+
+test("mobile About restores a layout that preserves vertical separation", () => {
+  const css = readIfPresent("src/styles/layout.css");
+  const mobile = css.match(/@media\s*\(max-width:\s*48rem\)\s*\{([\s\S]*)\}\s*$/)?.[1] ?? "";
+
+  assert.match(mobile, /\.story-chapter\s*>\s*\.shell\s*\{[^}]*display:\s*block/s);
+  assert.match(
+    mobile,
+    /\.story-chapter\s*>\s*\.about-human\s*\{[^}]*(?:display:\s*(?:grid|flex)[^}]*gap:\s*3rem|margin-top:\s*3rem)/s,
+  );
+});
+
+test("nav scroll animation support requires timeline and range", () => {
+  const motion = readIfPresent("src/styles/motion.css");
+
+  assert.match(
+    motion,
+    /@supports\s*\(animation-timeline:\s*scroll\(\)\)\s+and\s+\(animation-range:\s*[^)]+\)/,
+  );
+});
+
 test("award photography is evidence after the hero", () => {
   const hero = read("src/components/Hero.astro");
   const experience = read("src/components/Experience.astro");
