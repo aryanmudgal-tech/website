@@ -7,6 +7,20 @@ import test from "node:test";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFileSync(join(root, relativePath), "utf8");
 const client = (relativePath) => `dist/client/${relativePath}`;
+const externalUrls = [
+  "https://www.linkedin.com/in/aryan-mudgal",
+  "https://github.com/aryanmudgal-tech",
+  "https://devpost.com/software/dots-y5r21j",
+  "https://devpost.com/software/armie",
+  "https://drive.google.com/file/d/12grQ7uR837u36IkN1WaILOC0SHycm2rh/view?usp=sharing",
+  "https://devpost.com/software/c-o-r-e",
+];
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+function anchorFor(html, url) {
+  return html.match(new RegExp(`<a\\b(?=[^>]*\\bhref="${escapeRegExp(url)}")[^>]*>[\\s\\S]*?<\\/a>`))?.[0] ?? "";
+}
 
 test("built homepage exposes semantic recruiter content", () => {
   const html = read(client("index.html"));
@@ -52,7 +66,7 @@ test("built homepage exposes semantic recruiter content", () => {
   assert.match(html, /<footer[^>]*id="contact"/);
   assert.equal((html.match(/<h1(?:\s|>)/g) ?? []).length, 1);
   assert.equal(canvases.length, 1);
-  assert.match(html, /<div\b[^>]*aria-hidden="true"[^>]*>\s*<canvas\b/);
+  assert.match(html, /<div\b(?=[^>]*class="particle-brain")(?=[^>]*aria-hidden="true")[^>]*>\s*<canvas\b/);
 
   for (const id of ["work", "projects", "trajectory", "research", "leadership", "recognition", "about", "contact"]) {
     assert.ok(html.includes(`id="${id}"`), `built page is missing #${id}`);
@@ -93,12 +107,7 @@ test("built homepage keeps proof visible and links actionable", () => {
 
   for (const url of [
     "mailto:aryanmudgal4493@gmail.com",
-    "https://www.linkedin.com/in/aryan-mudgal",
-    "https://github.com/aryanmudgal-tech",
-    "https://devpost.com/software/dots-y5r21j",
-    "https://devpost.com/software/armie",
-    "https://drive.google.com/file/d/12grQ7uR837u36IkN1WaILOC0SHycm2rh/view?usp=sharing",
-    "https://devpost.com/software/c-o-r-e",
+    ...externalUrls,
   ]) {
     assert.ok(html.includes(`href="${url}"`), `built page is missing exact public URL: ${url}`);
   }
@@ -114,6 +123,15 @@ test("built homepage keeps proof visible and links actionable", () => {
     assert.match(link, /rel="noopener noreferrer"/);
   }
   assert.ok((html.match(/opens in a new tab/g) ?? []).length >= externalLinks.length);
+
+  for (const url of externalUrls) {
+    const anchor = anchorFor(html, url);
+    const openingTag = anchor.match(/^<a\b[^>]*>/)?.[0] ?? "";
+    assert.notEqual(anchor, "", `missing exact external anchor: ${url}`);
+    assert.match(openingTag, /\btarget="_blank"/);
+    assert.match(openingTag, /\brel="noopener noreferrer"/);
+    assert.match(anchor, /<span class="sr-only"> opens in a new tab<\/span>/);
+  }
 });
 
 test("built images reserve space and contain meaningful alternatives", () => {

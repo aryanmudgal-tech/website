@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import test from "node:test";
+import * as portfolio from "../src/data/portfolio.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -70,6 +72,63 @@ function servedSource(directory = join(root, "src")) {
   }).join("\n");
 }
 
+function hexFromChannels(red, green, blue) {
+  return `#${[red, green, blue]
+    .map((channel) => Math.round(channel).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+function normalizeHex(color) {
+  const value = color.slice(1);
+  if (value.length === 3 || value.length === 4) {
+    return `#${value.slice(0, 3).split("").map((digit) => digit.repeat(2)).join("")}`;
+  }
+  return `#${value.slice(0, 6)}`;
+}
+
+function normalizeRgb(body) {
+  const channels = body.split("/")[0].trim().split(/[\s,]+/).filter(Boolean).slice(0, 3);
+  assert.equal(channels.length, 3, `unsupported rgb() color: ${body}`);
+  return hexFromChannels(...channels.map((channel) => (
+    channel.endsWith("%") ? Number.parseFloat(channel) * 2.55 : Number.parseFloat(channel)
+  )));
+}
+
+function normalizeHsl(body) {
+  const channels = body.split("/")[0].trim().split(/[\s,]+/).filter(Boolean).slice(0, 3);
+  assert.equal(channels.length, 3, `unsupported hsl() color: ${body}`);
+  const hue = ((Number.parseFloat(channels[0]) % 360) + 360) % 360;
+  const saturation = Number.parseFloat(channels[1]) / 100;
+  const lightness = Number.parseFloat(channels[2]) / 100;
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const segment = hue / 60;
+  const secondary = chroma * (1 - Math.abs((segment % 2) - 1));
+  const [red, green, blue] = segment < 1 ? [chroma, secondary, 0]
+    : segment < 2 ? [secondary, chroma, 0]
+      : segment < 3 ? [0, chroma, secondary]
+        : segment < 4 ? [0, secondary, chroma]
+          : segment < 5 ? [secondary, 0, chroma]
+            : [chroma, 0, secondary];
+  const match = lightness - chroma / 2;
+  return hexFromChannels((red + match) * 255, (green + match) * 255, (blue + match) * 255);
+}
+
+function authoredCssPalette(css) {
+  const colors = (css.match(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/gi) ?? []).map(normalizeHex);
+  for (const match of css.matchAll(/rgba?\(([^)]*)\)/gi)) colors.push(normalizeRgb(match[1]));
+  for (const match of css.matchAll(/hsla?\(([^)]*)\)/gi)) colors.push(normalizeHsl(match[1]));
+  for (const match of css.matchAll(
+    /(?:^|[;{])\s*(?:color|background(?:-color)?|border-color|outline-color|fill|stroke)\s*:\s*([a-z]+)\s*(?=[;}])/gim,
+  )) {
+    const keyword = match[1].toLowerCase();
+    if (["transparent", "currentcolor", "inherit", "initial", "unset"].includes(keyword)) continue;
+    assert.ok(["black", "white"].includes(keyword), `unapproved named CSS color: ${keyword}`);
+    colors.push(keyword === "black" ? "#000000" : "#ffffff");
+  }
+  assert.doesNotMatch(css, /\b(?:hwb|lab|lch|oklab|oklch|color|color-mix)\s*\(/i);
+  return [...new Set(colors)].sort();
+}
+
 test("recruiter-first sections exist in the approved order", () => {
   const page = read("src/pages/index.astro");
   const components = [
@@ -134,6 +193,27 @@ test("core proof and supported content are preserved", () => {
   assert.doesNotMatch(data, /\bpublished\b/i);
   assert.doesNotMatch(data, /4(?:x|×)\s+hackathon\s+winner/i);
   assert.doesNotMatch(data, /3,000\+\s+followers/i);
+});
+
+test("every typed portfolio fact matches the approved content snapshot", () => {
+  const { navItems: _navItems, ...facts } = portfolio;
+  const factHash = createHash("sha256").update(JSON.stringify(facts)).digest("hex");
+
+  assert.deepEqual(Object.keys(facts).sort(), [
+    "experiences",
+    "interests",
+    "leadershipItems",
+    "links",
+    "places",
+    "projects",
+    "proofPoints",
+    "recognitions",
+    "researchItems",
+    "trajectoryColumns",
+    "trajectoryEvents",
+    "trajectoryLanes",
+  ]);
+  assert.equal(factHash, "1937230be150f15ce5de31c3d61a31210ea60838c5d6c9b1e0d19141006db8ef");
 });
 
 test("public contact and project URLs remain exact", () => {
@@ -261,8 +341,7 @@ test("Camera Dive source includes the fixed decorative brain and six scene marke
 
   assert.equal(existsSync(join(root, "src/components/ParticleBrain.astro")), true);
   assert.match(page, /<ParticleBrain\s*\/>/);
-  assert.match(brain, /<canvas\b/);
-  assert.match(brain, /aria-hidden="true"/);
+  assert.match(brain, /<div\b(?=[^>]*class="particle-brain")(?=[^>]*aria-hidden="true")[^>]*>\s*<canvas\b/);
   assert.match(styleSource(), /(?:\.particle-brain(?:__canvas)?|\[data-particle-brain\])\s*\{[^}]*pointer-events:\s*none/s);
   for (const scene of ["hero", "work", "projects", "research", "leadership", "about"]) {
     assert.match(source, new RegExp(`data-brain-scene=["']${scene}["']`));
@@ -271,6 +350,7 @@ test("Camera Dive source includes the fixed decorative brain and six scene marke
 
 test("particle runtime uses Canvas 2D with lifecycle and fallback safeguards", () => {
   const source = cameraDiveSource();
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
 
   assert.match(source, /getContext\(["']2d["']\)/);
   assert.match(source, /requestAnimationFrame/);
@@ -278,6 +358,26 @@ test("particle runtime uses Canvas 2D with lifecycle and fallback safeguards", (
   assert.match(source, /matchMedia\(["']\(prefers-reduced-motion:\s*reduce\)["']\)/);
   assert.match(source, /Math\.min\([^)]*(?:window\.)?devicePixelRatio[^)]*,\s*1\.5\)/);
   assert.match(source, /brain-unavailable/);
+  assert.match(engine, /(?:scrollY|getBoundingClientRect\(\))/);
+  assert.match(engine, /const\s+sceneProgress\s*=/);
+  assert.match(engine, /interpolateScene\(\s*[^,]+,\s*sceneProgress\s*\)/);
+  assert.doesNotMatch(engine, /Math\.(?:ceil|floor|round)\([^)]*sceneProgress/);
+  assert.match(engine, /IntersectionObserver/);
+  assert.match(engine, /\.isIntersecting/);
+  assert.match(engine, /\.observe\(\s*canvas\s*\)/);
+  assert.match(engine, /setTimeout\([\s\S]{0,300},\s*120\s*\)/);
+  assert.match(engine, /clearTimeout/);
+  assert.match(engine, /cancelAnimationFrame/);
+  assert.match(engine, /\.disconnect\(\)/);
+  assert.match(engine, /removeEventListener\(\s*["']resize["']/);
+
+  const reducedBranch = engine.match(
+    /if\s*\(\s*reducedMotion\.matches\s*\)\s*\{([\s\S]*?)\n\s*\}/,
+  )?.[1] ?? "";
+  assert.notEqual(reducedBranch, "", "runtime must branch for reduced motion");
+  assert.match(reducedBranch, /interpolateScene\(\s*[^,]+,\s*0\s*\)/);
+  assert.equal((reducedBranch.match(/(?:draw|render)\w*\s*\(/gi) ?? []).length, 1);
+  assert.doesNotMatch(reducedBranch, /requestAnimationFrame/);
 });
 
 test("global styles are split into tokens, layout, and motion modules", () => {
@@ -295,15 +395,12 @@ test("global styles are split into tokens, layout, and motion modules", () => {
 });
 
 test("served source uses only the exact approved Camera Dive palette", () => {
-  const approved = ["#000000", "#15846e", "#8052ff", "#8d8d92", "#bdbdbd", "#ffb829", "#ffffff"];
-  const authored = [
-    ...new Set(
-      (servedSource().match(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/gi) ?? [])
-        .map((color) => color.toLowerCase()),
-    ),
-  ].sort();
+  const css = styleSource();
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
 
-  assert.deepEqual(authored, approved);
+  assert.deepEqual(authoredCssPalette(css), ["#000000", "#8052ff", "#8d8d92", "#bdbdbd", "#ffb829", "#ffffff"]);
+  assert.doesNotMatch(css, /#15846e/i);
+  assert.match(engine, /["']#15846e["']/i);
 });
 
 test("primary navigation exposes the current section without scroll listeners", () => {
@@ -322,15 +419,18 @@ test("served source rejects prohibited runtimes and interaction patterns", () =>
   const source = servedSource();
   const packageJson = JSON.parse(read("package.json"));
 
-  assert.deepEqual(packageJson.dependencies ?? {}, {}, "Camera Dive must not add runtime dependencies");
-  for (const dependencyGroup of [
+  const dependencyNames = [
     packageJson.dependencies ?? {},
     packageJson.devDependencies ?? {},
     packageJson.optionalDependencies ?? {},
     packageJson.peerDependencies ?? {},
-  ]) {
-    assert.equal(Object.keys(dependencyGroup).some((name) => name.toLowerCase() === "three"), false);
-  }
+    packageJson.bundleDependencies ?? [],
+    packageJson.bundledDependencies ?? [],
+  ].flatMap((dependencyGroup) => (
+    Array.isArray(dependencyGroup) ? dependencyGroup : Object.keys(dependencyGroup)
+  ));
+  assert.deepEqual(dependencyNames, ["astro"], "Astro must remain the sole package dependency");
+  assert.equal(packageJson.devDependencies.astro, "^7.1.3");
 
   for (const banned of [
     /(?:from\s*|import\s*)["']three(?:\/[^"']*)?["']/i,
