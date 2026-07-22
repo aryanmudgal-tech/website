@@ -81,4 +81,3 @@ Primary navigation is reduced to Work, Projects, Research, Leadership, About, an
 5. Desktop, tablet, and mobile views preserve readable content and a recognizable particle composition without horizontal overflow.
 6. Keyboard navigation, visible focus, reduced-motion mode, and no-JavaScript reading are manually verified.
 7. `npm run check` passes, including the Astro production build, built-output tests, GitHub Pages base-path behavior, and Sites worker packaging.
-
