@@ -6,10 +6,49 @@ import {
   createBrainModel,
   interpolateScene,
   leadershipAccent,
+  PARTICLE_SHAPES,
   particleBudget,
+  particleShapeState,
 } from "../src/lib/particle-brain.mjs";
 
 const modelOptions = { seed: 20260721, count: 64 };
+
+test("the six chapters expose the approved semantic micro-shapes", () => {
+  assert.deepEqual(PARTICLE_SHAPES, [
+    "triangle",
+    "square",
+    "diamond",
+    "ring",
+    "hexagon",
+    "dot",
+  ]);
+
+  PARTICLE_SHAPES.forEach((shape, index) => {
+    assert.deepEqual(particleShapeState(index), {
+      fromShape: shape,
+      toShape: shape,
+      amount: 0,
+    });
+  });
+});
+
+test("shape state exposes a clamped continuous transition", () => {
+  assert.deepEqual(particleShapeState(-1), {
+    fromShape: "triangle",
+    toShape: "triangle",
+    amount: 0,
+  });
+  assert.deepEqual(particleShapeState(1.5), {
+    fromShape: "square",
+    toShape: "diamond",
+    amount: 0.5,
+  });
+  assert.deepEqual(particleShapeState(Number.POSITIVE_INFINITY), {
+    fromShape: "dot",
+    toShape: "dot",
+    amount: 0,
+  });
+});
 
 test("brain particles are deterministic for identical options", () => {
   const first = createBrainModel(modelOptions);

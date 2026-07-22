@@ -616,6 +616,22 @@ test("settled leadership scene keeps a saffron particle halo", () => {
   assert.match(renderBody, /["']#ffb829["']/i);
 });
 
+test("every brain node morphs between semantic micro-glyphs", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const renderBody = functionBody(engine, "renderFrame");
+  const glyphBody = functionBody(engine, "drawParticleGlyph");
+  const morphBody = functionBody(engine, "drawMorphedGlyph");
+
+  for (const shape of ["triangle", "square", "diamond", "ring", "hexagon", "dot"]) {
+    assert.match(glyphBody, new RegExp(`["']${shape}["']`));
+  }
+  assert.match(renderBody, /particleShapeState\(\s*frame\.clusterMix\s*\)/);
+  assert.match(renderBody, /for\s*\(\s*const\s+point\s+of\s+particles\s*\)/);
+  assert.match(renderBody, /drawMorphedGlyph\(\s*point\s*,\s*projected/);
+  assert.ok((morphBody.match(/drawParticleGlyph\(/g) ?? []).length >= 2);
+  assert.doesNotMatch(engine, /draw(?:Giant|Chapter|Scene)Shape/i);
+});
+
 test("global styles are split into tokens, layout, and motion modules", () => {
   const global = read("src/styles/global.css");
 
