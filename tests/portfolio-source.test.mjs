@@ -117,20 +117,99 @@ function normalizeHsl(body) {
   return hexFromChannels((red + match) * 255, (green + match) * 255, (blue + match) * 255);
 }
 
-function authoredCssPalette(css) {
-  const colors = (css.match(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/gi) ?? []).map(normalizeHex);
-  for (const match of css.matchAll(/rgba?\(([^)]*)\)/gi)) colors.push(normalizeRgb(match[1]));
-  for (const match of css.matchAll(/hsla?\(([^)]*)\)/gi)) colors.push(normalizeHsl(match[1]));
-  for (const match of css.matchAll(
-    /(?:^|[;{])\s*(?:color|background(?:-color)?|border-color|outline-color|fill|stroke)\s*:\s*([a-z]+)\s*(?=[;}])/gim,
-  )) {
-    const keyword = match[1].toLowerCase();
-    if (["transparent", "currentcolor", "inherit", "initial", "unset"].includes(keyword)) continue;
-    assert.ok(["black", "white"].includes(keyword), `unapproved named CSS color: ${keyword}`);
-    colors.push(keyword === "black" ? "#000000" : "#ffffff");
+const namedCssColors = new Set(`
+  aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue
+  blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk
+  crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki
+  darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen
+  darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue
+  dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite
+  gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki
+  lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan
+  lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen
+  lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen
+  magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen
+  mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream
+  mistyrose moccasin navajowhite navy oldlace olive olivedrab orange orangered orchid
+  palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum
+  powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown
+  seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen
+  steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen
+`.trim().split(/\s+/));
+
+function authoredColorValues(source) {
+  const values = [];
+  const properties = [
+    "--[\\w-]+",
+    "accent-color",
+    "background(?:-color)?",
+    "border(?:-(?:block|inline)(?:-(?:start|end))?|-(?:top|right|bottom|left))?(?:-color)?",
+    "box-shadow",
+    "caret-color",
+    "color",
+    "column-rule(?:-color)?",
+    "fill",
+    "filter",
+    "outline(?:-color)?",
+    "stroke",
+    "text-decoration(?:-color)?",
+    "text-shadow",
+  ].join("|");
+  const declarations = new RegExp(
+    `(?:^|[;{\"'])\\s*(?:${properties})\\s*:\\s*([^;}\"']+)`,
+    "gim",
+  );
+  const canvasAndDomAssignments =
+    /(?:fillStyle|strokeStyle|shadowColor|color|backgroundColor|borderColor|outlineColor|boxShadow|textShadow)\s*=\s*["'`]([^"'`]+)["'`]/gi;
+
+  for (const match of source.matchAll(declarations)) values.push(match[1]);
+  for (const match of source.matchAll(canvasAndDomAssignments)) values.push(match[1]);
+  return values;
+}
+
+function authoredCssPalette(source) {
+  const colors = (source.match(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/gi) ?? []).map(normalizeHex);
+  for (const match of source.matchAll(/rgba?\(([^)]*)\)/gi)) colors.push(normalizeRgb(match[1]));
+  for (const match of source.matchAll(/hsla?\(([^)]*)\)/gi)) colors.push(normalizeHsl(match[1]));
+  for (const value of authoredColorValues(source)) {
+    for (const token of value.match(/[a-z]+/gi) ?? []) {
+      const keyword = token.toLowerCase();
+      if (!namedCssColors.has(keyword)) continue;
+      assert.ok(["black", "white"].includes(keyword), `unapproved named CSS color: ${keyword}`);
+      colors.push(keyword === "black" ? "#000000" : "#ffffff");
+    }
   }
-  assert.doesNotMatch(css, /\b(?:hwb|lab|lch|oklab|oklch|color|color-mix)\s*\(/i);
+  assert.doesNotMatch(source, /\b(?:hwb|lab|lch|oklab|oklch|color|color-mix)\s*\(/i);
   return [...new Set(colors)].sort();
+}
+
+function functionBody(source, name) {
+  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const declaration = new RegExp(
+    `(?:function\\s+${escapedName}\\s*\\([^)]*\\)|(?:const|let|var)\\s+${escapedName}\\s*=\\s*(?:\\([^)]*\\)|[A-Za-z_$][\\w$]*)\\s*=>)\\s*\\{`,
+  );
+  const match = declaration.exec(source);
+  if (!match) return "";
+
+  const openingBrace = match.index + match[0].lastIndexOf("{");
+  let depth = 0;
+  for (let index = openingBrace; index < source.length; index += 1) {
+    if (source[index] === "{") depth += 1;
+    if (source[index] === "}") depth -= 1;
+    if (depth === 0) return source.slice(openingBrace + 1, index);
+  }
+  return "";
+}
+
+function schedulesAnimation(snippet, source, callbackName) {
+  const callbackPattern = callbackName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (new RegExp(`requestAnimationFrame\\(\\s*${callbackPattern}\\s*\\)`).test(snippet)) return true;
+
+  for (const call of snippet.matchAll(/\b([A-Za-z_$][\w$]*)\s*\(/g)) {
+    const body = functionBody(source, call[1]);
+    if (new RegExp(`requestAnimationFrame\\(\\s*${callbackPattern}\\s*\\)`).test(body)) return true;
+  }
+  return false;
 }
 
 test("recruiter-first sections exist in the approved order", () => {
@@ -390,30 +469,92 @@ test("particle runtime uses Canvas 2D with lifecycle and fallback safeguards", (
 test("render loop derives normalized scene progress and couples visibility to animation work", () => {
   const engine = readIfPresent("src/lib/particle-brain.mjs");
 
-  assert.match(engine, /function\s+sceneProgressFromRects\(\s*sceneElements\s*\)/);
-  assert.match(engine, /const\s+viewportCenter\s*=\s*(?:window\.)?innerHeight\s*\/\s*2/);
-  assert.match(engine, /getBoundingClientRect\(\)/);
-  assert.match(engine, /rect\.top\s*\+\s*rect\.height\s*\/\s*2/);
-  assert.match(
-    engine,
-    /\(\s*viewportCenter\s*-\s*centers\[[^\]]+\]\s*\)\s*\/\s*\(\s*centers\[[^\]]+\]\s*-\s*centers\[[^\]]+\]\s*\)/,
+  const interpolation = engine.match(
+    /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*interpolateScene\(\s*[^,]+,\s*([A-Za-z_$][\w$]*)\s*\)/,
   );
-  assert.match(engine, /return\s+index\s*\+\s*segmentProgress/);
-  assert.doesNotMatch(engine, /Math\.(?:ceil|floor|round)\([^)]*(?:sceneProgress|segmentProgress)/);
+  assert.ok(interpolation, "the rendered frame must interpolate from a computed progress value");
+  const [, frameName, progressName] = interpolation;
+  const progressAssignment = engine.match(
+    new RegExp(`(?:const|let|var)\\s+${progressName}\\s*=\\s*([^;]+)`),
+  );
+  assert.ok(progressAssignment, "the interpolation progress must be assigned from scene geometry");
+  assert.doesNotMatch(progressAssignment[1].trim(), /^-?(?:\d+(?:\.\d+)?|\.\d+)$/);
+
+  const progressHelper = progressAssignment[1].match(/^\s*([A-Za-z_$][\w$]*)\s*\(/)?.[1];
+  const geometryFlow = progressHelper ? functionBody(engine, progressHelper) : progressAssignment[1];
+  assert.notEqual(geometryFlow, "", "the geometry-to-progress calculation must be inspectable");
+  assert.match(geometryFlow, /getBoundingClientRect\(\)/);
+  assert.match(geometryFlow, /\.top\b/);
+  assert.match(geometryFlow, /\.height\b/);
+  assert.match(geometryFlow, /\/\s*2\b/);
+  assert.ok(
+    (geometryFlow.match(/(?<![*/])\/(?![*/])/g) ?? []).length >= 2
+      && (geometryFlow.match(/(?<![-=])-(?![-=>])/g) ?? []).length >= 2,
+    "scene progress must divide a relative position by a geometry-derived interval",
+  );
+  assert.match(geometryFlow, /return\s+[^;\n]*\+[^;\n]*/);
+  assert.doesNotMatch(geometryFlow, /Math\.(?:ceil|floor|round)\s*\(/);
+
+  const renderCall = new RegExp(`\\b(?:draw|render)[\\w$]*\\s*\\([^;)]*\\b${frameName}\\b`);
+  assert.match(engine.slice(interpolation.index), renderCall);
+
+  const animationCallbacks = [...engine.matchAll(/requestAnimationFrame\(\s*([A-Za-z_$][\w$]*)\s*\)/g)];
+  const callbackName = animationCallbacks
+    .map((match) => match[1])
+    .find((name) => functionBody(engine, name).includes(interpolation[0]));
+  assert.ok(callbackName, "interpolation and rendering must run inside the animation callback");
+  const loopBody = functionBody(engine, callbackName);
+  const renderPosition = loopBody.search(renderCall);
+  assert.ok(renderPosition >= 0, "the interpolated frame must flow into the animation callback's renderer");
+
+  const visibilityAssignment = engine.match(
+    /([A-Za-z_$][\w$]*)\s*=\s*(?:[A-Za-z_$][\w$]*|[A-Za-z_$][\w$]*\s*\[\s*0\s*\])\.isIntersecting/,
+  );
+  assert.ok(visibilityAssignment, "IntersectionObserver visibility must feed the animation gate");
+  const visibilityName = visibilityAssignment[1];
+  const beforeRender = loopBody.slice(0, renderPosition);
+  assert.match(beforeRender, /document\.hidden/);
+  const offscreenExpression = `(?:!\\s*${visibilityName}\\b|${visibilityName}\\s*===\\s*false\\b)`;
+  assert.match(beforeRender, new RegExp(offscreenExpression));
   assert.match(
-    engine,
-    /const\s+sceneProgress\s*=\s*sceneProgressFromRects\(\s*sceneElements\s*\)\s*;\s*const\s+cameraFrame\s*=\s*interpolateScene\(\s*[^,]+,\s*sceneProgress\s*\)\s*;[\s\S]{0,300}renderFrame\([^;]*cameraFrame/,
+    beforeRender,
+    /if\s*\([^)]*document\.hidden[^)]*\)\s*\{?\s*return/,
+    "hidden document state must return before rendering",
+  );
+  assert.match(
+    beforeRender,
+    new RegExp(`if\\s*\\([^)]*${offscreenExpression}[^)]*\\)\\s*\\{?\\s*return`),
+    "offscreen canvas state must return before rendering",
+  );
+  assert.equal(
+    schedulesAnimation(loopBody.slice(renderPosition), engine, callbackName),
+    true,
+    "animation scheduling must occur only after the hidden/offscreen gate and rendering",
   );
 
-  assert.match(engine, /let\s+canvasVisible\s*=\s*(?:true|false)/);
-  assert.match(engine, /canvasVisible\s*=\s*(?:entry|entries\[0\])\.isIntersecting/);
+  const observerRestart = engine.slice(visibilityAssignment.index, visibilityAssignment.index + 800);
   assert.match(
-    engine,
-    /function\s+renderLoop\([^)]*\)\s*\{[\s\S]{0,500}if\s*\(\s*document\.hidden\s*\|\|\s*!canvasVisible\s*\)[\s\S]{0,80}return[\s\S]{0,1200}const\s+sceneProgress\s*=\s*sceneProgressFromRects\(\s*sceneElements\s*\)\s*;\s*const\s+cameraFrame\s*=\s*interpolateScene\(\s*[^,]+,\s*sceneProgress\s*\)\s*;[\s\S]{0,300}renderFrame\([^;]*cameraFrame[\s\S]{0,500}requestAnimationFrame\(\s*renderLoop\s*\)/,
+    observerRestart,
+    new RegExp(`if\\s*\\(\\s*${visibilityName}(?:\\s*===\\s*true)?\\s*\\)`),
   );
+  assert.equal(
+    schedulesAnimation(observerRestart, engine, callbackName),
+    true,
+    "the observer must restart animation when the canvas becomes visible",
+  );
+
+  const visibilityListener = engine.match(
+    /addEventListener\(\s*["']visibilitychange["'][\s\S]{0,800}/,
+  )?.[0] ?? "";
+  assert.notEqual(visibilityListener, "", "runtime must listen for document visibility changes");
   assert.match(
-    engine,
-    /canvasVisible\s*=\s*(?:entry|entries\[0\])\.isIntersecting[\s\S]{0,300}if\s*\(\s*canvasVisible\s*\)[\s\S]{0,200}requestAnimationFrame\(\s*renderLoop\s*\)/,
+    visibilityListener,
+    /(?:!\s*document\.hidden|document\.visibilityState\s*===\s*["']visible["'])/,
+  );
+  assert.equal(
+    schedulesAnimation(visibilityListener, engine, callbackName),
+    true,
+    "visibilitychange must restart animation when the document becomes visible",
   );
 });
 
@@ -429,6 +570,24 @@ test("global styles are split into tokens, layout, and motion modules", () => {
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
   assert.match(css, /:focus-visible/);
   assert.doesNotMatch(css, /(?:linear|radial|conic)-gradient/i);
+});
+
+test("palette scan rejects named colors across authored styling contexts", () => {
+  for (const source of [
+    ".card { --accent: red; }",
+    ".card { border: 1px solid red; }",
+    ".card { box-shadow: 0 0 1rem red; }",
+    '<div style="outline: 2px solid red">',
+    'context.fillStyle = "red";',
+    'context.shadowColor = "red";',
+    'element.style.backgroundColor = "red";',
+  ]) {
+    assert.throws(() => authoredCssPalette(source), /unapproved named CSS color: red/);
+  }
+  assert.deepEqual(authoredCssPalette(".ink { color: black; background: white; }"), [
+    "#000000",
+    "#ffffff",
+  ]);
 });
 
 test("served source uses only the exact approved Camera Dive palette", () => {

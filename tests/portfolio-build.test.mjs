@@ -30,9 +30,29 @@ function decodeHtml(value) {
     .replaceAll("&quot;", '"');
 }
 
+function readableText(html) {
+  return decodeHtml(html)
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<(script|style|template)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function collectContentLeaves(value, counts = new Map(), key = "") {
   if (value === null || value === undefined || typeof value === "boolean") return counts;
-  if (["column", "featured", "id", "lead"].includes(key)) return counts;
+  if ([
+    "column",
+    "featured",
+    "href",
+    "id",
+    "image",
+    "imageAlt",
+    "imageHeight",
+    "imageWidth",
+    "lead",
+    "scale",
+  ].includes(key)) return counts;
   if (Array.isArray(value)) {
     for (const item of value) collectContentLeaves(item, counts, key);
     return counts;
@@ -161,17 +181,18 @@ test("built homepage keeps proof visible and links actionable", () => {
 });
 
 test("built homepage renders every canonical typed content leaf", () => {
-  const html = decodeHtml(read(client("index.html")));
+  const text = readableText(read(client("index.html")));
   const {
     navItems: _navItems,
     trajectoryColumns: _trajectoryColumns,
     trajectoryLanes: _trajectoryLanes,
+    links: _links,
     ...facts
   } = portfolio;
   const leaves = collectContentLeaves(facts);
 
   for (const [leaf, expectedCount] of leaves) {
-    const actualCount = html.split(leaf).length - 1;
+    const actualCount = text.split(leaf).length - 1;
     assert.ok(
       actualCount >= expectedCount,
       `built page renders ${actualCount}/${expectedCount} occurrences of typed content leaf: ${leaf}`,
