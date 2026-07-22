@@ -318,7 +318,7 @@ test("public contact and project URLs remain exact", () => {
 test("metadata, Person schema, and public asset helpers stay exact and base-path safe", () => {
   const layout = read("src/layouts/BaseLayout.astro");
   const assets = read("src/lib/site-url.ts");
-  const hero = read("src/components/Hero.astro");
+  const experience = read("src/components/Experience.astro");
   const projects = read("src/components/Projects.astro");
   const recognition = read("src/components/Recognition.astro");
 
@@ -350,7 +350,7 @@ test("metadata, Person schema, and public asset helpers stay exact and base-path
   assert.match(assets, /import\.meta\.env\.BASE_URL/);
   assert.match(assets, /configuredBase\.endsWith\("\/"\)/);
   assert.match(assets, /path\.replace\(\/\^\\\/\+\//);
-  assert.match(hero, /publicAssetUrl\("assets\/award-leader\.jpg"\)/);
+  assert.match(experience, /publicAssetUrl\("assets\/award-leader\.jpg"\)/);
   assert.match(projects, /publicAssetUrl\(project\.image\)/);
   assert.match(recognition, /publicAssetUrl\(recognition\.image\)/);
 });
@@ -570,6 +570,82 @@ test("global styles are split into tokens, layout, and motion modules", () => {
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
   assert.match(css, /:focus-visible/);
   assert.doesNotMatch(css, /(?:linear|radial|conic)-gradient/i);
+});
+
+test("about chapter keeps distinct desktop and tablet columns", () => {
+  const css = readIfPresent("src/styles/layout.css");
+
+  assert.doesNotMatch(css, /\.story-chapter--about\s*>\s*\.shell\s*>\s*\*/);
+  assert.match(
+    css,
+    /\.story-chapter--about\s*>\s*\.about-human\s*>\s*:first-child\s*\{[^}]*grid-column:\s*7\s*\/\s*10/s,
+  );
+  assert.match(
+    css,
+    /\.story-chapter--about\s*>\s*\.about-human\s*>\s*\.about-human__note\s*\{[^}]*grid-column:\s*10\s*\/\s*13/s,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*64rem\)[\s\S]*?\.story-chapter--about\s*>\s*\.about-human\s*>\s*:first-child\s*\{[^}]*grid-column:\s*6\s*\/\s*9/s,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*64rem\)[\s\S]*?\.story-chapter--about\s*>\s*\.about-human\s*>\s*\.about-human__note\s*\{[^}]*grid-column:\s*9\s*\/\s*13/s,
+  );
+});
+
+test("tablet and mobile chapters place headings and text on black scrims", () => {
+  const css = readIfPresent("src/styles/layout.css");
+
+  for (const breakpoint of ["64rem", "48rem"]) {
+    const responsiveRule = new RegExp(
+      `@media\\s*\\(max-width:\\s*${breakpoint}\\)[\\s\\S]*?\\.section-heading,[\\s\\S]*?background:\\s*rgb\\(0 0 0 \\/ 0\\.(?:88|94)\\)`,
+    );
+    assert.match(css, responsiveRule, `${breakpoint} must provide a heading scrim`);
+  }
+});
+
+test("navigation has a black fallback and a supported transparent-at-top state", () => {
+  const layout = readIfPresent("src/styles/layout.css");
+  const motion = readIfPresent("src/styles/motion.css");
+
+  assert.match(layout, /\.site-header\s*\{[^}]*background:\s*rgb\(0 0 0 \/ 0\.94\)/s);
+  assert.match(motion, /@supports\s*\(animation-timeline:\s*scroll\(\)\)/);
+  assert.match(motion, /@keyframes\s+nav-strip\s*\{[\s\S]*?background-color:\s*rgb\(0 0 0 \/ 0\)/);
+  assert.match(
+    motion,
+    /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.site-header\s*\{[^}]*background:\s*rgb\(0 0 0 \/ 0\.94\)/s,
+  );
+});
+
+test("award photography is evidence after the hero", () => {
+  const hero = read("src/components/Hero.astro");
+  const experience = read("src/components/Experience.astro");
+
+  assert.doesNotMatch(hero, /award-leader\.jpg|hero__figure/);
+  assert.match(experience, /class="work-evidence reveal"/);
+  assert.match(experience, /publicAssetUrl\("assets\/award-leader\.jpg"\)/);
+  assert.match(experience, /width="1195"/);
+  assert.match(experience, /height="793"/);
+  assert.match(experience, /alt="Aryan holding the Award for Innovative Student Leadership at the University at Buffalo"/);
+  assert.match(experience, /Award for Innovative Student Leadership/);
+  assert.match(experience, /1 of 2 among 20,000 students/);
+});
+
+test("every dynamic viewport pacing value has a viewport fallback", () => {
+  for (const relativePath of ["src/styles/tokens.css", "src/styles/layout.css", "src/styles/motion.css"]) {
+    const lines = readIfPresent(relativePath).split("\n");
+    lines.forEach((line, index) => {
+      if (!/dvh\b/.test(line)) return;
+      const property = line.trim().split(":")[0];
+      const preceding = lines[index - 1]?.trim() ?? "";
+      assert.match(
+        preceding,
+        new RegExp(`^${property.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}:.*vh\\b`),
+        `${relativePath}:${index + 1} must place a vh fallback immediately before ${line.trim()}`,
+      );
+    });
+  }
 });
 
 test("palette scan rejects named colors across authored styling contexts", () => {

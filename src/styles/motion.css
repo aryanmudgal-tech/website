@@ -3,6 +3,7 @@
 .action,
 .text-link,
 .contact-link,
+.work-evidence img,
 .project-lead__media img,
 .project-tile figure img,
 .recognition-item figure img {
@@ -30,6 +31,7 @@
   transform: translateY(0.06rem);
 }
 
+.work-evidence:hover img,
 .project-lead:hover .project-lead__media img,
 .project-tile:hover figure img,
 .recognition-item:hover figure img {
@@ -87,6 +89,11 @@
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .site-header {
+    animation: none !important;
+    background: rgb(0 0 0 / 0.94);
   }
 
   *,

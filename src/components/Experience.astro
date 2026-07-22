@@ -1,5 +1,6 @@
 ---
 import { experiences } from "../data/portfolio";
+import { publicAssetUrl } from "../lib/site-url";
 ---
 
 <section
@@ -15,6 +16,21 @@ import { experiences } from "../data/portfolio";
         Three roles, moving from market strategy to human-AI product infrastructure and deployed industrial machine learning.
       </p>
     </header>
+
+    <figure class="work-evidence reveal">
+      <img
+        src={publicAssetUrl("assets/award-leader.jpg")}
+        width="1195"
+        height="793"
+        alt="Aryan holding the Award for Innovative Student Leadership at the University at Buffalo"
+        fetchpriority="high"
+        decoding="async"
+      />
+      <figcaption>
+        <span>Award for Innovative Student Leadership</span>
+        <span>1 of 2 among 20,000 students</span>
+      </figcaption>
+    </figure>
 
     <ol class="experience-list" role="list">
       {experiences.map((experience, index) => (

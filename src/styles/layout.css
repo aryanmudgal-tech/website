@@ -48,7 +48,7 @@ main,
   right: 0;
   left: 0;
   height: var(--header-height);
-  background: rgb(0 0 0 / 0);
+  background: rgb(0 0 0 / 0.94);
 }
 
 .site-header__inner {
@@ -138,6 +138,7 @@ main,
 
 .story-chapter {
   position: relative;
+  min-height: clamp(46rem, 125vh, 72rem);
   min-height: clamp(46rem, 125dvh, 72rem);
   scroll-margin-top: var(--header-height);
 }
@@ -190,6 +191,7 @@ main,
     max(var(--gutter), calc((100% - var(--shell)) / 2));
   grid-template-rows: 1fr auto;
   align-items: center;
+  min-height: max(46rem, 100vh);
   min-height: max(46rem, 100dvh);
   padding-top: var(--header-height);
 }
@@ -251,34 +253,6 @@ main,
   text-decoration: underline;
 }
 
-.hero__figure {
-  align-self: center;
-  display: grid;
-  grid-column: 11 / 14;
-  grid-row: 1;
-  grid-template-rows: minmax(14rem, 21rem) auto;
-  overflow: hidden;
-  background: rgb(0 0 0 / 0.72);
-}
-
-.hero__figure img {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--media-radius);
-  object-fit: cover;
-  object-position: 52% center;
-}
-
-.hero__figure figcaption {
-  display: grid;
-  gap: 0.18rem;
-  padding-top: 0.8rem;
-  color: var(--text-quiet);
-  font-size: 0.67rem;
-  font-weight: 400;
-  line-height: 1.4;
-}
-
 .proof-band {
   grid-column: 1 / -1;
   grid-row: 2;
@@ -315,8 +289,7 @@ main,
 }
 
 .story-chapter--work > .shell > *,
-.story-chapter--research > .shell > *,
-.story-chapter--about > .shell > * {
+.story-chapter--research > .shell > * {
   grid-column: 7 / 13;
 }
 
@@ -339,6 +312,35 @@ main,
 .experience-list {
   display: grid;
   gap: 1px;
+}
+
+.work-evidence {
+  display: grid;
+  gap: 0.8rem;
+  margin-bottom: clamp(1.25rem, 3vw, 2.5rem);
+  padding: clamp(0.75rem, 1.5vw, 1rem);
+  background: rgb(0 0 0 / 0.8);
+}
+
+.work-evidence img {
+  width: 100%;
+  max-height: 34rem;
+  border-radius: var(--media-radius);
+  object-fit: cover;
+  object-position: 52% center;
+}
+
+.work-evidence figcaption {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem 1rem;
+  color: var(--text-quiet);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.work-evidence figcaption span:last-child {
+  text-align: right;
 }
 
 .experience {
@@ -740,6 +742,14 @@ main,
   align-content: start;
 }
 
+.story-chapter--about > .about-human > :first-child {
+  grid-column: 7 / 10;
+}
+
+.story-chapter--about > .about-human > .about-human__note {
+  grid-column: 10 / 13;
+}
+
 .about-human h2 {
   font-size: clamp(2.8rem, 5vw, 5.3rem);
 }
@@ -802,6 +812,7 @@ main,
 
 .not-found {
   display: grid;
+  min-height: 100vh;
   min-height: 100dvh;
   align-content: center;
   justify-items: start;
@@ -829,13 +840,43 @@ main,
 
 @media (max-width: 64rem) {
   .story-chapter {
+    min-height: clamp(42rem, 108vh, 62rem);
     min-height: clamp(42rem, 108dvh, 62rem);
   }
 
+  .section-heading,
+  .recognition-heading,
+  .trajectory-heading,
+  .experience-list,
+  .work-evidence,
+  .project-lead,
+  .project-tile,
+  .research-feature,
+  .research-notes,
+  .trajectory-node,
+  .leadership-mosaic,
+  .recognition-item,
+  .about-human {
+    background: rgb(0 0 0 / 0.88);
+  }
+
+  .section-heading,
+  .recognition-heading,
+  .trajectory-heading {
+    padding: clamp(1rem, 2vw, 1.5rem);
+  }
+
   .story-chapter--work > .shell > *,
-  .story-chapter--research > .shell > *,
-  .story-chapter--about > .shell > * {
+  .story-chapter--research > .shell > * {
     grid-column: 6 / 13;
+  }
+
+  .story-chapter--about > .about-human > :first-child {
+    grid-column: 6 / 9;
+  }
+
+  .story-chapter--about > .about-human > .about-human__note {
+    grid-column: 9 / 13;
   }
 
   .story-chapter--projects > .shell > *,
@@ -849,10 +890,6 @@ main,
 
   .hero h1 {
     font-size: clamp(4.4rem, 10vw, 7rem);
-  }
-
-  .hero__figure {
-    grid-column: 10 / 14;
   }
 
   .proof-band__inner {
@@ -938,6 +975,7 @@ main,
   .recognition-heading,
   .trajectory-heading,
   .experience-list,
+  .work-evidence,
   .project-lead,
   .project-matrix,
   .research-layout,
@@ -953,12 +991,17 @@ main,
   .trajectory-heading,
   .experience-list,
   .project-lead,
+  .project-tile,
+  .research-feature,
   .research-layout,
+  .research-notes,
+  .trajectory-node,
   .nested-chapter,
   .leadership-mosaic,
+  .recognition-item,
   .recognition-strip,
   .about-human {
-    background: rgb(0 0 0 / 0.9);
+    background: rgb(0 0 0 / 0.94);
   }
 
   .section-heading,
@@ -991,16 +1034,9 @@ main,
     font-size: 1.05rem;
   }
 
-  .hero__figure {
-    grid-column: 2;
-    grid-row: 2;
-    grid-template-rows: minmax(24rem, 66dvh) auto;
-    background: rgb(0 0 0 / 0.9);
-  }
-
   .proof-band {
     grid-column: 1 / -1;
-    grid-row: 3;
+    grid-row: 2;
   }
 
   .proof-band__inner {
@@ -1014,6 +1050,14 @@ main,
   .experience {
     grid-template-columns: 1.8rem minmax(0, 1fr);
     padding: 1.35rem;
+  }
+
+  .work-evidence figcaption {
+    grid-template-columns: 1fr;
+  }
+
+  .work-evidence figcaption span:last-child {
+    text-align: left;
   }
 
   .experience__outcome {
