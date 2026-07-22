@@ -61,6 +61,9 @@ test("scene interpolation clamps progress and returns finite camera values", () 
 
   assert.deepEqual(interpolateScene(frames, -1), frames[0]);
   assert.deepEqual(interpolateScene(frames, 3), frames[2]);
+  assert.deepEqual(interpolateScene(frames, Number.POSITIVE_INFINITY), frames[2]);
+  assert.deepEqual(interpolateScene(frames, Number.NEGATIVE_INFINITY), frames[0]);
+  assert.deepEqual(interpolateScene(frames, Number.NaN), frames[0]);
   assert.deepEqual(interpolateScene(frames, 0), frames[0]);
   assert.deepEqual(interpolateScene(frames, 1), frames[1]);
   assert.deepEqual(interpolateScene(frames, 2), frames[2]);

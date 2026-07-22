@@ -1,20 +1,19 @@
 const CLUSTER_CENTERS = Object.freeze([
+  Object.freeze({ x: -0.035, y: -0.035 }),
   Object.freeze({ x: -0.5, y: -0.43 }),
   Object.freeze({ x: 0.08, y: -0.55 }),
   Object.freeze({ x: 0.52, y: -0.2 }),
   Object.freeze({ x: -0.5, y: 0.12 }),
-  Object.freeze({ x: 0.04, y: 0.08 }),
-  Object.freeze({ x: 0.32, y: 0.52 }),
+  Object.freeze({ x: 0.035, y: 0.035 }),
 ]);
 
-const SCENE_FRAMES = Object.freeze([
-  Object.freeze({ x: 0, y: 0, zoom: 0.88, clusterMix: 0 }),
-  Object.freeze({ x: -0.5, y: -0.43, zoom: 2.2, clusterMix: 1 }),
-  Object.freeze({ x: 0.08, y: -0.55, zoom: 2.45, clusterMix: 2 }),
-  Object.freeze({ x: 0.52, y: -0.2, zoom: 2.6, clusterMix: 3 }),
-  Object.freeze({ x: -0.5, y: 0.12, zoom: 2.25, clusterMix: 4 }),
-  Object.freeze({ x: 0, y: 0, zoom: 0.9, clusterMix: 5 }),
-]);
+const SCENE_ZOOMS = Object.freeze([0.88, 2.2, 2.45, 2.6, 2.25, 0.9]);
+const SCENE_FRAMES = Object.freeze(CLUSTER_CENTERS.map((center, cluster) => Object.freeze({
+  x: center.x,
+  y: center.y,
+  zoom: SCENE_ZOOMS[cluster],
+  clusterMix: cluster,
+})));
 
 function mulberry32(seed) {
   let state = seed >>> 0;
@@ -88,7 +87,12 @@ export function interpolateScene(frames, progress) {
   }
 
   const maximum = frames.length - 1;
-  const clampedProgress = Math.min(Math.max(Number.isFinite(progress) ? progress : 0, 0), maximum);
+  const normalizedProgress = progress === Number.POSITIVE_INFINITY
+    ? maximum
+    : Number.isFinite(progress)
+      ? progress
+      : 0;
+  const clampedProgress = Math.min(Math.max(normalizedProgress, 0), maximum);
   const startIndex = Math.floor(clampedProgress);
   const endIndex = Math.min(startIndex + 1, maximum);
   const amount = clampedProgress - startIndex;
@@ -132,6 +136,19 @@ function trianglePath(context, x, y, radius, phase) {
   context.lineTo(x - radius * 0.86, y - direction * radius * 0.55);
   context.lineTo(x + radius * 0.86, y - direction * radius * 0.55);
   context.closePath();
+}
+
+function clusterBlend(clusterMix) {
+  const lastCluster = CLUSTER_CENTERS.length - 1;
+  const clampedMix = Math.min(Math.max(clusterMix, 0), lastCluster);
+  const fromCluster = Math.floor(clampedMix);
+  const toCluster = Math.min(fromCluster + 1, lastCluster);
+
+  return {
+    fromCluster,
+    toCluster,
+    amount: clampedMix - fromCluster,
+  };
 }
 
 export function initParticleBrain(canvas, sceneElements) {
@@ -181,17 +198,15 @@ export function initParticleBrain(canvas, sceneElements) {
     };
   }
 
-  function drawConnections(frame, transitionAmount) {
-    const activeCluster = Math.min(
-      CLUSTER_CENTERS.length - 1,
-      Math.max(0, Math.floor(frame.clusterMix + 0.5)),
-    );
-    const activeParticles = particles.filter((point) => point.cluster === activeCluster);
+  function drawConnectionField(frame, transitionAmount, cluster, weight, color) {
+    if (weight <= 0) return;
+
+    const activeParticles = particles.filter((point) => point.cluster === cluster);
     const threshold = 0.17 / Math.max(frame.zoom, 1);
 
-    context.strokeStyle = transitionAmount > 0.18 ? "#ffb829" : "#15846e";
+    context.strokeStyle = color;
     context.lineWidth = 0.65;
-    context.globalAlpha = 0.045 + transitionAmount * 0.09;
+    context.globalAlpha = (0.045 + transitionAmount * 0.045) * weight;
     context.beginPath();
 
     for (let index = 0; index < activeParticles.length; index += 1) {
@@ -212,10 +227,47 @@ export function initParticleBrain(canvas, sceneElements) {
     context.stroke();
   }
 
+  function drawConnections(frame, transitionAmount, blend) {
+    const fromWeight = 1 - blend.amount;
+    const toWeight = blend.amount;
+
+    drawConnectionField(frame, transitionAmount, blend.fromCluster, fromWeight, "#15846e");
+    if (blend.toCluster !== blend.fromCluster) {
+      drawConnectionField(frame, transitionAmount, blend.toCluster, toWeight, "#15846e");
+    }
+
+    if (transitionAmount > 0) {
+      drawConnectionField(
+        frame,
+        transitionAmount,
+        blend.fromCluster,
+        fromWeight * transitionAmount * 0.65,
+        "#ffb829",
+      );
+      drawConnectionField(
+        frame,
+        transitionAmount,
+        blend.toCluster,
+        toWeight * transitionAmount,
+        "#ffb829",
+      );
+    }
+  }
+
+  function strokeParticle(point, projected, radius, color, alpha, lineWidth) {
+    context.strokeStyle = color;
+    context.globalAlpha = alpha;
+    context.lineWidth = lineWidth;
+    context.beginPath();
+    trianglePath(context, projected.x, projected.y, radius, point.phase);
+    context.stroke();
+  }
+
   function renderFrame(frame) {
-    const transitionAmount = Math.sin((frame.clusterMix % 1) * Math.PI);
+    const blend = clusterBlend(frame.clusterMix);
+    const transitionAmount = Math.sin(blend.amount * Math.PI);
     context.clearRect(0, 0, width, height);
-    drawConnections(frame, transitionAmount);
+    drawConnections(frame, transitionAmount, blend);
 
     for (const point of particles) {
       const projected = modelPoint(point, frame, transitionAmount);
@@ -224,19 +276,36 @@ export function initParticleBrain(canvas, sceneElements) {
       const radius = (0.85 + point.tone * 1.15 + clusterStrength * 1.65 + transitionAmount * 0.45)
         * Math.min(Math.max(frame.zoom * 0.72, 0.8), 1.8);
 
-      context.strokeStyle = clusterStrength > 0.55
-        ? "#8052ff"
-        : transitionAmount > 0.38 && clusterDistance < 1.45
-          ? "#ffb829"
-          : point.tone > 0.82
-            ? "#15846e"
-            : "#bdbdbd";
-      context.globalAlpha = 0.12 + point.tone * 0.16 + clusterStrength * 0.62
-        + transitionAmount * Math.max(0, 1.5 - clusterDistance) * 0.05;
-      context.lineWidth = 0.65 + clusterStrength * 0.7;
-      context.beginPath();
-      trianglePath(context, projected.x, projected.y, radius, point.phase);
-      context.stroke();
+      strokeParticle(
+        point,
+        projected,
+        radius,
+        point.tone > 0.82 ? "#15846e" : "#bdbdbd",
+        0.12 + point.tone * 0.16,
+        0.65,
+      );
+
+      if (clusterStrength > 0) {
+        strokeParticle(
+          point,
+          projected,
+          radius,
+          "#8052ff",
+          clusterStrength * 0.62,
+          0.65 + clusterStrength * 0.7,
+        );
+      }
+
+      if (clusterStrength > 0 && transitionAmount > 0) {
+        strokeParticle(
+          point,
+          projected,
+          radius,
+          "#ffb829",
+          clusterStrength * transitionAmount * 0.38,
+          0.7 + clusterStrength * 0.7,
+        );
+      }
     }
 
     context.globalAlpha = 1;
@@ -251,18 +320,14 @@ export function initParticleBrain(canvas, sceneElements) {
     observer?.disconnect();
     window.removeEventListener("resize", handleResize);
     document.removeEventListener("visibilitychange", handleVisibilityChange);
+    reducedMotion.removeEventListener("change", handleMotionPreferenceChange);
   };
-
-  if (reducedMotion.matches) {
-    const frame = interpolateScene(frames, 0);
-    renderFrame(frame);
-    return teardown;
-  }
 
   function animate() {
     animationId = null;
     if (document.hidden) return;
     if (!canvasVisible) return;
+    if (reducedMotion.matches) return;
 
     const progress = sceneProgress(sceneElements);
     const frame = interpolateScene(frames, progress);
@@ -272,20 +337,27 @@ export function initParticleBrain(canvas, sceneElements) {
 
   function handleResize() {
     if (resizeTimer !== null) clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      resizeTimer = null;
-      resizeCanvas();
-      if (!tornDown && !document.hidden && canvasVisible && animationId === null) {
-        animationId = requestAnimationFrame(animate);
-      }
-    }, 120);
+    resizeTimer = setTimeout(finishResize, 120);
+  }
+
+  function finishResize() {
+    resizeTimer = null;
+    resizeCanvas();
+    if (reducedMotion.matches) {
+      const frame = interpolateScene(frames, 0);
+      renderFrame(frame);
+      return;
+    }
+    if (!tornDown && !document.hidden && canvasVisible && animationId === null) {
+      animationId = requestAnimationFrame(animate);
+    }
   }
 
   window.addEventListener("resize", handleResize);
   observer = new IntersectionObserver((entries) => {
     canvasVisible = entries[0].isIntersecting;
     if (canvasVisible) {
-      if (!tornDown && !document.hidden && animationId === null) {
+      if (!tornDown && !document.hidden && !reducedMotion.matches && animationId === null) {
         animationId = requestAnimationFrame(animate);
       }
     } else if (animationId !== null) {
@@ -297,7 +369,7 @@ export function initParticleBrain(canvas, sceneElements) {
 
   document.addEventListener("visibilitychange", handleVisibilityChange);
   function handleVisibilityChange() {
-    if (!document.hidden && canvasVisible) {
+    if (!document.hidden && canvasVisible && !reducedMotion.matches) {
       if (!tornDown && animationId === null) animationId = requestAnimationFrame(animate);
     } else if (animationId !== null) {
       cancelAnimationFrame(animationId);
@@ -305,6 +377,30 @@ export function initParticleBrain(canvas, sceneElements) {
     }
   }
 
-  animationId = requestAnimationFrame(animate);
+  reducedMotion.addEventListener("change", handleMotionPreferenceChange);
+  function handleMotionPreferenceChange() {
+    if (animationId !== null) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+
+    resizeCanvas();
+    if (reducedMotion.matches) {
+      const frame = interpolateScene(frames, 0);
+      renderFrame(frame);
+      return;
+    }
+
+    if (!tornDown && !document.hidden && canvasVisible) {
+      animationId = requestAnimationFrame(animate);
+    }
+  }
+
+  if (reducedMotion.matches) {
+    const frame = interpolateScene(frames, 0);
+    renderFrame(frame);
+  } else {
+    animationId = requestAnimationFrame(animate);
+  }
   return teardown;
 }
