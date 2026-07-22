@@ -1022,12 +1022,14 @@ main,
   .hero__copy {
     grid-column: 2;
     grid-row: 1;
+    min-width: 0;
     padding: 1.25rem;
     background: rgb(0 0 0 / 0.9);
   }
 
   .hero h1 {
-    font-size: clamp(4.1rem, 23vw, 6.6rem);
+    min-width: 0;
+    font-size: clamp(3rem, 16.5vw, 4.5rem);
   }
 
   .hero__positioning {
