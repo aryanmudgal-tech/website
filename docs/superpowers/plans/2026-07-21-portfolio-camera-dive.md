@@ -55,7 +55,7 @@ Set `test` to run `tests/particle-brain.test.mjs` before the two existing source
 
 - [ ] **Step 2: Write deterministic model tests**
 
-Import the planned helpers from `src/lib/particle-brain.mjs` and assert: identical seed/options return identical first twenty particles; different seeds differ; every point has finite `x`, `y`, `cluster`, `tone`, and `phase`; budgets equal `0` for reduced motion, `420` below 640px, `800` below 1024px, and `1400` otherwise; interpolation clamps progress and returns finite `x`, `y`, `zoom`, and `clusterMix`.
+Import the planned helpers from `src/lib/particle-brain.mjs` and assert: identical seed/options return identical first twenty particles; different seeds differ; every point has finite `x`, `y`, `cluster`, `tone`, and `phase`; budgets equal `420` for reduced motion and small viewports below 640px, `800` below 1024px, and `1400` otherwise; interpolation clamps progress and returns finite `x`, `y`, `zoom`, and `clusterMix`.
 
 - [ ] **Step 3: Replace outgoing visual assertions**
 
@@ -221,4 +221,3 @@ Confirm there is no Dala copy or asset, no prohibited runtime, no empty link, no
 - [ ] **Step 5: Review the branch and retain it for user inspection**
 
 Run a focused code/design review against the specification. Fix every Critical or Important finding, rerun `npm run check`, and keep the feature branch available for the user rather than merging or pushing without direction.
-
