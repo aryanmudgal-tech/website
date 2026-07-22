@@ -153,7 +153,7 @@ Replace the desktop tab map with a server-rendered chronological node list using
 
 Run: `npm test`
 
-Expected: particle and source tests pass with zero failures.
+Expected: particle and structural content assertions pass; visual-system assertions for the three modular stylesheets remain RED until Task 4.
 
 ### Task 4: Replace the visual system with the Dala-inspired dark stage
 
