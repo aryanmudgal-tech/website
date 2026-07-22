@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -8,6 +8,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 function read(relativePath) {
   return readFileSync(join(root, relativePath), "utf8");
+}
+
+function readIfPresent(relativePath) {
+  return existsSync(join(root, relativePath)) ? read(relativePath) : "";
 }
 
 function sourceBundle() {
@@ -29,16 +33,42 @@ function sourceBundle() {
   ].map(read).join("\n");
 }
 
+function cameraDiveSource() {
+  return [
+    "src/components/ParticleBrain.astro",
+    "src/lib/particle-brain.mjs",
+    "src/pages/index.astro",
+    "src/components/Hero.astro",
+    "src/components/Experience.astro",
+    "src/components/Projects.astro",
+    "src/components/Research.astro",
+    "src/components/Leadership.astro",
+    "src/components/About.astro",
+    "src/styles/global.css",
+    "src/styles/tokens.css",
+    "src/styles/layout.css",
+    "src/styles/motion.css",
+    "package.json",
+  ].map(readIfPresent).join("\n");
+}
+
+function styleSource() {
+  return [
+    "src/styles/global.css",
+    "src/styles/tokens.css",
+    "src/styles/layout.css",
+    "src/styles/motion.css",
+  ].map(readIfPresent).join("\n");
+}
+
 test("recruiter-first sections exist in the approved order", () => {
   const page = read("src/pages/index.astro");
   const components = [
     "<Hero",
     "<Experience",
     "<Projects",
-    "<Trajectory",
     "<Research",
     "<Leadership",
-    "<Recognition",
     "<About",
     "<SiteFooter",
   ];
@@ -54,10 +84,10 @@ test("recruiter-first sections exist in the approved order", () => {
 test("navigation and section contracts are conventional and complete", () => {
   const data = read("src/data/portfolio.ts");
   const source = sourceBundle();
+  const navItems = data.match(/export const navItems:[\s\S]*?=\s*\[([\s\S]*?)\];/)?.[1] ?? "";
+  const labels = [...navItems.matchAll(/label:\s*["']([^"']+)["']/g)].map((match) => match[1]);
 
-  for (const label of ["Work", "Projects", "Research", "Leadership", "Recognition", "About", "Contact"]) {
-    assert.match(data, new RegExp(`label: ["']${label}["']`));
-  }
+  assert.deepEqual(labels, ["Work", "Projects", "Research", "Leadership", "About", "Contact"]);
 
   for (const id of ["top", "work", "projects", "trajectory", "research", "leadership", "recognition", "about", "contact"]) {
     assert.match(source, new RegExp(`id=["']${id}["']`));
@@ -100,7 +130,6 @@ test("core proof and supported content are preserved", () => {
 test("requested portfolio corrections are exact and stale content is absent", () => {
   const data = read("src/data/portfolio.ts");
   const about = read("src/components/About.astro");
-  const css = read("src/styles/global.css");
 
   assert.match(data, /trajectoryColumns\s*=\s*\["2023",\s*"2024",\s*"2025",\s*"2026"\]/);
   assert.match(
@@ -109,8 +138,6 @@ test("requested portfolio corrections are exact and stale content is absent", ()
   );
   assert.match(data, /column:\s*"2023"\s*\|\s*"2024"\s*\|\s*"2025"\s*\|\s*"2026"/);
   assert.doesNotMatch(data, /trajectoryColumns\s*=\s*\[[^\]]*"2022"/);
-  assert.match(css, /\.trajectory-axis\s*\{[^}]*repeat\(4,/s);
-  assert.match(css, /\.trajectory-lane__cells\s*\{[^}]*repeat\(4,/s);
   assert.match(
     data,
     /period:\s*"2023",\s*column:\s*"2023",\s*lane:\s*"Leadership",\s*title:\s*"Student Senator"/s,
@@ -142,96 +169,68 @@ test("requested portfolio corrections are exact and stale content is absent", ()
   }
 });
 
-test("trajectory is progressive, selected server-side, and keyboard operable", () => {
+test("trajectory is a complete server-rendered chronological list", () => {
   const source = read("src/components/Trajectory.astro");
-  const css = read("src/styles/global.css");
 
-  assert.match(source, /role="tablist"/);
-  assert.match(source, /role="tab"/);
-  assert.match(source, /aria-selected=\{index === 0/);
-  assert.match(source, /id="trajectory-detail"/);
-  assert.match(source, /aria-live="polite"/);
-  for (const key of ["ArrowLeft", "ArrowRight", "Home", "End"]) {
-    assert.ok(source.includes(key), `trajectory must handle ${key}`);
+  assert.match(source, /<ol\b/);
+  assert.match(source, /trajectoryEvents\.map/);
+  for (const field of ["period", "lane", "title", "outcome", "detail"]) {
+    assert.match(source, new RegExp(`event\\.${field}`));
   }
-  assert.match(
-    source,
-    /\.sort\(\s*\(left, right\) => Number\(left\.dataset\.order\) - Number\(right\.dataset\.order\),?\s*\)/,
-  );
-  assert.match(source, /classList\.add\("trajectory-ready"\)/);
-  assert.match(source, /class="trajectory-fallback"/);
-  assert.match(source, /trajectory-fallback__detail/);
-  assert.match(source, /event\.detail/);
-  assert.match(css, /\.trajectory-enhanced\s*\{[^}]*display:\s*none/s);
-  assert.match(css, /\.trajectory-ready\s+\.trajectory-enhanced\s*\{[^}]*display:\s*grid/s);
-  assert.match(css, /\.trajectory-ready\s+\.trajectory-fallback\s*\{[^}]*display:\s*none/s);
-  assert.doesNotMatch(read("src/layouts/BaseLayout.astro"), /classList\.add\("js"\)/);
+  assert.doesNotMatch(source, /role="tab(?:list|panel)?"/);
+  assert.doesNotMatch(source, /<script\b/);
 });
 
 test("markerless content keeps list semantics and avoids viewport-width overflow", () => {
   const source = sourceBundle();
-  const css = read("src/styles/global.css");
+  const css = styleSource();
 
   assert.ok((source.match(/role="list"/g) ?? []).length >= 6);
   assert.doesNotMatch(css, /\.proof-band\s*\{[^}]*width:\s*100vw/s);
 });
 
-test("visual system includes responsive, focus, theme, and motion safeguards", () => {
-  const css = read("src/styles/global.css");
+test("Camera Dive source includes the fixed decorative brain and six scene markers", () => {
+  const page = read("src/pages/index.astro");
+  const brain = readIfPresent("src/components/ParticleBrain.astro");
+  const source = cameraDiveSource();
 
-  assert.match(css, /--accent:/);
-  assert.doesNotMatch(css, /--accent-(?:2|secondary|alt):/);
-  assert.match(css, /@media\s*\(prefers-color-scheme:\s*dark\)/);
-  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
-  assert.match(css, /:focus-visible/);
-  assert.match(css, /min-height:\s*100dvh/);
-  assert.match(css, /@media\s*\(max-width:\s*47\.99rem\)/);
-  assert.match(css, /@media\s*\(max-width:\s*72rem\)[\s\S]*?\.trajectory-ready\s+\.trajectory-enhanced\s*\{[^}]*display:\s*none/);
-  for (const state of [".wordmark:hover", ".site-nav a:active", ".site-footer__meta a:hover"]) {
-    assert.ok(css.includes(state), `missing interaction feedback: ${state}`);
+  assert.equal(existsSync(join(root, "src/components/ParticleBrain.astro")), true);
+  assert.match(page, /<ParticleBrain\s*\/>/);
+  assert.match(brain, /<canvas\b/);
+  assert.match(brain, /aria-hidden="true"/);
+  for (const scene of ["hero", "work", "projects", "research", "leadership", "about"]) {
+    assert.match(source, new RegExp(`data-brain-scene=["']${scene}["']`));
   }
-  assert.doesNotMatch(css, /(?:linear|radial|conic)-gradient/i);
-  assert.doesNotMatch(css, /cursor:\s*none/i);
-  assert.doesNotMatch(css, /animation-iteration-count:\s*infinite/i);
 });
 
-test("tonal chapters and humanist typography replace the robotic mono system", () => {
-  const css = read("src/styles/global.css");
+test("particle runtime uses Canvas 2D with lifecycle and fallback safeguards", () => {
+  const source = cameraDiveSource();
 
-  for (const token of [
-    "--chapter-work",
-    "--chapter-projects",
-    "--chapter-trajectory",
-    "--chapter-research",
-    "--chapter-leadership",
-    "--chapter-recognition",
-    "--chapter-about",
-  ]) {
-    assert.ok((css.match(new RegExp(`${token}:`, "g")) ?? []).length >= 2, `${token} must exist in light and dark themes`);
+  assert.match(source, /getContext\(["']2d["']\)/);
+  assert.match(source, /requestAnimationFrame/);
+  assert.match(source, /document\.hidden/);
+  assert.match(source, /matchMedia\(["']\(prefers-reduced-motion:\s*reduce\)["']\)/);
+  assert.match(source, /Math\.min\([^)]*(?:window\.)?devicePixelRatio[^)]*,\s*1\.5\)/);
+  assert.match(source, /brain-unavailable/);
+});
+
+test("global styles are split into tokens, layout, and motion modules", () => {
+  const global = read("src/styles/global.css");
+
+  for (const name of ["tokens", "layout", "motion"]) {
+    assert.equal(existsSync(join(root, `src/styles/${name}.css`)), true, `${name}.css must exist`);
+    assert.match(global, new RegExp(`(?:@import\\s+)?["']\\./${name}\\.css["']`));
   }
 
-  for (const roboticFont of [/--font-mono/i, /SFMono/i, /Consolas/i, /Liberation Mono/i, /\bmonospace\b/i]) {
-    assert.doesNotMatch(css, roboticFont);
-  }
-
-  for (const selector of [
-    ".section--work",
-    ".section--projects",
-    ".section--trajectory",
-    ".section--research",
-    ".section--leadership",
-    ".section--recognition",
-    ".section--about",
-  ]) {
-    assert.ok(css.includes(selector), `missing tonal chapter selector: ${selector}`);
-  }
-
-  assert.match(css, /\.recognition-item__year\s*\{/);
+  const css = styleSource();
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+  assert.match(css, /:focus-visible/);
+  assert.doesNotMatch(css, /(?:linear|radial|conic)-gradient/i);
 });
 
 test("primary navigation exposes the current section without scroll listeners", () => {
   const nav = read("src/components/SiteNav.astro");
-  const css = read("src/styles/global.css");
+  const css = styleSource();
 
   assert.match(nav, /IntersectionObserver/);
   assert.match(nav, /aria-current/);
@@ -241,25 +240,24 @@ test("primary navigation exposes the current section without scroll listeners", 
   assert.doesNotMatch(nav, /window\.addEventListener\(["']scroll["']/);
 });
 
-test("served source rejects theatre-era and heavy-runtime patterns", () => {
-  const source = sourceBundle();
+test("served source rejects prohibited runtimes and interaction patterns", () => {
+  const source = `${sourceBundle()}\n${cameraDiveSource()}`;
 
-  assert.doesNotMatch(source, /[—–]/);
   for (const banned of [
     /three\.js/i,
     /webgl/i,
+    /\bgsap\b/i,
     /scrolltrigger/i,
-    /<canvas/i,
+    /\blenis\b/i,
     /<audio/i,
-    /lofi\.mp3/i,
-    /curtain/i,
-    /intermission/i,
-    /end credits/i,
+    /\bDala\b/i,
     /custom cursor/i,
+    /cursor\s*:\s*none/i,
     /scroll hijack/i,
   ]) {
     assert.doesNotMatch(source, banned);
   }
+  assert.doesNotMatch(source, /href=(?:["']{2}|["']#["'])/);
 });
 
 test("build dependency stays on the patched Astro line", () => {

@@ -10,6 +10,7 @@ const client = (relativePath) => `dist/client/${relativePath}`;
 
 test("built homepage exposes semantic recruiter content", () => {
   const html = read(client("index.html"));
+  const canvases = html.match(/<canvas\b[^>]*>/g) ?? [];
 
   assert.match(html, /<title>Aryan Mudgal \| Engineer and researcher<\/title>/);
   assert.match(html, /<meta name="description"/);
@@ -23,6 +24,8 @@ test("built homepage exposes semantic recruiter content", () => {
   assert.match(html, /<main id="main-content"/);
   assert.match(html, /<footer[^>]*id="contact"/);
   assert.equal((html.match(/<h1(?:\s|>)/g) ?? []).length, 1);
+  assert.equal(canvases.length, 1);
+  assert.match(html, /<div\b[^>]*aria-hidden="true"[^>]*>\s*<canvas\b/);
 
   for (const id of ["work", "projects", "trajectory", "research", "leadership", "recognition", "about", "contact"]) {
     assert.ok(html.includes(`id="${id}"`), `built page is missing #${id}`);
@@ -34,15 +37,25 @@ test("built homepage keeps proof visible and links actionable", () => {
 
   for (const fact of [
     "Linde",
+    "Meta Layer Initiative",
+    "HCLTech",
     "MIDL-accepted",
+    "four hackathon recognitions",
     "Dots",
     "ARMIE",
     "StreamFair",
     "W.O.D.",
     "$500K+",
     "30,000+",
+    "100,000+",
+    "1,500+",
     "Award for Innovative Student Leadership",
     "SUNY Chancellor's Award for Student Excellence",
+    "Phi Beta Kappa",
+    "Gym",
+    "Golf",
+    "Badminton",
+    "Acting and mimicry",
   ]) {
     assert.ok(html.includes(fact), `built page is missing ${fact}`);
   }
@@ -54,7 +67,7 @@ test("built homepage keeps proof visible and links actionable", () => {
   assert.doesNotMatch(html, /href=(?:""|'')/);
   assert.doesNotMatch(html, /href=(?:"#"|'#')/);
   assert.doesNotMatch(html, /<script[^>]+src=/i);
-  assert.doesNotMatch(html, /<(?:canvas|audio)\b/i);
+  assert.doesNotMatch(html, /<audio\b/i);
 
   const externalLinks = html.match(/<a\b[^>]*target="_blank"[^>]*>/g) ?? [];
   assert.ok(externalLinks.length >= 5);
@@ -77,16 +90,25 @@ test("built images reserve space and contain meaningful alternatives", () => {
   assert.match(html, /src="(?:\/website)?\/assets\/award-leader\.jpg"[^>]*fetchpriority="high"/);
 });
 
-test("built trajectory has one initial selection and complete fallback labels", () => {
+test("built trajectory keeps every chronological label in server-rendered HTML", () => {
   const html = read(client("index.html"));
-  const tabs = html.match(/<button\b[^>]*role="tab"[^>]*>/g) ?? [];
-  const axis = html.match(/<div class="trajectory-axis"[^>]*>([\s\S]*?)<\/div>/)?.[1] ?? "";
-  const columns = [...axis.matchAll(/<span>(.*?)<\/span>/g)].map((match) => match[1]);
 
-  assert.equal(tabs.length, 12);
-  assert.equal(tabs.filter((tab) => tab.includes('aria-selected="true"')).length, 1);
-  assert.ok((html.match(/class="trajectory-event__outcome"/g) ?? []).length >= tabs.length);
-  assert.deepEqual(columns, ["", "2023", "2024", "2025", "2026"]);
+  for (const label of [
+    "SUNY Delegate",
+    "Student Senator",
+    "HCLTech",
+    "Meta Layer Initiative",
+    "W.O.D.",
+    "Fetal-maternal hemorrhage detection",
+    "ARMIE",
+    "StreamFair",
+    "Dots",
+    "Award for Innovative Student Leadership",
+    "SUNY Chancellor's Award for Student Excellence",
+    "Linde",
+  ]) {
+    assert.ok(html.includes(label), `built trajectory is missing ${label}`);
+  }
   for (const period of ["2022-2025", "2023", "2024", "2025", "2026"]) {
     assert.ok(html.includes(period), `built trajectory is missing ${period}`);
   }
