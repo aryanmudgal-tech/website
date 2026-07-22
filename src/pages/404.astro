@@ -1,11 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ParticleBrain from "../components/ParticleBrain.astro";
 import { siteBaseUrl } from "../lib/site-url";
 
 const homeUrl = siteBaseUrl;
 ---
 
 <BaseLayout title="Page not found | Aryan Mudgal" description="The requested page could not be found.">
+  <ParticleBrain />
   <main id="main-content" class="not-found shell">
     <p class="meta">404</p>
     <h1>Page not found</h1>

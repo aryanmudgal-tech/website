@@ -1,0 +1,109 @@
+.wordmark,
+.site-nav a,
+.action,
+.text-link,
+.contact-link,
+.project-lead__media img,
+.project-tile figure img,
+.recognition-item figure img {
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 220ms var(--ease-out);
+}
+
+.wordmark:hover,
+.site-nav a:hover,
+.text-link:hover,
+.contact-link:hover {
+  opacity: 0.76;
+}
+
+.action:hover,
+.text-link:hover,
+.contact-link:hover {
+  transform: translateY(-0.12rem);
+}
+
+.action:active,
+.text-link:active,
+.contact-link:active {
+  transform: translateY(0.06rem);
+}
+
+.project-lead:hover .project-lead__media img,
+.project-tile:hover figure img,
+.recognition-item:hover figure img {
+  transform: scale(1.018);
+}
+
+.site-nav a::after {
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 220ms var(--ease-out);
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 48.01rem) {
+    .site-header {
+      animation: nav-strip linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 10rem;
+    }
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in 1ms var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 24%;
+    }
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nav-strip {
+  from {
+    background-color: rgb(0 0 0 / 0);
+  }
+
+  to {
+    background-color: rgb(0 0 0 / 0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0ms !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .particle-brain,
+  .particle-brain__canvas {
+    opacity: 1;
+  }
+}
