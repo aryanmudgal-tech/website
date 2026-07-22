@@ -16,6 +16,21 @@ const externalUrls = [
   "https://drive.google.com/file/d/12grQ7uR837u36IkN1WaILOC0SHycm2rh/view?usp=sharing",
   "https://devpost.com/software/c-o-r-e",
 ];
+const sceneOrder = ["hero", "work", "projects", "research", "leadership", "about"];
+const trajectoryOrder = [
+  "delegate",
+  "senator",
+  "hcl",
+  "meta-layer",
+  "core",
+  "fmh",
+  "armie",
+  "streamfair",
+  "dots",
+  "innovative-student-leadership",
+  "suny-chancellors-award",
+  "linde",
+];
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -71,6 +86,7 @@ function collectContentLeaves(value, counts = new Map(), key = "") {
 test("built homepage exposes semantic recruiter content", () => {
   const html = read(client("index.html"));
   const canvases = html.match(/<canvas\b[^>]*>/g) ?? [];
+  const scenes = [...html.matchAll(/\bdata-brain-scene="([^"]+)"/g)].map((match) => match[1]);
   const description = "Aryan Mudgal builds applied AI systems across industrial operations, human-AI interaction, and healthcare.";
   const themeColors = [...html.matchAll(/<meta name="theme-color" content="([^"]+)"[^>]*>/g)].map((match) => match[1]);
   const schemaText = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? "";
@@ -113,6 +129,7 @@ test("built homepage exposes semantic recruiter content", () => {
   assert.equal((html.match(/<h1(?:\s|>)/g) ?? []).length, 1);
   assert.equal(canvases.length, 1);
   assert.match(html, /<div\b(?=[^>]*class="particle-brain")(?=[^>]*aria-hidden="true")[^>]*>\s*<canvas\b/);
+  assert.deepEqual(scenes, sceneOrder, "built page must expose exactly six ordered brain scenes");
 
   for (const id of ["work", "projects", "trajectory", "research", "leadership", "recognition", "about", "contact"]) {
     assert.ok(html.includes(`id="${id}"`), `built page is missing #${id}`);
@@ -160,8 +177,21 @@ test("built homepage keeps proof visible and links actionable", () => {
 
   assert.doesNotMatch(html, /href=(?:""|'')/);
   assert.doesNotMatch(html, /href=(?:"#"|'#')/);
-  assert.doesNotMatch(html, /<script[^>]+src=/i);
   assert.doesNotMatch(html, /<audio\b/i);
+
+  const assetBase = html.match(/<link rel="icon" href="([^"?]*\/)favicon\.svg"/)?.[1] ?? "";
+  const sourcedScripts = [...html.matchAll(/<script\b(?=[^>]*\bsrc=(["'])(.*?)\1)[^>]*>/gi)];
+  assert.notEqual(assetBase, "", "built page must expose a base-path-safe favicon URL");
+  assert.ok(sourcedScripts.length >= 1, "Astro must emit the bundled ParticleBrain module");
+  for (const [tag, , src] of sourcedScripts) {
+    assert.doesNotMatch(src, /^(?:https?:)?\/\//i, `script source must remain same-origin: ${src}`);
+    assert.match(tag, /\btype=(["'])module\1/i, `compiled script must be a module: ${tag}`);
+    assert.match(
+      src,
+      new RegExp(`^${escapeRegExp(assetBase)}_astro\/[A-Za-z0-9._-]+\\.js(?:[?#].*)?$`),
+      `script source must stay inside the current base path's compiled Astro assets: ${src}`,
+    );
+  }
 
   const externalLinks = html.match(/<a\b[^>]*target="_blank"[^>]*>/g) ?? [];
   assert.ok(externalLinks.length >= 5);
@@ -231,6 +261,13 @@ test("built trajectory keeps every chronological label in server-rendered HTML",
 
   assert.notEqual(trajectorySection, "", "built page must contain the #trajectory section");
   assert.notEqual(chronology, "", "#trajectory must contain the chronological list");
+  const trajectoryNodes = [...chronology.matchAll(/<li\b[^>]*\bid="trajectory-([^"]+)"[^>]*>/g)]
+    .map((match) => match[1]);
+  assert.deepEqual(
+    trajectoryNodes,
+    trajectoryOrder,
+    "built trajectory must expose exactly twelve ordered chronology nodes",
+  );
 
   for (const label of [
     "SUNY Delegate",

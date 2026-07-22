@@ -7,6 +7,21 @@ import test from "node:test";
 import * as portfolio from "../src/data/portfolio.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const sceneOrder = ["hero", "work", "projects", "research", "leadership", "about"];
+const trajectoryOrder = [
+  "delegate",
+  "senator",
+  "hcl",
+  "meta-layer",
+  "core",
+  "fmh",
+  "armie",
+  "streamfair",
+  "dots",
+  "innovative-student-leadership",
+  "suny-chancellors-award",
+  "linde",
+];
 
 function read(relativePath) {
   return readFileSync(join(root, relativePath), "utf8");
@@ -402,6 +417,11 @@ test("trajectory is a complete server-rendered chronological list", () => {
 
   assert.match(source, /<ol\b/);
   assert.match(source, /trajectoryEvents\.map/);
+  assert.deepEqual(
+    portfolio.trajectoryEvents.map((event) => event.id),
+    trajectoryOrder,
+    "source data must expose exactly twelve ordered chronology nodes",
+  );
   for (const field of ["period", "lane", "title", "outcome", "detail"]) {
     assert.match(source, new RegExp(`event\\.${field}`));
   }
@@ -433,9 +453,9 @@ test("Camera Dive source includes the fixed decorative brain and six scene marke
   assert.match(layerRule, /pointer-events:\s*none/);
   assert.match(canvasRule, /width:\s*100%/);
   assert.match(canvasRule, /height:\s*100%/);
-  for (const scene of ["hero", "work", "projects", "research", "leadership", "about"]) {
-    assert.match(source, new RegExp(`data-brain-scene=["']${scene}["']`));
-  }
+  const scenes = [...source.matchAll(/\bdata-brain-scene=["']([^"']+)["']/g)]
+    .map((match) => match[1]);
+  assert.deepEqual(scenes, sceneOrder, "source must expose exactly six ordered brain scenes");
 });
 
 test("particle runtime uses Canvas 2D with lifecycle and fallback safeguards", () => {
@@ -632,6 +652,23 @@ test("hero gives the email action primary Electric Iris emphasis", () => {
   assert.ok(
     hero.indexOf(">Email Aryan</a>") < hero.indexOf(">View experience</a>"),
     "the primary email action must appear before the secondary experience action",
+  );
+});
+
+test("mobile hero contains its unbreakable title between 320 and 390 pixels", () => {
+  const css = readIfPresent("src/styles/layout.css");
+  const mobile = css.match(/@media\s*\(max-width:\s*48rem\)\s*\{([\s\S]*)\}\s*$/)?.[1] ?? "";
+
+  assert.match(mobile, /\.hero__copy\s*\{[^}]*min-width:\s*0\s*;/s);
+  assert.match(mobile, /\.hero h1\s*\{[^}]*min-width:\s*0\s*;/s);
+  assert.match(
+    mobile,
+    /\.hero h1\s*\{[^}]*font-size:\s*clamp\(3rem,\s*16\.5vw,\s*4\.5rem\)\s*;/s,
+  );
+  assert.match(mobile, /\.proof-band__inner\s*\{[^}]*width:\s*100%/s);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*64rem\)[\s\S]*?\.proof-band__inner\s*\{[^}]*overflow-x:\s*auto/s,
   );
 });
 
