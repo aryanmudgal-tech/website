@@ -1104,6 +1104,11 @@ main,
     gap: 3rem;
   }
 
+  .story-chapter > .about-human > :first-child,
+  .story-chapter > .about-human > .about-human__note {
+    grid-column: 1;
+  }
+
   .site-footer__inner {
     min-height: 36rem;
   }

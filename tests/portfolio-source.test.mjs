@@ -644,6 +644,10 @@ test("mobile About restores a layout that preserves vertical separation", () => 
     mobile,
     /\.story-chapter\s*>\s*\.about-human\s*\{[^}]*(?:display:\s*(?:grid|flex)[^}]*gap:\s*3rem|margin-top:\s*3rem)/s,
   );
+  assert.match(
+    mobile,
+    /\.story-chapter\s*>\s*\.about-human\s*>\s*:first-child\s*,\s*\.story-chapter\s*>\s*\.about-human\s*>\s*\.about-human__note\s*\{[^}]*grid-column:\s*1\s*;/s,
+  );
 });
 
 test("nav scroll animation support requires timeline and range", () => {
