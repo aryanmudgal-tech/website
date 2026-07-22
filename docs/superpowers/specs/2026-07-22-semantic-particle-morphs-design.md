@@ -9,6 +9,8 @@ Make the Camera Dive transitions unmistakable by morphing the particle glyphs in
 
 The update must preserve the current six chapters, all portfolio content, normal document scrolling, Canvas 2D implementation, reduced-motion fallback, responsive particle budgets, and deployment behavior.
 
+The brain always remains a point cloud made from hundreds of discrete small particles, matching the character of the current effect and the Dala inspiration. Each small particle changes its own glyph. The renderer must never replace the particle field with one giant continuous triangle, square, diamond, ring, hexagon, dot, or chapter icon.
+
 ## Chapter shape language
 
 Each chapter owns one settled particle shape. The shape is a visual metaphor for the chapter rather than an arbitrary decoration.
@@ -23,6 +25,8 @@ Each chapter owns one settled particle shape. The shape is a visual metaphor for
 | About | Soft organic dot | People, personality, and a relaxed final pullback |
 
 The existing six cluster and camera destinations remain unchanged. Shape identity is added to the same scene progress so geometry, camera movement, node emphasis, bridge lines, and color all describe one continuous transition.
+
+The settled-shape descriptions apply to the repeated micro-glyph used by every particle. The overall composition remains the recognizable particle-built brain silhouette in every chapter.
 
 ## Morph behavior
 
@@ -96,6 +100,7 @@ Browser checks will verify:
 ## Acceptance criteria
 
 - A user can identify that particle shapes are changing during scroll without stopping exactly at a chapter boundary.
+- The brain is visibly constructed from many independent micro-glyph particles at every point in the experience; no chapter uses a single large continuous shape.
 - All six chapters settle into their specified semantic shape.
 - Text is visually dominant and comfortably readable in every chapter.
 - The brain remains recognizable and present rather than being hidden by full-screen opaque panels.
