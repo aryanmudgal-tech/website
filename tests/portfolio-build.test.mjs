@@ -251,7 +251,8 @@ test("built images reserve space and contain meaningful alternatives", () => {
   ]) {
     assert.match(html, new RegExp(`src="(?:/website)?/assets/${asset.replace(".", "\\.")}"`));
   }
-  assert.match(html, /src="(?:\/website)?\/assets\/award-leader\.jpg"[^>]*fetchpriority="high"/);
+  assert.match(html, /src="(?:\/website)?\/assets\/award-leader\.jpg"[^>]*loading="lazy"/);
+  assert.doesNotMatch(html, /src="(?:\/website)?\/assets\/award-leader\.jpg"[^>]*fetchpriority=/);
 });
 
 test("built trajectory keeps every chronological label in server-rendered HTML", () => {

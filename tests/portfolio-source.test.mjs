@@ -578,6 +578,44 @@ test("render loop derives normalized scene progress and couples visibility to an
   );
 });
 
+test("idle particle rendering skips unchanged scene progress", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const loopBody = functionBody(engine, "animate");
+
+  assert.match(engine, /let\s+lastProgress\s*=\s*null/);
+  assert.match(
+    loopBody,
+    /if\s*\(\s*progress\s*===\s*lastProgress\s*\)\s*\{[\s\S]*?requestAnimationFrame\(\s*animate\s*\)[\s\S]*?return/,
+  );
+  assert.ok(
+    loopBody.indexOf("progress === lastProgress") < loopBody.indexOf("renderFrame(frame)"),
+    "stable progress must return before Canvas drawing",
+  );
+  assert.match(engine, /lastProgress\s*=\s*null/);
+});
+
+test("particle transitions draw deterministic bridges toward the adjacent cluster", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const bridgeBody = functionBody(engine, "drawBridges");
+
+  assert.match(engine, /createBridgeEdges\(\s*particles/);
+  assert.notEqual(bridgeBody, "", "runtime must expose an inspectable bridge renderer");
+  assert.match(bridgeBody, /edge\.fromCluster\s*===\s*blend\.fromCluster/);
+  assert.match(bridgeBody, /edge\.toCluster\s*===\s*blend\.toCluster/);
+  assert.match(bridgeBody, /blend\.amount/);
+  assert.match(bridgeBody, /moveTo\(/);
+  assert.match(bridgeBody, /lineTo\(/);
+});
+
+test("settled leadership scene keeps a saffron particle halo", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const renderBody = functionBody(engine, "renderFrame");
+
+  assert.match(renderBody, /leadershipAccent\(\s*frame\.clusterMix\s*\)/);
+  assert.match(renderBody, /point\.cluster\s*===\s*LEADERSHIP_CLUSTER/);
+  assert.match(renderBody, /["']#ffb829["']/i);
+});
+
 test("global styles are split into tokens, layout, and motion modules", () => {
   const global = read("src/styles/global.css");
 
@@ -706,6 +744,8 @@ test("award photography is evidence after the hero", () => {
   assert.match(experience, /width="1195"/);
   assert.match(experience, /height="793"/);
   assert.match(experience, /alt="Aryan holding the Award for Innovative Student Leadership at the University at Buffalo"/);
+  assert.match(experience, /loading="lazy"/);
+  assert.doesNotMatch(experience, /fetchpriority=/);
   assert.match(experience, /Award for Innovative Student Leadership/);
   assert.match(experience, /1 of 2 among 20,000 students/);
 });

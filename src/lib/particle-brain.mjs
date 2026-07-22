@@ -8,6 +8,7 @@ const CLUSTER_CENTERS = Object.freeze([
 ]);
 
 const SCENE_ZOOMS = Object.freeze([0.88, 2.2, 2.45, 2.6, 2.25, 0.9]);
+const LEADERSHIP_CLUSTER = 4;
 const SCENE_FRAMES = Object.freeze(CLUSTER_CENTERS.map((center, cluster) => Object.freeze({
   x: center.x,
   y: center.y,
@@ -75,10 +76,51 @@ export function createBrainModel({ seed = 1, count = 1400 } = {}) {
   return particles;
 }
 
+function representativeParticles(particles, cluster, targetCenter) {
+  return particles
+    .map((point, index) => ({ point, index }))
+    .filter(({ point }) => point.cluster === cluster)
+    .sort((left, right) => {
+      const leftDistance = (left.point.x - targetCenter.x) ** 2
+        + (left.point.y - targetCenter.y) ** 2;
+      const rightDistance = (right.point.x - targetCenter.x) ** 2
+        + (right.point.y - targetCenter.y) ** 2;
+      return leftDistance - rightDistance || left.index - right.index;
+    });
+}
+
+export function createBridgeEdges(particles, edgesPerPair = 3) {
+  const requestedEdges = Math.max(0, Math.floor(Number.isFinite(edgesPerPair) ? edgesPerPair : 0));
+  const edges = [];
+
+  for (let cluster = 0; cluster < CLUSTER_CENTERS.length - 1; cluster += 1) {
+    const fromParticles = representativeParticles(particles, cluster, CLUSTER_CENTERS[cluster + 1]);
+    const toParticles = representativeParticles(particles, cluster + 1, CLUSTER_CENTERS[cluster]);
+    const edgeCount = Math.min(requestedEdges, fromParticles.length, toParticles.length);
+
+    for (let index = 0; index < edgeCount; index += 1) {
+      edges.push({
+        from: fromParticles[index].index,
+        to: toParticles[index].index,
+        fromCluster: cluster,
+        toCluster: cluster + 1,
+        phase: index % 2,
+      });
+    }
+  }
+
+  return edges;
+}
+
 export function particleBudget(width, reducedMotion = false) {
   if (reducedMotion || width < 640) return 420;
   if (width < 1024) return 800;
   return 1400;
+}
+
+export function leadershipAccent(clusterMix) {
+  if (!Number.isFinite(clusterMix)) return 0;
+  return Math.max(0, 1 - Math.abs(clusterMix - LEADERSHIP_CLUSTER));
 }
 
 export function interpolateScene(frames, progress) {
@@ -164,8 +206,10 @@ export function initParticleBrain(canvas, sceneElements) {
   let height = 1;
   let pixelRatio = 1;
   let particles = [];
+  let bridgeEdges = [];
   let animationId = null;
   let resizeTimer = null;
+  let lastProgress = null;
   let canvasVisible = true;
   let observer = null;
   let tornDown = false;
@@ -181,6 +225,8 @@ export function initParticleBrain(canvas, sceneElements) {
       seed: 20260721,
       count: particleBudget(width, reducedMotion.matches),
     });
+    bridgeEdges = createBridgeEdges(particles);
+    lastProgress = null;
   }
 
   function modelPoint(point, frame, transitionAmount) {
@@ -254,6 +300,29 @@ export function initParticleBrain(canvas, sceneElements) {
     }
   }
 
+  function drawBridges(frame, transitionAmount, blend) {
+    if (blend.amount <= 0 || blend.fromCluster === blend.toCluster) return;
+
+    const activeEdges = bridgeEdges.filter((edge) => (
+      edge.fromCluster === blend.fromCluster && edge.toCluster === blend.toCluster
+    ));
+    context.strokeStyle = "#ffb829";
+    context.lineWidth = 0.8 + transitionAmount * 0.8;
+    context.globalAlpha = transitionAmount * 0.32;
+    context.beginPath();
+
+    for (const edge of activeEdges) {
+      const start = modelPoint(particles[edge.from], frame, transitionAmount);
+      const destination = modelPoint(particles[edge.to], frame, transitionAmount);
+      const endX = start.x + (destination.x - start.x) * blend.amount;
+      const endY = start.y + (destination.y - start.y) * blend.amount;
+      context.moveTo(start.x, start.y);
+      context.lineTo(endX, endY);
+    }
+
+    context.stroke();
+  }
+
   function strokeParticle(point, projected, radius, color, alpha, lineWidth) {
     context.strokeStyle = color;
     context.globalAlpha = alpha;
@@ -266,8 +335,10 @@ export function initParticleBrain(canvas, sceneElements) {
   function renderFrame(frame) {
     const blend = clusterBlend(frame.clusterMix);
     const transitionAmount = Math.sin(blend.amount * Math.PI);
+    const leadershipStrength = leadershipAccent(frame.clusterMix);
     context.clearRect(0, 0, width, height);
     drawConnections(frame, transitionAmount, blend);
+    drawBridges(frame, transitionAmount, blend);
 
     for (const point of particles) {
       const projected = modelPoint(point, frame, transitionAmount);
@@ -296,14 +367,16 @@ export function initParticleBrain(canvas, sceneElements) {
         );
       }
 
-      if (clusterStrength > 0 && transitionAmount > 0) {
+      const leadershipHalo = point.cluster === LEADERSHIP_CLUSTER ? leadershipStrength : 0;
+      const amberStrength = Math.max(clusterStrength * transitionAmount, leadershipHalo);
+      if (amberStrength > 0) {
         strokeParticle(
           point,
           projected,
-          radius,
+          radius * (1 + leadershipHalo * 0.22),
           "#ffb829",
-          clusterStrength * transitionAmount * 0.38,
-          0.7 + clusterStrength * 0.7,
+          amberStrength * 0.38,
+          0.7 + amberStrength * 0.7,
         );
       }
     }
@@ -330,6 +403,11 @@ export function initParticleBrain(canvas, sceneElements) {
     if (reducedMotion.matches) return;
 
     const progress = sceneProgress(sceneElements);
+    if (progress === lastProgress) {
+      animationId = requestAnimationFrame(animate);
+      return;
+    }
+    lastProgress = progress;
     const frame = interpolateScene(frames, progress);
     renderFrame(frame);
     animationId = requestAnimationFrame(animate);

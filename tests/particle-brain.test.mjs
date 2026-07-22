@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  createBridgeEdges,
   createBrainModel,
   interpolateScene,
+  leadershipAccent,
   particleBudget,
 } from "../src/lib/particle-brain.mjs";
 
@@ -43,6 +45,21 @@ test("every brain particle exposes finite model values", () => {
   assert.deepEqual([...clusterIds].sort((left, right) => left - right), [0, 1, 2, 3, 4, 5]);
 });
 
+test("bridge edges deterministically connect representative adjacent clusters", () => {
+  const particles = createBrainModel({ seed: modelOptions.seed, count: 1400 });
+  const first = createBridgeEdges(particles, 3);
+  const second = createBridgeEdges(particles, 3);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.length, 15);
+  for (const edge of first) {
+    assert.equal(edge.toCluster, edge.fromCluster + 1);
+    assert.equal(particles[edge.from].cluster, edge.fromCluster);
+    assert.equal(particles[edge.to].cluster, edge.toCluster);
+    assert.equal(Number.isFinite(edge.phase), true);
+  }
+});
+
 test("particle budgets adapt at the approved viewport boundaries", () => {
   assert.equal(particleBudget(320, true), 420);
   assert.equal(particleBudget(1440, true), 420);
@@ -50,6 +67,14 @@ test("particle budgets adapt at the approved viewport boundaries", () => {
   assert.equal(particleBudget(640, false), 800);
   assert.equal(particleBudget(1023, false), 800);
   assert.equal(particleBudget(1024, false), 1400);
+});
+
+test("leadership accent stays fully present at the settled leadership scene", () => {
+  assert.equal(leadershipAccent(3), 0);
+  assert.equal(leadershipAccent(3.5), 0.5);
+  assert.equal(leadershipAccent(4), 1);
+  assert.equal(leadershipAccent(4.5), 0.5);
+  assert.equal(leadershipAccent(5), 0);
 });
 
 test("scene interpolation clamps progress and returns finite camera values", () => {
