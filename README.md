@@ -44,6 +44,21 @@ The fixed, pointer-transparent canvas is progressive enhancement. It uses only n
 
 With `prefers-reduced-motion: reduce`, the engine draws one static whole-brain frame and the CSS removes reveal movement. The site does not intercept wheel, touch, keyboard, or anchor navigation.
 
+## Semantic particle shapes
+
+Each of the six scroll scenes keeps the brain as a field of hundreds of small particles. Individual particle glyphs morph continuously through triangle, square, diamond, ring, hexagon, and dot states; the renderer never replaces the brain with one large chapter icon.
+
+| Scene | Micro-particle glyph | Visual role |
+|---|---|---|
+| Hero | Open triangle | Direction, curiosity, and forward motion |
+| Work | Square | Systems, infrastructure, and reliability |
+| Projects | Diamond | Pressure, experimentation, and refinement |
+| Research | Outlined ring | Detection, microscopy, and faint signals |
+| Leadership | Hexagon | Networks, organization, and collective scale |
+| About | Filled dot | People, personality, and a relaxed final pullback |
+
+During a scroll transition, the outgoing micro-glyph contracts and fades while the incoming micro-glyph expands and appears at the same particle center. This keeps the change visible without positional popping, while preserving the recognizable particle-built brain at every chapter.
+
 ## Editing content
 
 Factual content, chronology records, navigation labels, image metadata, and external links live in `src/data/portfolio.ts`. The six-scene composition lives in `src/pages/index.astro`; semantic chapter markup lives in `src/components/`; particle generation and camera behavior live in `src/lib/particle-brain.mjs`.
