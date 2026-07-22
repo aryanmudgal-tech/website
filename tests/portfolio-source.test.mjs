@@ -383,7 +383,7 @@ test("requested portfolio corrections are exact and stale content is absent", ()
     "the exact Chancellor's Award title must appear in Career Path and Recognition",
   );
   assert.ok((data.match(/year:\s*"2026"/g) ?? []).length >= 2, "both requested awards must show 2026");
-  assert.match(about, /<h2 id="about-title">Outside the work<\/h2>/);
+  assert.match(about, /<h2 id="about-title">Outside the work\.<\/h2>/);
 
   for (const stale of [
     /C\.O\.R\.E\. \/ W\.O\.D\./i,

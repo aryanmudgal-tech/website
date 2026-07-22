@@ -2,10 +2,15 @@
 import { interests, places } from "../data/portfolio";
 ---
 
-<section id="about" class="section section--about" aria-labelledby="about-title">
+<section
+  id="about"
+  class="section section--about story-chapter story-chapter--about"
+  data-brain-scene="about"
+  aria-labelledby="about-title"
+>
   <div class="about-human shell reveal">
     <div>
-      <h2 id="about-title">Outside the work</h2>
+      <h2 id="about-title">Outside the work.</h2>
       <ul class="interest-list" role="list">
         {interests.map((interest) => <li>{interest}</li>)}
       </ul>
