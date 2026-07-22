@@ -63,13 +63,17 @@ function styleSource() {
   ].map(readIfPresent).join("\n");
 }
 
-function servedSource(directory = join(root, "src")) {
+function servedFiles(directory = join(root, "src")) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
-    if (entry.isDirectory()) return servedSource(path);
+    if (entry.isDirectory()) return servedFiles(path);
     if (!/\.(?:astro|css|js|jsx|mjs|ts|tsx)$/.test(entry.name)) return [];
-    return [readFileSync(path, "utf8")];
-  }).join("\n");
+    return [{ path, source: readFileSync(path, "utf8") }];
+  });
+}
+
+function servedSource() {
+  return servedFiles().map((file) => file.source).join("\n");
 }
 
 function hexFromChannels(red, green, blue) {
@@ -342,7 +346,14 @@ test("Camera Dive source includes the fixed decorative brain and six scene marke
   assert.equal(existsSync(join(root, "src/components/ParticleBrain.astro")), true);
   assert.match(page, /<ParticleBrain\s*\/>/);
   assert.match(brain, /<div\b(?=[^>]*class="particle-brain")(?=[^>]*aria-hidden="true")[^>]*>\s*<canvas\b/);
-  assert.match(styleSource(), /(?:\.particle-brain(?:__canvas)?|\[data-particle-brain\])\s*\{[^}]*pointer-events:\s*none/s);
+  const css = styleSource();
+  const layerRule = css.match(/\.particle-brain\s*\{([^}]*)\}/s)?.[1] ?? "";
+  const canvasRule = css.match(/\.particle-brain__canvas\s*\{([^}]*)\}/s)?.[1] ?? "";
+  assert.match(layerRule, /position:\s*fixed/);
+  assert.match(layerRule, /inset:\s*0/);
+  assert.match(layerRule, /pointer-events:\s*none/);
+  assert.match(canvasRule, /width:\s*100%/);
+  assert.match(canvasRule, /height:\s*100%/);
   for (const scene of ["hero", "work", "projects", "research", "leadership", "about"]) {
     assert.match(source, new RegExp(`data-brain-scene=["']${scene}["']`));
   }
@@ -358,10 +369,6 @@ test("particle runtime uses Canvas 2D with lifecycle and fallback safeguards", (
   assert.match(source, /matchMedia\(["']\(prefers-reduced-motion:\s*reduce\)["']\)/);
   assert.match(source, /Math\.min\([^)]*(?:window\.)?devicePixelRatio[^)]*,\s*1\.5\)/);
   assert.match(source, /brain-unavailable/);
-  assert.match(engine, /(?:scrollY|getBoundingClientRect\(\))/);
-  assert.match(engine, /const\s+sceneProgress\s*=/);
-  assert.match(engine, /interpolateScene\(\s*[^,]+,\s*sceneProgress\s*\)/);
-  assert.doesNotMatch(engine, /Math\.(?:ceil|floor|round)\([^)]*sceneProgress/);
   assert.match(engine, /IntersectionObserver/);
   assert.match(engine, /\.isIntersecting/);
   assert.match(engine, /\.observe\(\s*canvas\s*\)/);
@@ -378,6 +385,36 @@ test("particle runtime uses Canvas 2D with lifecycle and fallback safeguards", (
   assert.match(reducedBranch, /interpolateScene\(\s*[^,]+,\s*0\s*\)/);
   assert.equal((reducedBranch.match(/(?:draw|render)\w*\s*\(/gi) ?? []).length, 1);
   assert.doesNotMatch(reducedBranch, /requestAnimationFrame/);
+});
+
+test("render loop derives normalized scene progress and couples visibility to animation work", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+
+  assert.match(engine, /function\s+sceneProgressFromRects\(\s*sceneElements\s*\)/);
+  assert.match(engine, /const\s+viewportCenter\s*=\s*(?:window\.)?innerHeight\s*\/\s*2/);
+  assert.match(engine, /getBoundingClientRect\(\)/);
+  assert.match(engine, /rect\.top\s*\+\s*rect\.height\s*\/\s*2/);
+  assert.match(
+    engine,
+    /\(\s*viewportCenter\s*-\s*centers\[[^\]]+\]\s*\)\s*\/\s*\(\s*centers\[[^\]]+\]\s*-\s*centers\[[^\]]+\]\s*\)/,
+  );
+  assert.match(engine, /return\s+index\s*\+\s*segmentProgress/);
+  assert.doesNotMatch(engine, /Math\.(?:ceil|floor|round)\([^)]*(?:sceneProgress|segmentProgress)/);
+  assert.match(
+    engine,
+    /const\s+sceneProgress\s*=\s*sceneProgressFromRects\(\s*sceneElements\s*\)\s*;\s*const\s+cameraFrame\s*=\s*interpolateScene\(\s*[^,]+,\s*sceneProgress\s*\)\s*;[\s\S]{0,300}renderFrame\([^;]*cameraFrame/,
+  );
+
+  assert.match(engine, /let\s+canvasVisible\s*=\s*(?:true|false)/);
+  assert.match(engine, /canvasVisible\s*=\s*(?:entry|entries\[0\])\.isIntersecting/);
+  assert.match(
+    engine,
+    /function\s+renderLoop\([^)]*\)\s*\{[\s\S]{0,500}if\s*\(\s*document\.hidden\s*\|\|\s*!canvasVisible\s*\)[\s\S]{0,80}return[\s\S]{0,1200}const\s+sceneProgress\s*=\s*sceneProgressFromRects\(\s*sceneElements\s*\)\s*;\s*const\s+cameraFrame\s*=\s*interpolateScene\(\s*[^,]+,\s*sceneProgress\s*\)\s*;[\s\S]{0,300}renderFrame\([^;]*cameraFrame[\s\S]{0,500}requestAnimationFrame\(\s*renderLoop\s*\)/,
+  );
+  assert.match(
+    engine,
+    /canvasVisible\s*=\s*(?:entry|entries\[0\])\.isIntersecting[\s\S]{0,300}if\s*\(\s*canvasVisible\s*\)[\s\S]{0,200}requestAnimationFrame\(\s*renderLoop\s*\)/,
+  );
 });
 
 test("global styles are split into tokens, layout, and motion modules", () => {
@@ -397,9 +434,25 @@ test("global styles are split into tokens, layout, and motion modules", () => {
 test("served source uses only the exact approved Camera Dive palette", () => {
   const css = styleSource();
   const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const canvasFiles = new Set([
+    join(root, "src/components/ParticleBrain.astro"),
+    join(root, "src/lib/particle-brain.mjs"),
+  ]);
+  const approved = new Set(["#000000", "#15846e", "#8052ff", "#8d8d92", "#bdbdbd", "#ffb829", "#ffffff"]);
+  const authored = new Set();
+
+  for (const file of servedFiles()) {
+    for (const color of authoredCssPalette(file.source)) {
+      assert.equal(approved.has(color), true, `unapproved color ${color} in ${file.path}`);
+      if (color === "#15846e") {
+        assert.equal(canvasFiles.has(file.path), true, `#15846e is canvas-only: ${file.path}`);
+      }
+      authored.add(color);
+    }
+  }
 
   assert.deepEqual(authoredCssPalette(css), ["#000000", "#8052ff", "#8d8d92", "#bdbdbd", "#ffb829", "#ffffff"]);
-  assert.doesNotMatch(css, /#15846e/i);
+  assert.deepEqual([...authored].sort(), [...approved].sort());
   assert.match(engine, /["']#15846e["']/i);
 });
 
@@ -444,6 +497,7 @@ test("served source rejects prohibited runtimes and interaction patterns", () =>
     /\bDala\b/i,
     /custom cursor/i,
     /cursor\s*:\s*none/i,
+    /cursor\s*:\s*url\s*\(/i,
     /scroll hijack/i,
     /::-(?:webkit-)?scrollbar/i,
     /scrollbar-(?:color|width)/i,

@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import test from "node:test";
+import * as portfolio from "../src/data/portfolio.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFileSync(join(root, relativePath), "utf8");
@@ -20,6 +21,31 @@ const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 function anchorFor(html, url) {
   return html.match(new RegExp(`<a\\b(?=[^>]*\\bhref="${escapeRegExp(url)}")[^>]*>[\\s\\S]*?<\\/a>`))?.[0] ?? "";
+}
+
+function decodeHtml(value) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&#39;", "'")
+    .replaceAll("&quot;", '"');
+}
+
+function collectContentLeaves(value, counts = new Map(), key = "") {
+  if (value === null || value === undefined || typeof value === "boolean") return counts;
+  if (["column", "featured", "id", "lead"].includes(key)) return counts;
+  if (Array.isArray(value)) {
+    for (const item of value) collectContentLeaves(item, counts, key);
+    return counts;
+  }
+  if (typeof value === "object") {
+    for (const [childKey, childValue] of Object.entries(value)) {
+      collectContentLeaves(childValue, counts, childKey);
+    }
+    return counts;
+  }
+  const leaf = String(value);
+  counts.set(leaf, (counts.get(leaf) ?? 0) + 1);
+  return counts;
 }
 
 test("built homepage exposes semantic recruiter content", () => {
@@ -134,6 +160,25 @@ test("built homepage keeps proof visible and links actionable", () => {
   }
 });
 
+test("built homepage renders every canonical typed content leaf", () => {
+  const html = decodeHtml(read(client("index.html")));
+  const {
+    navItems: _navItems,
+    trajectoryColumns: _trajectoryColumns,
+    trajectoryLanes: _trajectoryLanes,
+    ...facts
+  } = portfolio;
+  const leaves = collectContentLeaves(facts);
+
+  for (const [leaf, expectedCount] of leaves) {
+    const actualCount = html.split(leaf).length - 1;
+    assert.ok(
+      actualCount >= expectedCount,
+      `built page renders ${actualCount}/${expectedCount} occurrences of typed content leaf: ${leaf}`,
+    );
+  }
+});
+
 test("built images reserve space and contain meaningful alternatives", () => {
   const html = read(client("index.html"));
   const images = html.match(/<img\b[^>]*>/g) ?? [];
@@ -159,7 +204,7 @@ test("built images reserve space and contain meaningful alternatives", () => {
 });
 
 test("built trajectory keeps every chronological label in server-rendered HTML", () => {
-  const html = read(client("index.html"));
+  const html = decodeHtml(read(client("index.html")));
   const trajectorySection = html.match(/<section\b[^>]*id="trajectory"[^>]*>([\s\S]*?)<\/section>/)?.[1] ?? "";
   const chronology = trajectorySection.match(/<ol\b[^>]*>([\s\S]*?)<\/ol>/)?.[1] ?? "";
 
