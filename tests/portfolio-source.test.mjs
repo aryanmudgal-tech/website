@@ -670,10 +670,13 @@ test("about chapter keeps distinct desktop and tablet columns", () => {
 
 test("tablet and mobile chapters place headings and text on black scrims", () => {
   const css = readIfPresent("src/styles/layout.css");
+  const tokens = readIfPresent("src/styles/tokens.css");
+
+  assert.match(tokens, /--reading-surface:\s*rgb\(0 0 0 \/ 0\.9\)/);
 
   for (const breakpoint of ["64rem", "48rem"]) {
     const responsiveRule = new RegExp(
-      `@media\\s*\\(max-width:\\s*${breakpoint}\\)[\\s\\S]*?\\.section-heading,[\\s\\S]*?background:\\s*rgb\\(0 0 0 \\/ 0\\.(?:88|94)\\)`,
+      `@media\\s*\\(max-width:\\s*${breakpoint}\\)[\\s\\S]*?\\.section-heading,[\\s\\S]*?background:\\s*var\\(--reading-surface\\)`,
     );
     assert.match(css, responsiveRule, `${breakpoint} must provide a heading scrim`);
   }

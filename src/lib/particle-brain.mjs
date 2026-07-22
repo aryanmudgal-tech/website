@@ -8,6 +8,14 @@ const CLUSTER_CENTERS = Object.freeze([
 ]);
 
 const SCENE_ZOOMS = Object.freeze([0.88, 2.2, 2.45, 2.6, 2.25, 0.9]);
+export const PARTICLE_SHAPES = Object.freeze([
+  "triangle",
+  "square",
+  "diamond",
+  "ring",
+  "hexagon",
+  "dot",
+]);
 const LEADERSHIP_CLUSTER = 4;
 const SCENE_FRAMES = Object.freeze(CLUSTER_CENTERS.map((center, cluster) => Object.freeze({
   x: center.x,
@@ -123,6 +131,33 @@ export function leadershipAccent(clusterMix) {
   return Math.max(0, 1 - Math.abs(clusterMix - LEADERSHIP_CLUSTER));
 }
 
+export function particleShapeState(progress) {
+  const maximum = PARTICLE_SHAPES.length - 1;
+  const normalized = progress === Number.POSITIVE_INFINITY
+    ? maximum
+    : Number.isFinite(progress)
+      ? progress
+      : 0;
+  const clamped = Math.min(Math.max(normalized, 0), maximum);
+  const fromIndex = Math.floor(clamped);
+  const toIndex = Math.min(fromIndex + 1, maximum);
+  const amount = clamped - fromIndex;
+
+  if (amount === 0 || fromIndex === toIndex) {
+    return {
+      fromShape: PARTICLE_SHAPES[fromIndex],
+      toShape: PARTICLE_SHAPES[fromIndex],
+      amount: 0,
+    };
+  }
+
+  return {
+    fromShape: PARTICLE_SHAPES[fromIndex],
+    toShape: PARTICLE_SHAPES[toIndex],
+    amount,
+  };
+}
+
 export function interpolateScene(frames, progress) {
   if (!Array.isArray(frames) || frames.length === 0) {
     return { x: 0, y: 0, zoom: 1, clusterMix: 0 };
@@ -172,12 +207,58 @@ function sceneProgress(sceneElements) {
   return lastIndex;
 }
 
-function trianglePath(context, x, y, radius, phase) {
-  const direction = phase === 0 ? -1 : 1;
-  context.moveTo(x, y + direction * radius);
-  context.lineTo(x - radius * 0.86, y - direction * radius * 0.55);
-  context.lineTo(x + radius * 0.86, y - direction * radius * 0.55);
+function polygonPath(context, x, y, radius, sides, rotation) {
+  for (let index = 0; index < sides; index += 1) {
+    const angle = rotation + (index / sides) * Math.PI * 2;
+    const pointX = x + Math.cos(angle) * radius;
+    const pointY = y + Math.sin(angle) * radius;
+    if (index === 0) context.moveTo(pointX, pointY);
+    else context.lineTo(pointX, pointY);
+  }
   context.closePath();
+}
+
+function drawParticleGlyph(context, shape, x, y, radius, rotation, alpha, color, lineWidth) {
+  context.globalAlpha = alpha;
+  context.strokeStyle = color;
+  context.fillStyle = color;
+  context.lineWidth = lineWidth;
+  context.beginPath();
+
+  if (shape === "ring") {
+    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.stroke();
+    return;
+  }
+
+  if (shape === "dot") {
+    context.arc(x, y, Math.max(radius * 0.62, 0.7), 0, Math.PI * 2);
+    context.fill();
+    return;
+  }
+
+  let sides = 4;
+  if (shape === "triangle") sides = 3;
+  else if (shape === "hexagon") sides = 6;
+  else if (shape !== "square" && shape !== "diamond") return;
+
+  polygonPath(context, x, y, radius, sides, rotation);
+  context.stroke();
+}
+
+function glyphRotation(shape, phase) {
+  const alternating = phase === 0 ? 0 : Math.PI;
+  if (shape === "triangle") return -Math.PI / 2 + alternating;
+  if (shape === "square") return Math.PI / 4;
+  if (shape === "diamond") return 0;
+  if (shape === "hexagon") return -Math.PI / 2 + alternating / 6;
+  return 0;
+}
+
+function interpolateRotation(from, to, amount) {
+  const turn = Math.PI * 2;
+  const delta = ((to - from + Math.PI) % turn + turn) % turn - Math.PI;
+  return from + delta * amount;
 }
 
 function clusterBlend(clusterMix) {
@@ -323,19 +404,50 @@ export function initParticleBrain(canvas, sceneElements) {
     context.stroke();
   }
 
-  function strokeParticle(point, projected, radius, color, alpha, lineWidth) {
-    context.strokeStyle = color;
-    context.globalAlpha = alpha;
-    context.lineWidth = lineWidth;
-    context.beginPath();
-    trianglePath(context, projected.x, projected.y, radius, point.phase);
-    context.stroke();
+  function drawMorphedGlyph(point, projected, radius, shapeState, amount, color, alpha, lineWidth) {
+    const fromAlpha = 1 - amount;
+    const toAlpha = amount;
+    const fromRadius = radius * (1 - amount * 0.16);
+    const toRadius = radius * (0.84 + amount * 0.16);
+    const glyphAngle = interpolateRotation(
+      glyphRotation(shapeState.fromShape, point.phase),
+      glyphRotation(shapeState.toShape, point.phase),
+      amount,
+    );
+
+    drawParticleGlyph(
+      context,
+      shapeState.fromShape,
+      projected.x,
+      projected.y,
+      fromRadius,
+      glyphAngle,
+      alpha * fromAlpha,
+      color,
+      lineWidth,
+    );
+
+    if (shapeState.toShape !== shapeState.fromShape && toAlpha > 0) {
+      drawParticleGlyph(
+        context,
+        shapeState.toShape,
+        projected.x,
+        projected.y,
+        toRadius,
+        glyphAngle,
+        alpha * toAlpha,
+        color,
+        lineWidth,
+      );
+    }
   }
 
   function renderFrame(frame) {
     const blend = clusterBlend(frame.clusterMix);
     const transitionAmount = Math.sin(blend.amount * Math.PI);
     const leadershipStrength = leadershipAccent(frame.clusterMix);
+    const shapeState = particleShapeState(frame.clusterMix);
+    const easedShapeAmount = shapeState.amount * shapeState.amount * (3 - 2 * shapeState.amount);
     context.clearRect(0, 0, width, height);
     drawConnections(frame, transitionAmount, blend);
     drawBridges(frame, transitionAmount, blend);
@@ -347,20 +459,24 @@ export function initParticleBrain(canvas, sceneElements) {
       const radius = (0.85 + point.tone * 1.15 + clusterStrength * 1.65 + transitionAmount * 0.45)
         * Math.min(Math.max(frame.zoom * 0.72, 0.8), 1.8);
 
-      strokeParticle(
+      drawMorphedGlyph(
         point,
         projected,
         radius,
+        shapeState,
+        easedShapeAmount,
         point.tone > 0.82 ? "#15846e" : "#bdbdbd",
         0.12 + point.tone * 0.16,
         0.65,
       );
 
       if (clusterStrength > 0) {
-        strokeParticle(
+        drawMorphedGlyph(
           point,
           projected,
           radius,
+          shapeState,
+          easedShapeAmount,
           "#8052ff",
           clusterStrength * 0.62,
           0.65 + clusterStrength * 0.7,
@@ -370,10 +486,12 @@ export function initParticleBrain(canvas, sceneElements) {
       const leadershipHalo = point.cluster === LEADERSHIP_CLUSTER ? leadershipStrength : 0;
       const amberStrength = Math.max(clusterStrength * transitionAmount, leadershipHalo);
       if (amberStrength > 0) {
-        strokeParticle(
+        drawMorphedGlyph(
           point,
           projected,
           radius * (1 + leadershipHalo * 0.22),
+          shapeState,
+          easedShapeAmount,
           "#ffb829",
           amberStrength * 0.38,
           0.7 + amberStrength * 0.7,
