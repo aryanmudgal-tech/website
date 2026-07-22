@@ -1,0 +1,16 @@
+<div class="particle-brain" aria-hidden="true">
+  <canvas class="particle-brain__canvas" data-particle-brain></canvas>
+  <div class="particle-brain__fallback"></div>
+</div>
+
+<script>
+  import { initParticleBrain } from "../lib/particle-brain.mjs";
+
+  const canvas = document.querySelector("[data-particle-brain]");
+  const sceneElements = [...document.querySelectorAll("[data-brain-scene]")];
+
+  if (canvas instanceof HTMLCanvasElement) {
+    const teardown = initParticleBrain(canvas, sceneElements);
+    document.addEventListener("astro:before-swap", teardown, { once: true });
+  }
+</script>
