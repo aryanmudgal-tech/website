@@ -317,7 +317,8 @@ git commit -m "feat: morph semantic particle glyphs"
 **Files:**
 - Modify: `src/styles/tokens.css`
 - Modify: `src/styles/layout.css`
-- Modify: `tests/portfolio-source.test.mjs`
+- Modify: `package.json`
+- Create: `tests/particle-contrast.test.mjs`
 
 **Interfaces:**
 - Consumes: existing `.section-heading`, evidence-panel, hero-copy, nested-chapter, and substantive-copy selectors.
@@ -325,12 +326,20 @@ git commit -m "feat: morph semantic particle glyphs"
 
 - [ ] **Step 1: Add failing contrast contracts**
 
-Add this test to `tests/portfolio-source.test.mjs`:
+Create `tests/particle-contrast.test.mjs` with this contract:
 
 ```js
+import assert from "node:assert/strict";
+import test from "node:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const root = new URL("..", import.meta.url).pathname;
+const read = (relative) => readFileSync(join(root, relative), "utf8");
+
 test("reading surfaces prioritize text over the particle field", () => {
-  const tokens = readIfPresent("src/styles/tokens.css");
-  const layout = readIfPresent("src/styles/layout.css");
+  const tokens = read("src/styles/tokens.css");
+  const layout = read("src/styles/layout.css");
 
   assert.match(tokens, /--reading-surface:\s*rgb\(0 0 0 \/ 0\.9\)/);
   assert.match(tokens, /--reading-surface-strong:\s*rgb\(0 0 0 \/ 0\.96\)/);
@@ -346,12 +355,14 @@ test("reading surfaces prioritize text over the particle field", () => {
 });
 ```
 
+Update the `test` script in `package.json` so it includes `tests/particle-contrast.test.mjs` beside the existing particle, source, and workflow test files.
+
 - [ ] **Step 2: Run the focused contrast test and confirm RED**
 
 Run:
 
 ```bash
-node --test --test-name-pattern="reading surfaces prioritize" tests/portfolio-source.test.mjs
+node --test tests/particle-contrast.test.mjs
 ```
 
 Expected: failure reports missing reading-surface tokens and localized desktop surface use.
@@ -417,7 +428,7 @@ Expected: every source, particle, palette, content, workflow, and contrast test 
 - [ ] **Step 6: Commit the contrast pass**
 
 ```bash
-git add src/styles/tokens.css src/styles/layout.css tests/portfolio-source.test.mjs
+git add package.json src/styles/tokens.css src/styles/layout.css tests/particle-contrast.test.mjs
 git commit -m "style: strengthen portfolio reading contrast"
 ```
 
