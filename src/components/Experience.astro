@@ -1,15 +1,36 @@
 ---
 import { experiences } from "../data/portfolio";
+import { publicAssetUrl } from "../lib/site-url";
 ---
 
-<section id="work" class="section section--work" aria-labelledby="work-title">
+<section
+  id="work"
+  class="section section--work story-chapter story-chapter--work"
+  data-brain-scene="work"
+  aria-labelledby="work-title"
+>
   <div class="shell">
     <header class="section-heading reveal">
-      <h2 id="work-title">Professional experience</h2>
+      <h2 id="work-title">Systems that find the signal.</h2>
       <p>
         Three roles, moving from market strategy to human-AI product infrastructure and deployed industrial machine learning.
       </p>
     </header>
+
+    <figure class="work-evidence reveal">
+      <img
+        src={publicAssetUrl("assets/award-leader.jpg")}
+        width="1195"
+        height="793"
+        alt="Aryan holding the Award for Innovative Student Leadership at the University at Buffalo"
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption>
+        <span>Award for Innovative Student Leadership</span>
+        <span>1 of 2 among 20,000 students</span>
+      </figcaption>
+    </figure>
 
     <ol class="experience-list" role="list">
       {experiences.map((experience, index) => (

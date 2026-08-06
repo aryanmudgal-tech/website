@@ -1,172 +1,24 @@
 ---
-import {
-  trajectoryColumns,
-  trajectoryEvents,
-  trajectoryLanes,
-} from "../data/portfolio";
-
-const initialEvent = trajectoryEvents[0];
+import { trajectoryEvents } from "../data/portfolio";
 ---
 
-<section id="trajectory" class="section section--trajectory" aria-labelledby="trajectory-title">
-  <div class="shell">
-    <header class="trajectory-heading reveal">
-      <h2 id="trajectory-title">Career path</h2>
-      <p>See how industry work, rapid builds, medical research, and public leadership began to reinforce each other.</p>
-    </header>
+<section id="trajectory" class="nested-chapter nested-chapter--trajectory" aria-labelledby="trajectory-title">
+  <header class="trajectory-heading reveal">
+    <h2 id="trajectory-title">Career path</h2>
+    <p>See how industry work, rapid builds, medical research, and public leadership began to reinforce each other.</p>
+  </header>
 
-    <ol class="trajectory-fallback" role="list">
-      {trajectoryEvents.map((event) => (
-        <li>
-          <div class="trajectory-fallback__meta">
-            <span>{event.period}</span>
-            <span>{event.lane}</span>
-          </div>
-          <h3>{event.title}</h3>
-          <p class="trajectory-fallback__outcome">{event.outcome}</p>
-          <p class="trajectory-fallback__detail">{event.detail}</p>
-        </li>
-      ))}
-    </ol>
-
-    <div class="trajectory-enhanced reveal">
-      <div class="trajectory-map-wrap">
-        <p class="trajectory-heading__instruction" id="trajectory-instructions">
-          Select an event. Left and right arrow keys move between events.
-        </p>
-        <div
-          class="trajectory-map"
-          role="tablist"
-          aria-label="Career trajectory"
-          aria-describedby="trajectory-instructions"
-          aria-orientation="horizontal"
-        >
-          <div class="trajectory-axis" role="presentation" aria-hidden="true">
-            <span></span>
-            {trajectoryColumns.map((column) => <span>{column}</span>)}
-          </div>
-
-          {trajectoryLanes.map((lane) => (
-            <div class="trajectory-lane" role="presentation">
-              <p class="trajectory-lane__label" aria-hidden="true">{lane}</p>
-              <div class="trajectory-lane__cells" role="presentation">
-                {trajectoryColumns.map((column) => (
-                  <div class="trajectory-cell" role="presentation">
-                    {trajectoryEvents
-                      .filter((event) => event.lane === lane && event.column === column)
-                      .map((event) => {
-                        const index = trajectoryEvents.indexOf(event);
-                        return (
-                          <button
-                            class="trajectory-event"
-                            type="button"
-                            role="tab"
-                            id={`trajectory-tab-${event.id}`}
-                            aria-controls="trajectory-detail"
-                            aria-selected={index === 0 ? "true" : "false"}
-                            tabindex={index === 0 ? 0 : -1}
-                            data-order={index}
-                            data-period={event.period}
-                            data-lane={event.lane}
-                            data-title={event.title}
-                            data-outcome={event.outcome}
-                            data-detail={event.detail}
-                          >
-                            <span class="trajectory-event__meta">{event.period}</span>
-                            <span class="sr-only">{event.lane} event: </span>
-                            <strong>{event.title}</strong>
-                            <span class="trajectory-event__outcome">{event.outcome}</span>
-                          </button>
-                        );
-                      })}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+  <ol class="trajectory-chronology" role="list">
+    {trajectoryEvents.map((event) => (
+      <li id={`trajectory-${event.id}`} class="trajectory-node reveal">
+        <div class="trajectory-node__meta">
+          <span>{event.period}</span>
+          <span>{event.lane}</span>
         </div>
-      </div>
-
-      <aside
-        id="trajectory-detail"
-        class="trajectory-detail"
-        role="tabpanel"
-        tabindex="0"
-        aria-live="polite"
-        aria-labelledby={`trajectory-tab-${initialEvent.id}`}
-      >
-        <div class="trajectory-detail__meta">
-          <span data-detail-period>{initialEvent.period}</span>
-          <span data-detail-lane>{initialEvent.lane}</span>
-        </div>
-        <h3 data-detail-title>{initialEvent.title}</h3>
-        <p class="trajectory-detail__outcome" data-detail-outcome>{initialEvent.outcome}</p>
-        <p data-detail-copy>{initialEvent.detail}</p>
-      </aside>
-    </div>
-  </div>
+        <h3>{event.title}</h3>
+        <p class="trajectory-node__outcome">{event.outcome}</p>
+        <p class="trajectory-node__detail">{event.detail}</p>
+      </li>
+    ))}
+  </ol>
 </section>
-
-<script>
-  function initTrajectory() {
-    const root = document.querySelector<HTMLElement>("#trajectory");
-    const panel = document.querySelector<HTMLElement>("#trajectory-detail");
-    const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>(".trajectory-event")).sort(
-      (left, right) => Number(left.dataset.order) - Number(right.dataset.order),
-    );
-
-    if (!root || !panel || tabs.length === 0) return;
-
-    const period = panel.querySelector<HTMLElement>("[data-detail-period]");
-    const lane = panel.querySelector<HTMLElement>("[data-detail-lane]");
-    const title = panel.querySelector<HTMLElement>("[data-detail-title]");
-    const outcome = panel.querySelector<HTMLElement>("[data-detail-outcome]");
-    const detail = panel.querySelector<HTMLElement>("[data-detail-copy]");
-
-    function selectTab(nextIndex: number, moveFocus = false) {
-      const next = tabs[nextIndex];
-      if (!next) return;
-
-      tabs.forEach((tab, index) => {
-        const selected = index === nextIndex;
-        tab.setAttribute("aria-selected", String(selected));
-        tab.tabIndex = selected ? 0 : -1;
-      });
-
-      panel.setAttribute("aria-labelledby", next.id);
-      if (period) period.textContent = next.dataset.period ?? "";
-      if (lane) lane.textContent = next.dataset.lane ?? "";
-      if (title) title.textContent = next.dataset.title ?? "";
-      if (outcome) outcome.textContent = next.dataset.outcome ?? "";
-      if (detail) detail.textContent = next.dataset.detail ?? "";
-      if (moveFocus) next.focus();
-    }
-
-    tabs.forEach((tab, index) => {
-      tab.addEventListener("click", () => selectTab(index));
-      tab.addEventListener("keydown", (event) => {
-        let nextIndex = index;
-
-        if (event.key === "ArrowRight") {
-          nextIndex = (index + 1) % tabs.length;
-        } else if (event.key === "ArrowLeft") {
-          nextIndex = (index - 1 + tabs.length) % tabs.length;
-        } else if (event.key === "Home") {
-          nextIndex = 0;
-        } else if (event.key === "End") {
-          nextIndex = tabs.length - 1;
-        } else {
-          return;
-        }
-
-        event.preventDefault();
-        selectTab(nextIndex, true);
-      });
-    });
-
-    root.classList.add("trajectory-ready");
-  }
-
-  initTrajectory();
-  document.addEventListener("astro:after-swap", initTrajectory);
-</script>

@@ -1,14 +1,20 @@
 ---
 import { researchItems } from "../data/portfolio";
+import Trajectory from "./Trajectory.astro";
 
 const featuredResearch = researchItems.find((item) => item.featured) ?? researchItems[0];
 const ongoingResearch = researchItems.filter((item) => item !== featuredResearch);
 ---
 
-<section id="research" class="section section--research" aria-labelledby="research-title">
+<section
+  id="research"
+  class="section section--research story-chapter story-chapter--research"
+  data-brain-scene="research"
+  aria-labelledby="research-title"
+>
   <div class="shell">
     <header class="section-heading reveal">
-      <h2 id="research-title">Research for earlier, better signals</h2>
+      <h2 id="research-title">Earlier signals, better decisions.</h2>
       <p>Applied medical AI focused on the moments when a faint signal can change the next clinical decision.</p>
     </header>
 
@@ -37,5 +43,7 @@ const ongoingResearch = researchItems.filter((item) => item !== featuredResearch
         ))}
       </div>
     </div>
+
+    <Trajectory />
   </div>
 </section>

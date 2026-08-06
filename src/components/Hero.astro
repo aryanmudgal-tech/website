@@ -1,18 +1,17 @@
 ---
 import { links, proofPoints } from "../data/portfolio";
-import { publicAssetUrl } from "../lib/site-url";
 
 ---
 
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero story-chapter story-chapter--hero" data-brain-scene="hero" aria-labelledby="hero-title">
   <div class="hero__copy">
     <h1 id="hero-title">Aryan<br />Mudgal</h1>
     <p class="hero__positioning">
       Engineer and researcher building applied AI across industrial operations, human-AI interaction, and healthcare.
     </p>
     <div class="hero__actions" aria-label="Primary actions">
-      <a class="action action--primary" href="#work">View experience</a>
-      <a class="action action--text" href={links.email}>Email Aryan</a>
+      <a class="action action--primary" href={links.email}>Email Aryan</a>
+      <a class="action action--text" href="#work">View experience</a>
     </div>
   </div>
   <div class="proof-band" aria-label="Selected proof">
@@ -26,18 +25,4 @@ import { publicAssetUrl } from "../lib/site-url";
       ))}
     </ul>
   </div>
-  <figure class="hero__figure">
-    <img
-      src={publicAssetUrl("assets/award-leader.jpg")}
-      width="1195"
-      height="793"
-      alt="Aryan holding the Award for Innovative Student Leadership at the University at Buffalo"
-      fetchpriority="high"
-      decoding="async"
-    />
-    <figcaption>
-      <span>Award for Innovative Student Leadership</span>
-      <span>1 of 2 among 20,000 students</span>
-    </figcaption>
-  </figure>
 </section>

@@ -77,7 +77,6 @@ export const navItems: readonly Link[] = [
   { label: "Projects", href: "#projects" },
   { label: "Research", href: "#research" },
   { label: "Leadership", href: "#leadership" },
-  { label: "Recognition", href: "#recognition" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];

@@ -1,13 +1,34 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import test from "node:test";
+import * as portfolio from "../src/data/portfolio.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const sceneOrder = ["hero", "work", "projects", "research", "leadership", "about"];
+const trajectoryOrder = [
+  "delegate",
+  "senator",
+  "hcl",
+  "meta-layer",
+  "core",
+  "fmh",
+  "armie",
+  "streamfair",
+  "dots",
+  "innovative-student-leadership",
+  "suny-chancellors-award",
+  "linde",
+];
 
 function read(relativePath) {
   return readFileSync(join(root, relativePath), "utf8");
+}
+
+function readIfPresent(relativePath) {
+  return existsSync(join(root, relativePath)) ? read(relativePath) : "";
 }
 
 function sourceBundle() {
@@ -29,16 +50,191 @@ function sourceBundle() {
   ].map(read).join("\n");
 }
 
+function cameraDiveSource() {
+  return [
+    "src/components/ParticleBrain.astro",
+    "src/lib/particle-brain.mjs",
+    "src/pages/index.astro",
+    "src/components/Hero.astro",
+    "src/components/Experience.astro",
+    "src/components/Projects.astro",
+    "src/components/Research.astro",
+    "src/components/Leadership.astro",
+    "src/components/About.astro",
+    "src/styles/global.css",
+    "src/styles/tokens.css",
+    "src/styles/layout.css",
+    "src/styles/motion.css",
+    "package.json",
+  ].map(readIfPresent).join("\n");
+}
+
+function styleSource() {
+  return [
+    "src/styles/global.css",
+    "src/styles/tokens.css",
+    "src/styles/layout.css",
+    "src/styles/motion.css",
+  ].map(readIfPresent).join("\n");
+}
+
+function servedFiles(directory = join(root, "src")) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return servedFiles(path);
+    if (!/\.(?:astro|css|js|jsx|mjs|ts|tsx)$/.test(entry.name)) return [];
+    return [{ path, source: readFileSync(path, "utf8") }];
+  });
+}
+
+function servedSource() {
+  return servedFiles().map((file) => file.source).join("\n");
+}
+
+function hexFromChannels(red, green, blue) {
+  return `#${[red, green, blue]
+    .map((channel) => Math.round(channel).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+function normalizeHex(color) {
+  const value = color.slice(1);
+  if (value.length === 3 || value.length === 4) {
+    return `#${value.slice(0, 3).split("").map((digit) => digit.repeat(2)).join("")}`;
+  }
+  return `#${value.slice(0, 6)}`;
+}
+
+function normalizeRgb(body) {
+  const channels = body.split("/")[0].trim().split(/[\s,]+/).filter(Boolean).slice(0, 3);
+  assert.equal(channels.length, 3, `unsupported rgb() color: ${body}`);
+  return hexFromChannels(...channels.map((channel) => (
+    channel.endsWith("%") ? Number.parseFloat(channel) * 2.55 : Number.parseFloat(channel)
+  )));
+}
+
+function normalizeHsl(body) {
+  const channels = body.split("/")[0].trim().split(/[\s,]+/).filter(Boolean).slice(0, 3);
+  assert.equal(channels.length, 3, `unsupported hsl() color: ${body}`);
+  const hue = ((Number.parseFloat(channels[0]) % 360) + 360) % 360;
+  const saturation = Number.parseFloat(channels[1]) / 100;
+  const lightness = Number.parseFloat(channels[2]) / 100;
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const segment = hue / 60;
+  const secondary = chroma * (1 - Math.abs((segment % 2) - 1));
+  const [red, green, blue] = segment < 1 ? [chroma, secondary, 0]
+    : segment < 2 ? [secondary, chroma, 0]
+      : segment < 3 ? [0, chroma, secondary]
+        : segment < 4 ? [0, secondary, chroma]
+          : segment < 5 ? [secondary, 0, chroma]
+            : [chroma, 0, secondary];
+  const match = lightness - chroma / 2;
+  return hexFromChannels((red + match) * 255, (green + match) * 255, (blue + match) * 255);
+}
+
+const namedCssColors = new Set(`
+  aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue
+  blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk
+  crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki
+  darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen
+  darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue
+  dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite
+  gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki
+  lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan
+  lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen
+  lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen
+  magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen
+  mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream
+  mistyrose moccasin navajowhite navy oldlace olive olivedrab orange orangered orchid
+  palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum
+  powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown
+  seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen
+  steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen
+`.trim().split(/\s+/));
+
+function authoredColorValues(source) {
+  const values = [];
+  const properties = [
+    "--[\\w-]+",
+    "accent-color",
+    "background(?:-color)?",
+    "border(?:-(?:block|inline)(?:-(?:start|end))?|-(?:top|right|bottom|left))?(?:-color)?",
+    "box-shadow",
+    "caret-color",
+    "color",
+    "column-rule(?:-color)?",
+    "fill",
+    "filter",
+    "outline(?:-color)?",
+    "stroke",
+    "text-decoration(?:-color)?",
+    "text-shadow",
+  ].join("|");
+  const declarations = new RegExp(
+    `(?:^|[;{\"'])\\s*(?:${properties})\\s*:\\s*([^;}\"']+)`,
+    "gim",
+  );
+  const canvasAndDomAssignments =
+    /(?:fillStyle|strokeStyle|shadowColor|color|backgroundColor|borderColor|outlineColor|boxShadow|textShadow)\s*=\s*["'`]([^"'`]+)["'`]/gi;
+
+  for (const match of source.matchAll(declarations)) values.push(match[1]);
+  for (const match of source.matchAll(canvasAndDomAssignments)) values.push(match[1]);
+  return values;
+}
+
+function authoredCssPalette(source) {
+  const colors = (source.match(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/gi) ?? []).map(normalizeHex);
+  for (const match of source.matchAll(/rgba?\(([^)]*)\)/gi)) colors.push(normalizeRgb(match[1]));
+  for (const match of source.matchAll(/hsla?\(([^)]*)\)/gi)) colors.push(normalizeHsl(match[1]));
+  for (const value of authoredColorValues(source)) {
+    for (const token of value.match(/[a-z]+/gi) ?? []) {
+      const keyword = token.toLowerCase();
+      if (!namedCssColors.has(keyword)) continue;
+      assert.ok(["black", "white"].includes(keyword), `unapproved named CSS color: ${keyword}`);
+      colors.push(keyword === "black" ? "#000000" : "#ffffff");
+    }
+  }
+  assert.doesNotMatch(source, /\b(?:hwb|lab|lch|oklab|oklch|color|color-mix)\s*\(/i);
+  return [...new Set(colors)].sort();
+}
+
+function functionBody(source, name) {
+  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const declaration = new RegExp(
+    `(?:function\\s+${escapedName}\\s*\\([^)]*\\)|(?:const|let|var)\\s+${escapedName}\\s*=\\s*(?:\\([^)]*\\)|[A-Za-z_$][\\w$]*)\\s*=>)\\s*\\{`,
+  );
+  const match = declaration.exec(source);
+  if (!match) return "";
+
+  const openingBrace = match.index + match[0].lastIndexOf("{");
+  let depth = 0;
+  for (let index = openingBrace; index < source.length; index += 1) {
+    if (source[index] === "{") depth += 1;
+    if (source[index] === "}") depth -= 1;
+    if (depth === 0) return source.slice(openingBrace + 1, index);
+  }
+  return "";
+}
+
+function schedulesAnimation(snippet, source, callbackName) {
+  const callbackPattern = callbackName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (new RegExp(`requestAnimationFrame\\(\\s*${callbackPattern}\\s*\\)`).test(snippet)) return true;
+
+  for (const call of snippet.matchAll(/\b([A-Za-z_$][\w$]*)\s*\(/g)) {
+    const body = functionBody(source, call[1]);
+    if (new RegExp(`requestAnimationFrame\\(\\s*${callbackPattern}\\s*\\)`).test(body)) return true;
+  }
+  return false;
+}
+
 test("recruiter-first sections exist in the approved order", () => {
   const page = read("src/pages/index.astro");
   const components = [
     "<Hero",
     "<Experience",
     "<Projects",
-    "<Trajectory",
     "<Research",
     "<Leadership",
-    "<Recognition",
     "<About",
     "<SiteFooter",
   ];
@@ -54,10 +250,10 @@ test("recruiter-first sections exist in the approved order", () => {
 test("navigation and section contracts are conventional and complete", () => {
   const data = read("src/data/portfolio.ts");
   const source = sourceBundle();
+  const navItems = data.match(/export const navItems:[\s\S]*?=\s*\[([\s\S]*?)\];/)?.[1] ?? "";
+  const labels = [...navItems.matchAll(/label:\s*["']([^"']+)["']/g)].map((match) => match[1]);
 
-  for (const label of ["Work", "Projects", "Research", "Leadership", "Recognition", "About", "Contact"]) {
-    assert.match(data, new RegExp(`label: ["']${label}["']`));
-  }
+  assert.deepEqual(labels, ["Work", "Projects", "Research", "Leadership", "About", "Contact"]);
 
   for (const id of ["top", "work", "projects", "trajectory", "research", "leadership", "recognition", "about", "contact"]) {
     assert.match(source, new RegExp(`id=["']${id}["']`));
@@ -97,10 +293,86 @@ test("core proof and supported content are preserved", () => {
   assert.doesNotMatch(data, /3,000\+\s+followers/i);
 });
 
+test("every typed portfolio fact matches the approved content snapshot", () => {
+  const { navItems: _navItems, ...facts } = portfolio;
+  const factHash = createHash("sha256").update(JSON.stringify(facts)).digest("hex");
+
+  assert.deepEqual(Object.keys(facts).sort(), [
+    "experiences",
+    "interests",
+    "leadershipItems",
+    "links",
+    "places",
+    "projects",
+    "proofPoints",
+    "recognitions",
+    "researchItems",
+    "trajectoryColumns",
+    "trajectoryEvents",
+    "trajectoryLanes",
+  ]);
+  assert.equal(factHash, "1937230be150f15ce5de31c3d61a31210ea60838c5d6c9b1e0d19141006db8ef");
+});
+
+test("public contact and project URLs remain exact", () => {
+  const data = read("src/data/portfolio.ts");
+
+  for (const url of [
+    "mailto:aryanmudgal4493@gmail.com",
+    "https://www.linkedin.com/in/aryan-mudgal",
+    "https://github.com/aryanmudgal-tech",
+    "https://devpost.com/software/dots-y5r21j",
+    "https://devpost.com/software/armie",
+    "https://drive.google.com/file/d/12grQ7uR837u36IkN1WaILOC0SHycm2rh/view?usp=sharing",
+    "https://devpost.com/software/c-o-r-e",
+  ]) {
+    assert.ok(data.includes(`"${url}"`), `missing exact public URL: ${url}`);
+  }
+});
+
+test("metadata, Person schema, and public asset helpers stay exact and base-path safe", () => {
+  const layout = read("src/layouts/BaseLayout.astro");
+  const assets = read("src/lib/site-url.ts");
+  const experience = read("src/components/Experience.astro");
+  const projects = read("src/components/Projects.astro");
+  const recognition = read("src/components/Recognition.astro");
+
+  for (const value of [
+    "Aryan Mudgal | Engineer and researcher",
+    "Aryan Mudgal builds applied AI systems across industrial operations, human-AI interaction, and healthcare.",
+    '"@context": "https://schema.org"',
+    '"@type": "Person"',
+    'name: "Aryan Mudgal"',
+    'email: "mailto:aryanmudgal4493@gmail.com"',
+    'jobTitle: "Software engineer and researcher"',
+    '"https://www.linkedin.com/in/aryan-mudgal"',
+    '"https://github.com/aryanmudgal-tech"',
+    '"Applied artificial intelligence"',
+    '"Machine learning"',
+    '"Human-AI interaction"',
+    '"Medical AI"',
+  ]) {
+    assert.ok(layout.includes(value), `metadata surface is missing: ${value}`);
+  }
+
+  assert.match(layout, /<meta property="og:type" content="website"/);
+  assert.match(layout, /<meta property="og:title" content=\{title\}/);
+  assert.match(layout, /<meta property="og:description" content=\{description\}/);
+  assert.match(layout, /<meta name="twitter:card" content="summary"/);
+  assert.match(layout, /<meta name="twitter:title" content=\{title\}/);
+  assert.match(layout, /<meta name="twitter:description" content=\{description\}/);
+  assert.match(layout, /publicAssetUrl\("favicon\.svg"\)/);
+  assert.match(assets, /import\.meta\.env\.BASE_URL/);
+  assert.match(assets, /configuredBase\.endsWith\("\/"\)/);
+  assert.match(assets, /path\.replace\(\/\^\\\/\+\//);
+  assert.match(experience, /publicAssetUrl\("assets\/award-leader\.jpg"\)/);
+  assert.match(projects, /publicAssetUrl\(project\.image\)/);
+  assert.match(recognition, /publicAssetUrl\(recognition\.image\)/);
+});
+
 test("requested portfolio corrections are exact and stale content is absent", () => {
   const data = read("src/data/portfolio.ts");
   const about = read("src/components/About.astro");
-  const css = read("src/styles/global.css");
 
   assert.match(data, /trajectoryColumns\s*=\s*\["2023",\s*"2024",\s*"2025",\s*"2026"\]/);
   assert.match(
@@ -109,8 +381,6 @@ test("requested portfolio corrections are exact and stale content is absent", ()
   );
   assert.match(data, /column:\s*"2023"\s*\|\s*"2024"\s*\|\s*"2025"\s*\|\s*"2026"/);
   assert.doesNotMatch(data, /trajectoryColumns\s*=\s*\[[^\]]*"2022"/);
-  assert.match(css, /\.trajectory-axis\s*\{[^}]*repeat\(4,/s);
-  assert.match(css, /\.trajectory-lane__cells\s*\{[^}]*repeat\(4,/s);
   assert.match(
     data,
     /period:\s*"2023",\s*column:\s*"2023",\s*lane:\s*"Leadership",\s*title:\s*"Student Senator"/s,
@@ -128,7 +398,7 @@ test("requested portfolio corrections are exact and stale content is absent", ()
     "the exact Chancellor's Award title must appear in Career Path and Recognition",
   );
   assert.ok((data.match(/year:\s*"2026"/g) ?? []).length >= 2, "both requested awards must show 2026");
-  assert.match(about, /<h2 id="about-title">Outside the work<\/h2>/);
+  assert.match(about, /<h2 id="about-title">Outside the work\.<\/h2>/);
 
   for (const stale of [
     /C\.O\.R\.E\. \/ W\.O\.D\./i,
@@ -142,96 +412,425 @@ test("requested portfolio corrections are exact and stale content is absent", ()
   }
 });
 
-test("trajectory is progressive, selected server-side, and keyboard operable", () => {
+test("trajectory is a complete server-rendered chronological list", () => {
   const source = read("src/components/Trajectory.astro");
-  const css = read("src/styles/global.css");
 
-  assert.match(source, /role="tablist"/);
-  assert.match(source, /role="tab"/);
-  assert.match(source, /aria-selected=\{index === 0/);
-  assert.match(source, /id="trajectory-detail"/);
-  assert.match(source, /aria-live="polite"/);
-  for (const key of ["ArrowLeft", "ArrowRight", "Home", "End"]) {
-    assert.ok(source.includes(key), `trajectory must handle ${key}`);
-  }
-  assert.match(
-    source,
-    /\.sort\(\s*\(left, right\) => Number\(left\.dataset\.order\) - Number\(right\.dataset\.order\),?\s*\)/,
+  assert.match(source, /<ol\b/);
+  assert.match(source, /trajectoryEvents\.map/);
+  assert.deepEqual(
+    portfolio.trajectoryEvents.map((event) => event.id),
+    trajectoryOrder,
+    "source data must expose exactly twelve ordered chronology nodes",
   );
-  assert.match(source, /classList\.add\("trajectory-ready"\)/);
-  assert.match(source, /class="trajectory-fallback"/);
-  assert.match(source, /trajectory-fallback__detail/);
-  assert.match(source, /event\.detail/);
-  assert.match(css, /\.trajectory-enhanced\s*\{[^}]*display:\s*none/s);
-  assert.match(css, /\.trajectory-ready\s+\.trajectory-enhanced\s*\{[^}]*display:\s*grid/s);
-  assert.match(css, /\.trajectory-ready\s+\.trajectory-fallback\s*\{[^}]*display:\s*none/s);
-  assert.doesNotMatch(read("src/layouts/BaseLayout.astro"), /classList\.add\("js"\)/);
+  for (const field of ["period", "lane", "title", "outcome", "detail"]) {
+    assert.match(source, new RegExp(`event\\.${field}`));
+  }
+  assert.doesNotMatch(source, /role="tab(?:list|panel)?"/);
+  assert.doesNotMatch(source, /<script\b/);
 });
 
 test("markerless content keeps list semantics and avoids viewport-width overflow", () => {
   const source = sourceBundle();
-  const css = read("src/styles/global.css");
+  const css = styleSource();
 
   assert.ok((source.match(/role="list"/g) ?? []).length >= 6);
   assert.doesNotMatch(css, /\.proof-band\s*\{[^}]*width:\s*100vw/s);
 });
 
-test("visual system includes responsive, focus, theme, and motion safeguards", () => {
-  const css = read("src/styles/global.css");
+test("Camera Dive source includes the fixed decorative brain and six scene markers", () => {
+  const page = read("src/pages/index.astro");
+  const brain = readIfPresent("src/components/ParticleBrain.astro");
+  const source = cameraDiveSource();
 
-  assert.match(css, /--accent:/);
-  assert.doesNotMatch(css, /--accent-(?:2|secondary|alt):/);
-  assert.match(css, /@media\s*\(prefers-color-scheme:\s*dark\)/);
-  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
-  assert.match(css, /:focus-visible/);
-  assert.match(css, /min-height:\s*100dvh/);
-  assert.match(css, /@media\s*\(max-width:\s*47\.99rem\)/);
-  assert.match(css, /@media\s*\(max-width:\s*72rem\)[\s\S]*?\.trajectory-ready\s+\.trajectory-enhanced\s*\{[^}]*display:\s*none/);
-  for (const state of [".wordmark:hover", ".site-nav a:active", ".site-footer__meta a:hover"]) {
-    assert.ok(css.includes(state), `missing interaction feedback: ${state}`);
-  }
-  assert.doesNotMatch(css, /(?:linear|radial|conic)-gradient/i);
-  assert.doesNotMatch(css, /cursor:\s*none/i);
-  assert.doesNotMatch(css, /animation-iteration-count:\s*infinite/i);
+  assert.equal(existsSync(join(root, "src/components/ParticleBrain.astro")), true);
+  assert.match(page, /<ParticleBrain\s*\/>/);
+  assert.match(brain, /<div\b(?=[^>]*class="particle-brain")(?=[^>]*aria-hidden="true")[^>]*>\s*<canvas\b/);
+  const css = styleSource();
+  const layerRule = css.match(/\.particle-brain\s*\{([^}]*)\}/s)?.[1] ?? "";
+  const canvasRule = css.match(/\.particle-brain__canvas\s*\{([^}]*)\}/s)?.[1] ?? "";
+  assert.match(layerRule, /position:\s*fixed/);
+  assert.match(layerRule, /inset:\s*0/);
+  assert.match(layerRule, /pointer-events:\s*none/);
+  assert.match(canvasRule, /width:\s*100%/);
+  assert.match(canvasRule, /height:\s*100%/);
+  const scenes = [...source.matchAll(/\bdata-brain-scene=["']([^"']+)["']/g)]
+    .map((match) => match[1]);
+  assert.deepEqual(scenes, sceneOrder, "source must expose exactly six ordered brain scenes");
 });
 
-test("tonal chapters and humanist typography replace the robotic mono system", () => {
-  const css = read("src/styles/global.css");
+test("particle runtime uses Canvas 2D with lifecycle and fallback safeguards", () => {
+  const source = cameraDiveSource();
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
 
-  for (const token of [
-    "--chapter-work",
-    "--chapter-projects",
-    "--chapter-trajectory",
-    "--chapter-research",
-    "--chapter-leadership",
-    "--chapter-recognition",
-    "--chapter-about",
+  assert.match(source, /getContext\(["']2d["']\)/);
+  assert.match(source, /requestAnimationFrame/);
+  assert.match(source, /document\.hidden/);
+  assert.match(source, /matchMedia\(["']\(prefers-reduced-motion:\s*reduce\)["']\)/);
+  assert.match(source, /Math\.min\([^)]*(?:window\.)?devicePixelRatio[^)]*,\s*1\.5\)/);
+  assert.match(source, /brain-unavailable/);
+  assert.match(engine, /IntersectionObserver/);
+  assert.match(engine, /\.isIntersecting/);
+  assert.match(engine, /\.observe\(\s*canvas\s*\)/);
+  assert.match(engine, /setTimeout\([\s\S]{0,300},\s*120\s*\)/);
+  assert.match(engine, /clearTimeout/);
+  assert.match(engine, /cancelAnimationFrame/);
+  assert.match(engine, /\.disconnect\(\)/);
+  assert.match(engine, /removeEventListener\(\s*["']resize["']/);
+
+  const reducedBranch = engine.match(
+    /if\s*\(\s*reducedMotion\.matches\s*\)\s*\{([\s\S]*?)\n\s*\}/,
+  )?.[1] ?? "";
+  assert.notEqual(reducedBranch, "", "runtime must branch for reduced motion");
+  assert.match(reducedBranch, /interpolateScene\(\s*[^,]+,\s*0\s*\)/);
+  assert.equal((reducedBranch.match(/(?:draw|render)\w*\s*\(/gi) ?? []).length, 1);
+  assert.doesNotMatch(reducedBranch, /requestAnimationFrame/);
+});
+
+test("render loop derives normalized scene progress and couples visibility to animation work", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+
+  const interpolation = engine.match(
+    /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*interpolateScene\(\s*[^,]+,\s*([A-Za-z_$][\w$]*)\s*\)/,
+  );
+  assert.ok(interpolation, "the rendered frame must interpolate from a computed progress value");
+  const [, frameName, progressName] = interpolation;
+  const progressAssignment = engine.match(
+    new RegExp(`(?:const|let|var)\\s+${progressName}\\s*=\\s*([^;]+)`),
+  );
+  assert.ok(progressAssignment, "the interpolation progress must be assigned from scene geometry");
+  assert.doesNotMatch(progressAssignment[1].trim(), /^-?(?:\d+(?:\.\d+)?|\.\d+)$/);
+
+  const progressHelper = progressAssignment[1].match(/^\s*([A-Za-z_$][\w$]*)\s*\(/)?.[1];
+  const geometryFlow = progressHelper ? functionBody(engine, progressHelper) : progressAssignment[1];
+  assert.notEqual(geometryFlow, "", "the geometry-to-progress calculation must be inspectable");
+  assert.match(geometryFlow, /getBoundingClientRect\(\)/);
+  assert.match(geometryFlow, /\.top\b/);
+  assert.match(geometryFlow, /\.height\b/);
+  assert.match(geometryFlow, /\/\s*2\b/);
+  assert.ok(
+    (geometryFlow.match(/(?<![*/])\/(?![*/])/g) ?? []).length >= 2
+      && (geometryFlow.match(/(?<![-=])-(?![-=>])/g) ?? []).length >= 2,
+    "scene progress must divide a relative position by a geometry-derived interval",
+  );
+  assert.match(geometryFlow, /return\s+[^;\n]*\+[^;\n]*/);
+  assert.doesNotMatch(geometryFlow, /Math\.(?:ceil|floor|round)\s*\(/);
+
+  const renderCall = new RegExp(`\\b(?:draw|render)[\\w$]*\\s*\\([^;)]*\\b${frameName}\\b`);
+  assert.match(engine.slice(interpolation.index), renderCall);
+
+  const animationCallbacks = [...engine.matchAll(/requestAnimationFrame\(\s*([A-Za-z_$][\w$]*)\s*\)/g)];
+  const callbackName = animationCallbacks
+    .map((match) => match[1])
+    .find((name) => functionBody(engine, name).includes(interpolation[0]));
+  assert.ok(callbackName, "interpolation and rendering must run inside the animation callback");
+  const loopBody = functionBody(engine, callbackName);
+  const renderPosition = loopBody.search(renderCall);
+  assert.ok(renderPosition >= 0, "the interpolated frame must flow into the animation callback's renderer");
+
+  const visibilityAssignment = engine.match(
+    /([A-Za-z_$][\w$]*)\s*=\s*(?:[A-Za-z_$][\w$]*|[A-Za-z_$][\w$]*\s*\[\s*0\s*\])\.isIntersecting/,
+  );
+  assert.ok(visibilityAssignment, "IntersectionObserver visibility must feed the animation gate");
+  const visibilityName = visibilityAssignment[1];
+  const beforeRender = loopBody.slice(0, renderPosition);
+  assert.match(beforeRender, /document\.hidden/);
+  const offscreenExpression = `(?:!\\s*${visibilityName}\\b|${visibilityName}\\s*===\\s*false\\b)`;
+  assert.match(beforeRender, new RegExp(offscreenExpression));
+  assert.match(
+    beforeRender,
+    /if\s*\([^)]*document\.hidden[^)]*\)\s*\{?\s*return/,
+    "hidden document state must return before rendering",
+  );
+  assert.match(
+    beforeRender,
+    new RegExp(`if\\s*\\([^)]*${offscreenExpression}[^)]*\\)\\s*\\{?\\s*return`),
+    "offscreen canvas state must return before rendering",
+  );
+  assert.equal(
+    schedulesAnimation(loopBody.slice(renderPosition), engine, callbackName),
+    true,
+    "animation scheduling must occur only after the hidden/offscreen gate and rendering",
+  );
+
+  const observerRestart = engine.slice(visibilityAssignment.index, visibilityAssignment.index + 800);
+  assert.match(
+    observerRestart,
+    new RegExp(`if\\s*\\(\\s*${visibilityName}(?:\\s*===\\s*true)?\\s*\\)`),
+  );
+  assert.equal(
+    schedulesAnimation(observerRestart, engine, callbackName),
+    true,
+    "the observer must restart animation when the canvas becomes visible",
+  );
+
+  const visibilityListener = engine.match(
+    /addEventListener\(\s*["']visibilitychange["'][\s\S]{0,800}/,
+  )?.[0] ?? "";
+  assert.notEqual(visibilityListener, "", "runtime must listen for document visibility changes");
+  assert.match(
+    visibilityListener,
+    /(?:!\s*document\.hidden|document\.visibilityState\s*===\s*["']visible["'])/,
+  );
+  assert.equal(
+    schedulesAnimation(visibilityListener, engine, callbackName),
+    true,
+    "visibilitychange must restart animation when the document becomes visible",
+  );
+});
+
+test("idle particle rendering skips unchanged scene progress", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const loopBody = functionBody(engine, "animate");
+
+  assert.match(engine, /let\s+lastProgress\s*=\s*null/);
+  assert.match(
+    loopBody,
+    /if\s*\(\s*progress\s*===\s*lastProgress\s*\)\s*\{[\s\S]*?requestAnimationFrame\(\s*animate\s*\)[\s\S]*?return/,
+  );
+  assert.ok(
+    loopBody.indexOf("progress === lastProgress") < loopBody.indexOf("renderFrame(frame)"),
+    "stable progress must return before Canvas drawing",
+  );
+  assert.match(engine, /lastProgress\s*=\s*null/);
+});
+
+test("particle transitions draw deterministic bridges toward the adjacent cluster", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const bridgeBody = functionBody(engine, "drawBridges");
+
+  assert.match(engine, /createBridgeEdges\(\s*particles/);
+  assert.notEqual(bridgeBody, "", "runtime must expose an inspectable bridge renderer");
+  assert.match(bridgeBody, /edge\.fromCluster\s*===\s*blend\.fromCluster/);
+  assert.match(bridgeBody, /edge\.toCluster\s*===\s*blend\.toCluster/);
+  assert.match(bridgeBody, /blend\.amount/);
+  assert.match(bridgeBody, /moveTo\(/);
+  assert.match(bridgeBody, /lineTo\(/);
+});
+
+test("settled leadership scene keeps a saffron particle halo", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const renderBody = functionBody(engine, "renderFrame");
+
+  assert.match(renderBody, /leadershipAccent\(\s*frame\.clusterMix\s*\)/);
+  assert.match(renderBody, /point\.cluster\s*===\s*LEADERSHIP_CLUSTER/);
+  assert.match(renderBody, /["']#ffb829["']/i);
+});
+
+test("every brain node morphs between semantic micro-glyphs", () => {
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const renderBody = functionBody(engine, "renderFrame");
+  const glyphBody = functionBody(engine, "drawParticleGlyph");
+  const morphBody = functionBody(engine, "drawMorphedGlyph");
+
+  for (const shape of ["triangle", "square", "diamond", "ring", "hexagon", "dot"]) {
+    assert.match(glyphBody, new RegExp(`["']${shape}["']`));
+  }
+  assert.match(renderBody, /particleShapeState\(\s*frame\.clusterMix\s*\)/);
+  assert.match(renderBody, /for\s*\(\s*const\s+point\s+of\s+particles\s*\)/);
+  assert.match(renderBody, /drawMorphedGlyph\(\s*point\s*,\s*projected/);
+  assert.ok((morphBody.match(/drawParticleGlyph\(/g) ?? []).length >= 2);
+  assert.doesNotMatch(engine, /draw(?:Giant|Chapter|Scene)Shape/i);
+});
+
+test("global styles are split into tokens, layout, and motion modules", () => {
+  const global = read("src/styles/global.css");
+
+  for (const name of ["tokens", "layout", "motion"]) {
+    assert.equal(existsSync(join(root, `src/styles/${name}.css`)), true, `${name}.css must exist`);
+    assert.match(global, new RegExp(`^\\s*@import\\s+(?:url\\()?['"]\\./${name}\\.css['"]\\)?\\s*;`, "m"));
+  }
+
+  const css = styleSource();
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+  assert.match(css, /:focus-visible/);
+  assert.doesNotMatch(css, /(?:linear|radial|conic)-gradient/i);
+});
+
+test("about chapter keeps distinct desktop and tablet columns", () => {
+  const css = readIfPresent("src/styles/layout.css");
+
+  assert.doesNotMatch(css, /\.story-chapter--about\s*>\s*\.shell\s*>\s*\*/);
+  assert.match(
+    css,
+    /\.story-chapter--about\s*>\s*\.about-human\s*>\s*:first-child\s*\{[^}]*grid-column:\s*7\s*\/\s*10/s,
+  );
+  assert.match(
+    css,
+    /\.story-chapter--about\s*>\s*\.about-human\s*>\s*\.about-human__note\s*\{[^}]*grid-column:\s*10\s*\/\s*13/s,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*64rem\)[\s\S]*?\.story-chapter--about\s*>\s*\.about-human\s*>\s*:first-child\s*\{[^}]*grid-column:\s*6\s*\/\s*9/s,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*64rem\)[\s\S]*?\.story-chapter--about\s*>\s*\.about-human\s*>\s*\.about-human__note\s*\{[^}]*grid-column:\s*9\s*\/\s*13/s,
+  );
+});
+
+test("tablet and mobile chapters place headings and text on black scrims", () => {
+  const css = readIfPresent("src/styles/layout.css");
+  const tokens = readIfPresent("src/styles/tokens.css");
+
+  assert.match(tokens, /--reading-surface:\s*rgb\(0 0 0 \/ 0\.9\)/);
+
+  for (const breakpoint of ["64rem", "48rem"]) {
+    const responsiveRule = new RegExp(
+      `@media\\s*\\(max-width:\\s*${breakpoint}\\)[\\s\\S]*?\\.section-heading,[\\s\\S]*?background:\\s*var\\(--reading-surface\\)`,
+    );
+    assert.match(css, responsiveRule, `${breakpoint} must provide a heading scrim`);
+  }
+});
+
+test("navigation has a black fallback and a supported transparent-at-top state", () => {
+  const layout = readIfPresent("src/styles/layout.css");
+  const motion = readIfPresent("src/styles/motion.css");
+
+  assert.match(layout, /\.site-header\s*\{[^}]*background:\s*rgb\(0 0 0 \/ 0\.94\)/s);
+  assert.match(motion, /@supports\s*\(animation-timeline:\s*scroll\(\)\)/);
+  assert.match(motion, /@keyframes\s+nav-strip\s*\{[\s\S]*?background-color:\s*rgb\(0 0 0 \/ 0\)/);
+  assert.match(
+    motion,
+    /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.site-header\s*\{[^}]*background:\s*rgb\(0 0 0 \/ 0\.94\)/s,
+  );
+});
+
+test("hero gives the email action primary Electric Iris emphasis", () => {
+  const hero = read("src/components/Hero.astro");
+
+  assert.match(
+    hero,
+    /<a class="action action--primary" href=\{links\.email\}>Email Aryan<\/a>/,
+  );
+  assert.match(
+    hero,
+    /<a class="action action--text" href="#work">View experience<\/a>/,
+  );
+  assert.ok(
+    hero.indexOf(">Email Aryan</a>") < hero.indexOf(">View experience</a>"),
+    "the primary email action must appear before the secondary experience action",
+  );
+});
+
+test("mobile hero contains its unbreakable title between 320 and 390 pixels", () => {
+  const css = readIfPresent("src/styles/layout.css");
+  const mobile = css.match(/@media\s*\(max-width:\s*48rem\)\s*\{([\s\S]*)\}\s*$/)?.[1] ?? "";
+
+  assert.match(mobile, /\.hero__copy\s*\{[^}]*min-width:\s*0\s*;/s);
+  assert.match(mobile, /\.hero h1\s*\{[^}]*min-width:\s*0\s*;/s);
+  assert.match(
+    mobile,
+    /\.hero h1\s*\{[^}]*font-size:\s*clamp\(3rem,\s*16\.5vw,\s*4\.5rem\)\s*;/s,
+  );
+  assert.match(mobile, /\.proof-band__inner\s*\{[^}]*width:\s*100%/s);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*64rem\)[\s\S]*?\.proof-band__inner\s*\{[^}]*overflow-x:\s*auto/s,
+  );
+});
+
+test("mobile About restores a layout that preserves vertical separation", () => {
+  const css = readIfPresent("src/styles/layout.css");
+  const mobile = css.match(/@media\s*\(max-width:\s*48rem\)\s*\{([\s\S]*)\}\s*$/)?.[1] ?? "";
+
+  assert.match(mobile, /\.story-chapter\s*>\s*\.shell\s*\{[^}]*display:\s*block/s);
+  assert.match(
+    mobile,
+    /\.story-chapter\s*>\s*\.about-human\s*\{[^}]*(?:display:\s*(?:grid|flex)[^}]*gap:\s*3rem|margin-top:\s*3rem)/s,
+  );
+  assert.match(
+    mobile,
+    /\.story-chapter\s*>\s*\.about-human\s*>\s*:first-child\s*,\s*\.story-chapter\s*>\s*\.about-human\s*>\s*\.about-human__note\s*\{[^}]*grid-column:\s*1\s*;/s,
+  );
+});
+
+test("nav scroll animation support requires timeline and range", () => {
+  const motion = readIfPresent("src/styles/motion.css");
+
+  assert.match(
+    motion,
+    /@supports\s*\(animation-timeline:\s*scroll\(\)\)\s+and\s+\(animation-range:\s*[^)]+\)/,
+  );
+});
+
+test("award photography is evidence after the hero", () => {
+  const hero = read("src/components/Hero.astro");
+  const experience = read("src/components/Experience.astro");
+
+  assert.doesNotMatch(hero, /award-leader\.jpg|hero__figure/);
+  assert.match(experience, /class="work-evidence reveal"/);
+  assert.match(experience, /publicAssetUrl\("assets\/award-leader\.jpg"\)/);
+  assert.match(experience, /width="1195"/);
+  assert.match(experience, /height="793"/);
+  assert.match(experience, /alt="Aryan holding the Award for Innovative Student Leadership at the University at Buffalo"/);
+  assert.match(experience, /loading="lazy"/);
+  assert.doesNotMatch(experience, /fetchpriority=/);
+  assert.match(experience, /Award for Innovative Student Leadership/);
+  assert.match(experience, /1 of 2 among 20,000 students/);
+});
+
+test("every dynamic viewport pacing value has a viewport fallback", () => {
+  for (const relativePath of ["src/styles/tokens.css", "src/styles/layout.css", "src/styles/motion.css"]) {
+    const lines = readIfPresent(relativePath).split("\n");
+    lines.forEach((line, index) => {
+      if (!/dvh\b/.test(line)) return;
+      const property = line.trim().split(":")[0];
+      const preceding = lines[index - 1]?.trim() ?? "";
+      assert.match(
+        preceding,
+        new RegExp(`^${property.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}:.*vh\\b`),
+        `${relativePath}:${index + 1} must place a vh fallback immediately before ${line.trim()}`,
+      );
+    });
+  }
+});
+
+test("palette scan rejects named colors across authored styling contexts", () => {
+  for (const source of [
+    ".card { --accent: red; }",
+    ".card { border: 1px solid red; }",
+    ".card { box-shadow: 0 0 1rem red; }",
+    '<div style="outline: 2px solid red">',
+    'context.fillStyle = "red";',
+    'context.shadowColor = "red";',
+    'element.style.backgroundColor = "red";',
   ]) {
-    assert.ok((css.match(new RegExp(`${token}:`, "g")) ?? []).length >= 2, `${token} must exist in light and dark themes`);
+    assert.throws(() => authoredCssPalette(source), /unapproved named CSS color: red/);
+  }
+  assert.deepEqual(authoredCssPalette(".ink { color: black; background: white; }"), [
+    "#000000",
+    "#ffffff",
+  ]);
+});
+
+test("served source uses only the exact approved Camera Dive palette", () => {
+  const css = styleSource();
+  const engine = readIfPresent("src/lib/particle-brain.mjs");
+  const canvasFiles = new Set([
+    join(root, "src/components/ParticleBrain.astro"),
+    join(root, "src/lib/particle-brain.mjs"),
+  ]);
+  const approved = new Set(["#000000", "#15846e", "#8052ff", "#8d8d92", "#bdbdbd", "#ffb829", "#ffffff"]);
+  const authored = new Set();
+
+  for (const file of servedFiles()) {
+    for (const color of authoredCssPalette(file.source)) {
+      assert.equal(approved.has(color), true, `unapproved color ${color} in ${file.path}`);
+      if (color === "#15846e") {
+        assert.equal(canvasFiles.has(file.path), true, `#15846e is canvas-only: ${file.path}`);
+      }
+      authored.add(color);
+    }
   }
 
-  for (const roboticFont of [/--font-mono/i, /SFMono/i, /Consolas/i, /Liberation Mono/i, /\bmonospace\b/i]) {
-    assert.doesNotMatch(css, roboticFont);
-  }
-
-  for (const selector of [
-    ".section--work",
-    ".section--projects",
-    ".section--trajectory",
-    ".section--research",
-    ".section--leadership",
-    ".section--recognition",
-    ".section--about",
-  ]) {
-    assert.ok(css.includes(selector), `missing tonal chapter selector: ${selector}`);
-  }
-
-  assert.match(css, /\.recognition-item__year\s*\{/);
+  assert.deepEqual(authoredCssPalette(css), ["#000000", "#8052ff", "#8d8d92", "#bdbdbd", "#ffb829", "#ffffff"]);
+  assert.deepEqual([...authored].sort(), [...approved].sort());
+  assert.match(engine, /["']#15846e["']/i);
 });
 
 test("primary navigation exposes the current section without scroll listeners", () => {
   const nav = read("src/components/SiteNav.astro");
-  const css = read("src/styles/global.css");
+  const css = styleSource();
 
   assert.match(nav, /IntersectionObserver/);
   assert.match(nav, /aria-current/);
@@ -241,25 +840,47 @@ test("primary navigation exposes the current section without scroll listeners", 
   assert.doesNotMatch(nav, /window\.addEventListener\(["']scroll["']/);
 });
 
-test("served source rejects theatre-era and heavy-runtime patterns", () => {
-  const source = sourceBundle();
+test("served source rejects prohibited runtimes and interaction patterns", () => {
+  const source = servedSource();
+  const packageJson = JSON.parse(read("package.json"));
 
-  assert.doesNotMatch(source, /[—–]/);
+  const dependencyNames = [
+    packageJson.dependencies ?? {},
+    packageJson.devDependencies ?? {},
+    packageJson.optionalDependencies ?? {},
+    packageJson.peerDependencies ?? {},
+    packageJson.bundleDependencies ?? [],
+    packageJson.bundledDependencies ?? [],
+  ].flatMap((dependencyGroup) => (
+    Array.isArray(dependencyGroup) ? dependencyGroup : Object.keys(dependencyGroup)
+  ));
+  assert.deepEqual(dependencyNames, ["astro"], "Astro must remain the sole package dependency");
+  assert.equal(packageJson.devDependencies.astro, "^7.1.3");
+
   for (const banned of [
-    /three\.js/i,
+    /(?:from\s*|import\s*)["']three(?:\/[^"']*)?["']/i,
+    /import\s*\(\s*["']three(?:\/[^"']*)?["']\s*\)/i,
+    /require\(\s*["']three(?:\/[^"']*)?["']\s*\)/i,
     /webgl/i,
+    /\bgsap\b/i,
     /scrolltrigger/i,
-    /<canvas/i,
+    /\blenis\b/i,
     /<audio/i,
-    /lofi\.mp3/i,
-    /curtain/i,
-    /intermission/i,
-    /end credits/i,
+    /\bDala\b/i,
     /custom cursor/i,
+    /cursor\s*:\s*none/i,
+    /cursor\s*:\s*url\s*\(/i,
     /scroll hijack/i,
+    /::-(?:webkit-)?scrollbar/i,
+    /scrollbar-(?:color|width)/i,
+    /addEventListener\(\s*["'](?:wheel|mousewheel|touchmove)["']/i,
+    /(?:window\.)?scroll(?:To|By)\s*\(/i,
+    /\.scrollIntoView\s*\(/i,
+    /\.scrollTop\s*=/i,
   ]) {
     assert.doesNotMatch(source, banned);
   }
+  assert.doesNotMatch(source, /href=(?:["']{2}|["']#["'])/);
 });
 
 test("build dependency stays on the patched Astro line", () => {

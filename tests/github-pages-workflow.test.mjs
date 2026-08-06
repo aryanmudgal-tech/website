@@ -37,7 +37,17 @@ test("GitHub Pages build prefixes every public image with the repository base pa
   const page404 = read("dist/client/404.html");
 
   assert.doesNotMatch(index, /(?:src|href)="\/assets\//);
-  assert.match(index, /src="\/website\/assets\/award-leader\.jpg"/);
-  assert.match(index, /src="\/website\/assets\/hack-dots\.jpg"/);
+  for (const asset of [
+    "award-leader.jpg",
+    "hack-dots.jpg",
+    "hack-armie.jpg",
+    "hack-streamfair.jpg",
+    "hack-core.jpg",
+    "award-chancellor.jpg",
+    "award-pbk.jpg",
+  ]) {
+    assert.match(index, new RegExp(`src="/website/assets/${asset.replace(".", "\\.")}"`));
+  }
+  assert.match(index, /href="\/website\/favicon\.svg"/);
   assert.match(page404, /href="\/website\/favicon\.svg"/);
 });
