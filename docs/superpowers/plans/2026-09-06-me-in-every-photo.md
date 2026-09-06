@@ -640,7 +640,7 @@ test("every section heading is a sentence, not a bucket label", () => {
 
 test("served source rejects theatre-era and heavy-runtime patterns", () => {
   const source = components() + read("src/data/portfolio.ts");
-  assert.doesNotMatch(source, /[—–]/, "no em or en dashes in served copy");
+  assert.doesNotMatch(source, /[, –]/, "no em or en dashes in served copy");
   for (const banned of [/three\.js/i, /webgl/i, /scrolltrigger/i, /<canvas/i, /lofi\.mp3/i, /curtain/i, /intermission/i, /end credits/i, /custom cursor/i, /scroll hijack/i, /autoplay/i, /<iframe/i]) {
     assert.doesNotMatch(source, banned);
   }
