@@ -352,8 +352,12 @@ main {
 }
 
 .room__caption {
+  position: relative;
   margin-top: 0.6rem;
-  min-height: 3.6rem;
+  height: 3.8rem;
+  overflow: hidden;
+  padding-top: 0.1rem;
+  background: var(--paper);
   font-size: 0.86rem;
   line-height: 1.45;
   color: var(--muted);
@@ -783,13 +787,13 @@ main {
   }
 
   .room__caption {
-    min-height: 0;
+    height: 1.3rem;
     margin-top: 0.35rem;
+    padding-top: 0;
     font-size: 0.78rem;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
+    line-height: 1.3rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .fixation--long {

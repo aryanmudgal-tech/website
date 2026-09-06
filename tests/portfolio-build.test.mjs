@@ -68,7 +68,8 @@ test("built images reserve space, describe themselves, and load in the right ord
   }
   assert.equal((html.match(/fetchpriority="high"/g) ?? []).length, 1, "exactly one image is high priority");
   const lazy = images.filter((image) => /loading="lazy"/.test(image)).length;
-  assert.equal(lazy, images.length - 1, "every image except the hero room is lazy");
+  assert.equal(lazy, images.length - 11, "every image outside the eleven frame rooms is lazy");
+  assert.equal((html.match(/loading="eager"/g) ?? []).length, 11, "the eleven frame rooms load eagerly so they are painted before they fade in");
   assert.ok((html.match(/<picture\b/g) ?? []).length >= 22);
   assert.match(html, /type="image\/avif"/);
 });

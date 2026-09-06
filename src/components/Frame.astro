@@ -36,7 +36,7 @@ const fullWidths = (image: ImageMetadata) => [800, 1600].filter((width) => width
               sizes="(min-width: 64rem) 30rem, 100vw"
               formats={["avif", "webp"]}
               alt=""
-              loading={index === 0 ? "eager" : "lazy"}
+              loading="eager"
               fetchpriority={index === 0 ? "high" : "low"}
               decoding="async"
             />
