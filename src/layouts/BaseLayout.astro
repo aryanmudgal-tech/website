@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { publicAssetUrl } from "../lib/site-url";
+import { identity, links } from "../data/portfolio";
 
 interface Props {
   title?: string;
@@ -8,26 +9,33 @@ interface Props {
 }
 
 const {
-  title = "Aryan Mudgal | Engineer and researcher",
-  description = "Aryan Mudgal builds applied AI systems across industrial operations, human-AI interaction, and healthcare.",
+  title = "Aryan Mudgal | Software engineer, University at Buffalo, class of December 2026",
+  description = identity.description,
 } = Astro.props;
+
+const site = Astro.site ?? new URL("https://aryanmudgal-tech.github.io");
+const ogImage = new URL(publicAssetUrl("og.jpg"), site).href;
+const canonical = new URL(publicAssetUrl(""), site).href;
 
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Aryan Mudgal",
-  email: "mailto:aryanmudgal4493@gmail.com",
-  jobTitle: "Software engineer and researcher",
-  sameAs: [
-    "https://www.linkedin.com/in/aryan-mudgal",
-    "https://github.com/aryanmudgal-tech",
+  name: identity.name,
+  email: links.email,
+  url: canonical,
+  image: ogImage,
+  jobTitle: "Software engineer",
+  alumniOf: {
+    "@type": "CollegeOrUniversity",
+    name: "University at Buffalo",
+  },
+  award: [
+    "Award for Innovative Student Leadership, University at Buffalo, 2026",
+    "SUNY Chancellor's Award for Student Excellence, 2026",
+    "Phi Beta Kappa, 2026",
   ],
-  knowsAbout: [
-    "Applied artificial intelligence",
-    "Machine learning",
-    "Human-AI interaction",
-    "Medical AI",
-  ],
+  sameAs: [links.linkedin, links.github, links.devpost],
+  knowsAbout: ["Software engineering", "Machine learning", "Computer vision", "Accessibility"],
 };
 ---
 
@@ -37,15 +45,27 @@ const personSchema = {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f3f4f6" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#17191d" media="(prefers-color-scheme: dark)" />
-    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#f3f2ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#15171a" media="(prefers-color-scheme: dark)" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="profile" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="icon" href={publicAssetUrl("favicon.svg")} type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+    />
     <title>{title}</title>
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
   </head>

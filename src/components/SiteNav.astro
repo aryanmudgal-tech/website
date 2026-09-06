@@ -4,11 +4,16 @@ import { navItems } from "../data/portfolio";
 
 <header class="site-header">
   <div class="site-header__inner shell">
-    <a class="wordmark" href="#top" aria-label="Aryan Mudgal, back to top">
-      <span aria-hidden="true">AM</span>
-      <span>Aryan Mudgal</span>
-    </a>
-    <nav class="site-nav" aria-label="Primary">
+    <a class="wordmark" href="#top">Aryan Mudgal</a>
+    <nav class="site-nav site-nav--inline" aria-label="Primary">
+      <ul role="list">
+        {navItems.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <button class="menu-button" type="button" popovertarget="site-menu">Menu</button>
+    <nav id="site-menu" class="site-nav site-nav--menu" popover aria-label="Menu">
       <ul role="list">
         {navItems.map((item) => (
           <li><a href={item.href}>{item.label}</a></li>
@@ -19,58 +24,47 @@ import { navItems } from "../data/portfolio";
 </header>
 
 <script>
-  let sectionObserver: IntersectionObserver | undefined;
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-nav a[href^="#"]'));
+  const destinations = links
+    .map((link) => document.getElementById(link.hash.slice(1)))
+    .filter((element): element is HTMLElement => element !== null);
+  const unique = Array.from(new Set(destinations));
 
-  function initSectionNavigation() {
-    sectionObserver?.disconnect();
+  function setCurrent(id: string | null) {
+    links.forEach((link) => {
+      if (id && link.hash === `#${id}`) {
+        link.setAttribute("aria-current", "location");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+  }
 
-    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-nav a[href^="#"]'));
-    const destinations = links
-      .map((link) => {
-        const id = link.hash.slice(1);
-        const element = document.getElementById(id);
-        return element ? { id, element } : null;
-      })
-      .filter((destination): destination is { id: string; element: HTMLElement } => destination !== null);
-
-    if (destinations.length === 0) return;
-
+  if (unique.length > 0) {
     const visibility = new Map<string, number>();
-
-    function setCurrent(id: string | null) {
-      links.forEach((link) => {
-        if (id && link.hash === `#${id}`) {
-          link.setAttribute("aria-current", "location");
-        } else {
-          link.removeAttribute("aria-current");
-        }
-      });
-    }
-
-    sectionObserver = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           visibility.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
         });
-
-        const current = [...visibility.entries()]
-          .filter(([, ratio]) => ratio > 0)
-          .sort((a, b) => b[1] - a[1])[0];
-
+        const current = [...visibility.entries()].filter(([, ratio]) => ratio > 0).sort((a, b) => b[1] - a[1])[0];
         setCurrent(current?.[0] ?? null);
       },
-      {
-        rootMargin: "-20% 0px -58% 0px",
-        threshold: [0, 0.25, 0.5, 0.75, 1],
-      },
+      { rootMargin: "-20% 0px -58% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     );
-
-    destinations.forEach(({ element }) => sectionObserver?.observe(element));
-
-    const hashMatch = destinations.find(({ id }) => window.location.hash === `#${id}`);
-    if (hashMatch) setCurrent(hashMatch.id);
+    unique.forEach((element) => observer.observe(element));
   }
 
-  initSectionNavigation();
-  document.addEventListener("astro:after-swap", initSectionNavigation);
+  const menu = document.getElementById("site-menu");
+  if (menu && "hidePopover" in menu) {
+    menu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        try {
+          (menu as HTMLElement & { hidePopover: () => void }).hidePopover();
+        } catch {
+          // already closed
+        }
+      });
+    });
+  }
 </script>
