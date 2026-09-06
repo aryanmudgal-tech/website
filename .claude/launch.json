@@ -13,11 +13,10 @@
     },
     {
       "name": "preview",
-      "runtimeExecutable": "/opt/homebrew/opt/node@24/bin/npm",
+      "runtimeExecutable": "/opt/homebrew/opt/node@24/bin/node",
       "runtimeArgs": [
-        "run",
+        "node_modules/astro/astro.js",
         "preview",
-        "--",
         "--port",
         "4321",
         "--host",
