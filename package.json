@@ -1,17 +1,22 @@
 {
   "name": "aryan-mudgal-portfolio",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/clean-dist.mjs && astro build && node scripts/prepare-sites-build.mjs",
+    "build": "node scripts/clean-dist.mjs && astro build",
     "preview": "astro preview",
+    "rooms": "node scripts/crop-rooms.mjs",
     "test": "node --test tests/portfolio-source.test.mjs tests/github-pages-workflow.test.mjs",
     "test:build": "node --test tests/portfolio-build.test.mjs",
     "check": "npm run test && npm run build && npm run test:build"
   },
   "devDependencies": {
-    "astro": "^7.1.3"
+    "astro": "^7.1.3",
+    "sharp": "^0.34.5"
   }
 }
