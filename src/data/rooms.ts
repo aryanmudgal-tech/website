@@ -108,15 +108,6 @@ export const rooms: readonly Room[] = [
     receipt: { label: "Resume", href: "resume.pdf" },
   },
   {
-    id: "chancellor",
-    source: "Chancellors-award/Chancellors-award-Albany.jpeg",
-    focal: { x: 0.545, y: 0.19 },
-    minCover: 0.85,
-    alt: "Aryan holding the SUNY Chancellor's Award for Student Excellence certificate between SUNY Chancellor John B. King Jr. and a University at Buffalo administrator in front of a SUNY backdrop",
-    caption: "Albany, 27 April 2026. SUNY Chancellor's Award for Student Excellence, with Chancellor John B. King Jr.",
-    receipt: { label: "SUNY", href: "https://www.suny.edu/suny-news/press-releases/4-26/4-27-26-3/case.html" },
-  },
-  {
     id: "pillar",
     source: "Pillars-award/innovative-student-leader-award-3.png",
     focal: { x: 0.53, y: 0.23 },
@@ -124,6 +115,15 @@ export const rooms: readonly Room[] = [
     alt: "Aryan holding the Pillar of Leadership plaque for the Innovative Student Leadership Award in front of a University at Buffalo backdrop",
     caption: "University at Buffalo, April 2026. Award for Innovative Student Leadership.",
     receipt: { label: "UB Student Life", href: "https://www.buffalo.edu/studentlife/life-on-campus/clubs-and-activities/event-calendars/ceremonies-and-celebrations/leadership-awards.html" },
+  },
+  {
+    id: "chancellor",
+    source: "Chancellors-award/Chancellors-award-Albany.jpeg",
+    focal: { x: 0.545, y: 0.19 },
+    minCover: 0.85,
+    alt: "Aryan holding the SUNY Chancellor's Award for Student Excellence certificate between SUNY Chancellor John B. King Jr. and a University at Buffalo administrator in front of a SUNY backdrop",
+    caption: "Albany, 27 April 2026. SUNY Chancellor's Award for Student Excellence, with Chancellor John B. King Jr.",
+    receipt: { label: "SUNY", href: "https://www.suny.edu/suny-news/press-releases/4-26/4-27-26-3/case.html" },
   },
   {
     id: "pbk",
