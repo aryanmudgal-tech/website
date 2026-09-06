@@ -848,21 +848,22 @@ main {
     timeline-scope: --r-hero, --r-dots, --r-armie, --r-streamfair, --r-wod, --r-safeline, --r-research, --r-chancellor, --r-pillar, --r-pbk, --r-contact;
   }
 
-  :not(.room)[data-room="hero"] { view-timeline-name: --r-hero; }
-  :not(.room)[data-room="dots"] { view-timeline-name: --r-dots; }
-  :not(.room)[data-room="armie"] { view-timeline-name: --r-armie; }
-  :not(.room)[data-room="streamfair"] { view-timeline-name: --r-streamfair; }
-  :not(.room)[data-room="wod"] { view-timeline-name: --r-wod; }
-  :not(.room)[data-room="safeline"] { view-timeline-name: --r-safeline; }
-  :not(.room)[data-room="research"] { view-timeline-name: --r-research; }
-  :not(.room)[data-room="chancellor"] { view-timeline-name: --r-chancellor; }
-  :not(.room)[data-room="pillar"] { view-timeline-name: --r-pillar; }
-  :not(.room)[data-room="pbk"] { view-timeline-name: --r-pbk; }
+  :not(.room)[data-room="hero"] > :first-child { view-timeline-name: --r-hero; }
+  :not(.room)[data-room="dots"] > :first-child { view-timeline-name: --r-dots; }
+  :not(.room)[data-room="armie"] > :first-child { view-timeline-name: --r-armie; }
+  :not(.room)[data-room="streamfair"] > :first-child { view-timeline-name: --r-streamfair; }
+  :not(.room)[data-room="wod"] > :first-child { view-timeline-name: --r-wod; }
+  :not(.room)[data-room="safeline"] > :first-child { view-timeline-name: --r-safeline; }
+  :not(.room)[data-room="research"] > :first-child { view-timeline-name: --r-research; }
+  :not(.room)[data-room="chancellor"] > :first-child { view-timeline-name: --r-chancellor; }
+  :not(.room)[data-room="pillar"] > :first-child { view-timeline-name: --r-pillar; }
+  :not(.room)[data-room="pbk"] > :first-child { view-timeline-name: --r-pbk; }
   :not(.room)[data-room="contact"] { view-timeline-name: --r-contact; }
 
+  /* Subjects are each chapter's short first block, so a room switches as that block reaches mid-screen, whatever the chapter's height. */
   .room {
     animation: room-in linear both;
-    animation-range: cover 24% cover 34%;
+    animation-range: cover 36% cover 50%;
   }
 
   .room--1 {
