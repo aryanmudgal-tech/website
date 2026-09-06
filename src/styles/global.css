@@ -753,8 +753,11 @@ main {
     justify-content: center;
   }
 
-  .site-nav--menu {
+  .site-nav--menu:popover-open {
     display: block;
+  }
+
+  .site-nav--menu {
     position: fixed;
     inset: auto var(--gutter) auto auto;
     top: calc(var(--header-height) + 0.5rem);
