@@ -19,7 +19,7 @@ const youtubeHref =
       <a class="video__poster" href={youtubeHref} target="_blank" rel="noopener noreferrer">
         <img src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} width="480" height="360" alt={`Video: ${video.title}`} loading="lazy" decoding="async" />
         <span class="video__badge" aria-hidden="true">Plays when in view</span>
-        <span class="sr-only"> opens on YouTube in a new tab</span>
+        <span class="sr-only"> opens in a new tab on YouTube</span>
       </a>
       <figcaption class="video__caption">{video.title}</figcaption>
     </figure>
