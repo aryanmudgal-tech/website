@@ -48,7 +48,11 @@ test("built links are actionable and external links are safe", () => {
   assert.doesNotMatch(html, /href=(?:""|'')/);
   assert.doesNotMatch(html, /href=(?:"#"|'#')/);
   assert.doesNotMatch(html, /<script[^>]+src=/i);
-  assert.doesNotMatch(html, /<(?:canvas|iframe)\b/i);
+  assert.doesNotMatch(html, /<(?:canvas|iframe)\b/i, "players are injected on scroll, never shipped in the HTML");
+  assert.ok((html.match(/data-video="/g) ?? []).length >= 5, "the four demos and the ceremony video are present");
+  assert.doesNotMatch(html, /<video\b[^>]*\bautoplay\b/i);
+  assert.match(html, /<video\b[^>]*\bmuted\b[^>]*\bplaysinline\b/i);
+  assert.match(html, /video\/safeline-demo\.mp4/);
   const externalLinks = html.match(/<a\b[^>]*target="_blank"[^>]*>/g) ?? [];
   assert.ok(externalLinks.length >= 12, `expected at least 12 external receipts, found ${externalLinks.length}`);
   for (const link of externalLinks) {

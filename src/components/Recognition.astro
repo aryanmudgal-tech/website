@@ -2,6 +2,7 @@
 import { recognitions, headings } from "../data/portfolio";
 import Source from "./Source.astro";
 import ChapterFigure from "./ChapterFigure.astro";
+import Video from "./Video.astro";
 ---
 
 <section id="recognition" class="chapter" aria-labelledby="recognition-title">
@@ -17,9 +18,9 @@ import ChapterFigure from "./ChapterFigure.astro";
         <p class="award__denominator">{award.denominator}. {award.date}.</p>
         <p>{award.context}</p>
         <ChapterFigure room={award.id} />
+        {award.video && <Video video={award.video} />}
         <div class="receipts">
           {award.receipts.map((receipt) => <Source receipt={receipt} />)}
-          {award.watch && <Source receipt={award.watch} prefix="" />}
         </div>
       </div>
     </article>

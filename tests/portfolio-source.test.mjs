@@ -14,6 +14,7 @@ const componentFiles = [
   "src/components/ChapterFigure.astro",
   "src/components/Ledger.astro",
   "src/components/Source.astro",
+  "src/components/Video.astro",
   "src/components/Hero.astro",
   "src/components/Experience.astro",
   "src/components/Projects.astro",
@@ -78,7 +79,7 @@ test("the first screen carries status, target, and three sourced proofs", () => 
   assert.deepEqual(ledger.slice(0, 2).map((row) => row.fraction), ["1 of 2", "1 of 15"]);
   for (const row of ledger) {
     assert.ok(row.receipt.href.startsWith("http"), `ledger row ${row.fraction} needs an absolute source`);
-    assert.ok(row.anchor.startsWith("#recognition-"), `ledger row ${row.fraction} must point at its Recognition row`);
+    assert.match(row.anchor, /^#(?:recognition-[a-z]+|research)$/, `ledger row ${row.fraction} must point at its Recognition row or at Research`);
   }
 });
 
@@ -174,9 +175,16 @@ test("every section heading is a sentence, not a bucket label", () => {
 test("served source rejects theatre-era and heavy-runtime patterns", () => {
   const source = components() + read("src/data/portfolio.ts");
   assert.doesNotMatch(source, /[—–]/, "no em or en dashes in served copy");
-  for (const banned of [/three\.js/i, /webgl/i, /scrolltrigger/i, /<canvas/i, /lofi\.mp3/i, /curtain/i, /intermission/i, /end credits/i, /custom cursor/i, /scroll hijack/i, /autoplay/i, /<iframe/i]) {
+  for (const banned of [/three\.js/i, /webgl/i, /scrolltrigger/i, /<canvas/i, /lofi\.mp3/i, /curtain/i, /intermission/i, /end credits/i, /custom cursor/i, /scroll hijack/i, /<(?:video|audio)\b[^>]*\bautoplay\b/i, /<iframe/i]) {
     assert.doesNotMatch(source, banned);
   }
+  // Demos may play muted when scrolled into view, never on load, and never with sound without a tap.
+  const video = read("src/components/Video.astro");
+  assert.match(video, /IntersectionObserver/);
+  assert.match(video, /youtube-nocookie\.com/);
+  assert.match(video, /mute=\$\{muted \? 1 : 0\}/);
+  assert.match(video, /prefers-reduced-motion: reduce/);
+  assert.match(video, /preload="none"/);
 });
 
 test("package pins Astro 7, Node 24, and Sharp for the crop pipeline", () => {

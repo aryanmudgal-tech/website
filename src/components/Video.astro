@@ -1,0 +1,107 @@
+---
+import type { Video as VideoData } from "../data/portfolio";
+import { publicAssetUrl } from "../lib/site-url";
+
+interface Props {
+  video: VideoData;
+}
+
+const { video } = Astro.props;
+const youtubeHref =
+  video.provider === "youtube"
+    ? `https://www.youtube.com/watch?v=${video.id}${video.start ? `&t=${video.start}s` : ""}`
+    : null;
+---
+
+{
+  video.provider === "youtube" ? (
+    <figure class="video video--youtube" data-video="youtube" data-id={video.id} data-start={video.start ?? 0} data-title={video.title}>
+      <a class="video__poster" href={youtubeHref} target="_blank" rel="noopener noreferrer">
+        <img src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} width="480" height="360" alt={`Video: ${video.title}`} loading="lazy" decoding="async" />
+        <span class="video__badge" aria-hidden="true">Plays when in view</span>
+        <span class="sr-only"> opens on YouTube in a new tab</span>
+      </a>
+      <figcaption class="video__caption">{video.title}</figcaption>
+    </figure>
+  ) : (
+    <figure class="video video--file" data-video="file">
+      <video class="video__file" muted playsinline loop preload="none" poster={publicAssetUrl(video.poster)} width={video.width} height={video.height} aria-label={video.title}>
+        <source src={publicAssetUrl(video.src)} type="video/mp4" />
+      </video>
+      <figcaption class="video__caption">
+        {video.title} <a class="source" href={publicAssetUrl(video.src)}>Open the video file</a>
+      </figcaption>
+    </figure>
+  )
+}
+
+<script>
+  // Demos start, muted, when they scroll into view, and stop when they leave. One observer, no library.
+  const figures = Array.from(document.querySelectorAll<HTMLElement>("[data-video]"));
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function embedUrl(figure: HTMLElement, muted: boolean) {
+    const start = Number(figure.dataset.start || 0);
+    const params = `autoplay=1&mute=${muted ? 1 : 0}&playsinline=1&rel=0&modestbranding=1${start ? `&start=${start}` : ""}`;
+    return `https://www.youtube-nocookie.com/embed/${figure.dataset.id}?${params}`;
+  }
+
+  function mountYoutube(figure: HTMLElement, muted: boolean) {
+    if (figure.querySelector("iframe")) return;
+    const frame = document.createElement("iframe");
+    frame.className = "video__frame";
+    frame.src = embedUrl(figure, muted);
+    frame.title = figure.dataset.title || "Video";
+    frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+    frame.setAttribute("allowfullscreen", "");
+    frame.setAttribute("loading", "lazy");
+    const poster = figure.querySelector<HTMLElement>(".video__poster");
+    if (poster) {
+      poster.hidden = true;
+      poster.insertAdjacentElement("beforebegin", frame);
+    }
+  }
+
+  function unmountYoutube(figure: HTMLElement) {
+    figure.querySelector("iframe")?.remove();
+    const poster = figure.querySelector<HTMLElement>(".video__poster");
+    if (poster) poster.hidden = false;
+  }
+
+  figures.forEach((figure) => {
+    const poster = figure.querySelector<HTMLAnchorElement>(".video__poster");
+    if (poster && figure.dataset.video === "youtube") {
+      poster.addEventListener("click", (event) => {
+        event.preventDefault();
+        mountYoutube(figure, false);
+      });
+    }
+    const file = figure.querySelector<HTMLVideoElement>("video");
+    if (file && reduced) file.controls = true;
+  });
+
+  if (!reduced && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const figure = entry.target as HTMLElement;
+          const file = figure.querySelector<HTMLVideoElement>("video");
+          if (entry.intersectionRatio >= 0.5) {
+            if (file) {
+              file.play().catch(() => {
+                file.controls = true;
+              });
+            } else {
+              mountYoutube(figure, true);
+            }
+          } else if (!entry.isIntersecting) {
+            if (file) file.pause();
+            else unmountYoutube(figure);
+          }
+        });
+      },
+      { threshold: [0, 0.5] },
+    );
+    figures.forEach((figure) => observer.observe(figure));
+  }
+</script>

@@ -42,6 +42,8 @@ export type Project = Sourced & {
   readonly myPart: string;
   readonly team: readonly string[];
   readonly aside?: string;
+  /** A demo that plays, muted, when the card scrolls into view. */
+  readonly demo?: Video;
 };
 
 export type RouteEvent = {
@@ -59,6 +61,8 @@ export type ResearchItem = Sourced & {
 };
 
 export type LeadershipItem = Sourced & {
+  /** Set when a room in the frame belongs to this row. */
+  readonly roomId?: ChapterId;
   readonly title: string;
   readonly role: string;
   readonly period: string;
@@ -72,8 +76,13 @@ export type Recognition = Sourced & {
   readonly denominator: string;
   readonly context: string;
   readonly date: string;
-  readonly watch?: Receipt;
+  /** Footage of the ceremony that plays, muted, when the row scrolls into view. */
+  readonly video?: Video;
 };
+
+export type Video =
+  | { readonly provider: "youtube"; readonly id: string; readonly title: string; readonly start?: number }
+  | { readonly provider: "file"; readonly src: string; readonly poster: string; readonly width: number; readonly height: number; readonly title: string };
 
 export type AboutLine = {
   readonly text: string;
@@ -105,7 +114,7 @@ const source = {
   ubStudentEngagement: { label: "UB Student Life", href: "https://www.buffalo.edu/studentlife/who-we-are/departments/engagement.host.html/content/shared/www/studentlife/units/uls/student-engagement/signature-opportunities/student-engagement-ambassador1.detail.html" },
   ubPbk: { label: "UB Arts and Sciences", href: "https://arts-sciences.buffalo.edu/phi-beta-kappa.html" },
   spectrumCleanCampus: { label: "The Spectrum", href: "https://www.ubspectrum.com/article/2024/12/clean-campus-has-students-step-up-to-clean-ub-one-weekend-at-a-time" },
-  ceremonyVideo: { label: "Hear Aryan speak at the ceremony, 2:56", href: "https://www.youtube.com/watch?v=Aru9b8gWmtE&t=176s" },
+  paper: { label: "Paper, PDF", href: "https://drive.google.com/file/d/12K4Mb6QBVbpLYVfUZwRWAKymKw0D9aG-/view" },
   linkedin: { label: "LinkedIn", href: "https://www.linkedin.com/in/aryan-mudgal" },
   resume: { label: "Resume", href: "resume.pdf" },
   devpostDots: { label: "Devpost", href: "https://devpost.com/software/dots-y5r21j" },
@@ -113,7 +122,6 @@ const source = {
   devpostArmie: { label: "Devpost", href: "https://devpost.com/software/armie" },
   githubArmie: { label: "GitHub", href: "https://github.com/liviaellen/ble-mithack" },
   githubStreamFair: { label: "GitHub", href: "https://github.com/aryanmudgal-tech/StreamFair" },
-  videoStreamFair: { label: "Demo video, sign-in required", href: "https://drive.google.com/file/d/12grQ7uR837u36IkN1WaILOC0SHycm2rh/view?usp=sharing" },
   devpostWod: { label: "Devpost", href: "https://devpost.com/software/c-o-r-e" },
   githubWod: { label: "GitHub", href: "https://github.com/aryanmudgal-tech/stanford-xr-core" },
   githubSafeline: { label: "GitHub", href: "https://github.com/aryanmudgal-tech/safeline" },
@@ -158,10 +166,10 @@ export const ledger: readonly LedgerRow[] = [
     receipt: source.sunyRelease,
   },
   {
-    fraction: "Top 10%",
-    text: "Phi Beta Kappa, University at Buffalo chapter, 2026.",
-    anchor: "#recognition-pbk",
-    receipt: source.ubPbk,
+    fraction: "Co-author",
+    text: "DE-C3, a deep-learning Kleihauer-Betke test for fetomaternal hemorrhage, submitted to MIDL 2025.",
+    anchor: "#research",
+    receipt: source.paper,
   },
 ];
 
@@ -213,6 +221,7 @@ export const projects: readonly Project[] = [
     myPart: "The iOS app and its full pipeline, the voice agent, and the backend that generates the Braille-map STL.",
     team: ["Ayush Srivastava", "Manav Sharma", "Abhi Ramtel"],
     aside: "One blind user tested it before the demo: my cousin.",
+    demo: { provider: "youtube", id: "gWNJgLeBlTY", title: "Dots demo: a LiDAR scan becomes a Braille map and answers questions by voice." },
     receipts: [source.devpostDots, source.githubDots],
   },
   {
@@ -225,6 +234,7 @@ export const projects: readonly Project[] = [
       "Mixed-reality surgical training on Snap Spectacles paired with a 3D-printed robot arm, so a trainee's hands practice on something physical while the headset scores them.",
     myPart: "The anomaly-detection model, trained on existing neurosurgical training datasets.",
     team: ["Livia Ellen", "Lidia Likaya"],
+    demo: { provider: "youtube", id: "guVT8SgJ9do", title: "ARMIE demo: mixed-reality surgical training with the robot arm." },
     receipts: [source.devpostArmie, source.githubArmie],
     exception: "armie-honorable-mention",
   },
@@ -239,7 +249,7 @@ export const projects: readonly Project[] = [
     myPart: "The extension and the payment flow.",
     team: ["Yash Nakadi", "Ayush Srivastava"],
     aside: "The team was Water Mellon. It is a Carnegie Mellon pun and nothing deeper.",
-    receipts: [source.githubStreamFair, source.videoStreamFair],
+    receipts: [source.githubStreamFair],
   },
   {
     id: "wod",
@@ -251,6 +261,7 @@ export const projects: readonly Project[] = [
     built: "A playable VR world set in Tang-dynasty China, built in Moonlake by a two-person team over a weekend.",
     myPart: "World logic and the playable loop.",
     team: ["Ayush Srivastava"],
+    demo: { provider: "youtube", id: "H1yUmIEEXMg", title: "W.O.D. demo: the playable Tang-dynasty world in Moonlake." },
     receipts: [source.devpostWod, source.githubWod],
   },
   {
@@ -263,6 +274,7 @@ export const projects: readonly Project[] = [
     myPart: "The voice pipeline and the report portal.",
     team: ["Ayush Srivastava"],
     aside: "Officers we spoke with said it would cut hours of documentation; the judges called the idea unique. Both are what people said in the room, not a citation.",
+    demo: { provider: "file", src: "video/safeline-demo.mp4", poster: "video/safeline-poster.jpg", width: 720, height: 1280, title: "Safeline demo, recorded on a phone at the hackathon: a spoken account becomes a draft incident report." },
     receipts: [source.githubSafeline],
     exception: "safeline-remarks",
   },
@@ -286,13 +298,13 @@ export const route: readonly RouteEvent[] = [
 
 export const research: readonly ResearchItem[] = [
   {
-    title: "Fetomaternal hemorrhage detection",
+    title: "DE-C3: a data-efficient contrastive cell classifier for the Kleihauer-Betke test",
     role: "Research Assistant, University at Buffalo",
     period: "February to December 2025",
     summary: "Automated the cell-level work behind the Kleihauer-Betke test, a slide assay that counts fetal red cells in maternal blood.",
     detail:
-      "Built a segmentation pipeline that seeds SAM2 with Grounding DINO detections, isolating 2.5 million individual cells into pixel-level masks and removing manual per-cell prompting. Ran Kleihauer-Betke slide data from a Cornell collaboration and improved detection accuracy from 89% to 92%. The condition is associated with around 4% of stillbirths.",
-    receipts: [source.resume],
+      "Built a segmentation pipeline that seeds SAM2 with Grounding DINO detections, isolating 2.5 million individual cells into pixel-level masks and removing manual per-cell prompting. Ran Kleihauer-Betke slide data from a Cornell collaboration and improved detection accuracy from 89% to 92%. The condition is associated with around 4% of stillbirths. Co-author on the resulting paper with the Yuan and Xi groups at UB and collaborators at Weill Cornell and Columbia, submitted to MIDL 2025.",
+    receipts: [source.paper, source.resume],
   },
 ];
 
@@ -325,7 +337,7 @@ export const leadership: readonly LeadershipItem[] = [
     role: "Co-founder, with Chirag Ohri",
     period: "Since spring 2024",
     summary: "Ten cleanup drives, more than 150 pounds of litter, chapters started at NYU and Boston University, about 500 dollars raised through UB's Get Seeded competition, and a Spectrum News feature.",
-    receipts: [source.spectrumCleanCampus, source.ubnowChancellor],
+    receipts: [source.spectrumCleanCampus],
   },
   {
     title: "UB Student Engagement",
@@ -361,7 +373,7 @@ export const recognitions: readonly Recognition[] = [
     context: "SUNY's highest student honor, presented in Albany by Chancellor John B. King Jr.",
     date: "Albany, 27 April 2026",
     receipts: [source.sunyRelease, source.ubnowChancellor],
-    watch: source.ceremonyVideo,
+    video: { provider: "youtube", id: "Aru9b8gWmtE", start: 176, title: "UB's Celebrating Student Excellence video. Aryan speaks at 2:56; starts muted, tap the speaker to hear him." },
   },
   {
     id: "pbk",

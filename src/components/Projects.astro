@@ -2,6 +2,7 @@
 import { projects, headings } from "../data/portfolio";
 import Source from "./Source.astro";
 import ChapterFigure from "./ChapterFigure.astro";
+import Video from "./Video.astro";
 ---
 
 <section id="projects" class="chapter" aria-labelledby="projects-title">
@@ -21,6 +22,7 @@ import ChapterFigure from "./ChapterFigure.astro";
       <p class="card__result">{project.result}</p>
       <ChapterFigure room={project.id} />
       <p>{project.built}</p>
+      {project.demo && <Video video={project.demo} />}
       <p class="my-part"><strong>My part:</strong> {project.myPart}</p>
       <p class="card__team">Team: {project.team.join(", ")}.</p>
       {project.aside && <p class="card__aside">{project.aside}</p>}

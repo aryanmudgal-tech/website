@@ -178,3 +178,14 @@ New source and build assertions:
 5. The W.O.D. gameplay recording, and whether a Safeline repo exists.
 6. The five-reader verdict on the one joke.
 7. The phone-frame choice after seeing the docked strip on his own phone.
+
+## Addendum, 6 September 2026: demos, the paper, the ceremony video
+
+Approved by Aryan after the first build.
+
+- Demo videos play inline. Each project card carries its demo; the SUNY ceremony video sits in the Chancellor's Award row, starting at 2:56. A player is created only when the card scrolls at least half into view and is removed when it leaves, so nothing loads or plays on page load and only one player runs at a time. Playback starts muted (browsers refuse unmuted autoplay); the player's own control unmutes. `prefers-reduced-motion: reduce` disables autoplay and shows the poster with a tap-to-play link. YouTube embeds use `youtube-nocookie.com`; posters come from YouTube's thumbnail CDN and load lazily. No iframe ships in the static HTML; the no-JavaScript state is the poster linking to YouTube.
+- Sources: Dots `gWNJgLeBlTY`, ARMIE `guVT8SgJ9do`, W.O.D. `H1yUmIEEXMg`, ceremony `Aru9b8gWmtE` at 176 s. The Safeline demo is a 58-second portrait phone recording that lived on Google Drive; it is re-encoded to a 5.7 MB H.264 MP4 at 720 by 1280 and self-hosted at `public/video/safeline-demo.mp4` with a poster frame, played through a native `<video muted playsinline loop preload="none">`. The Drive link that v2 attached to StreamFair was this Safeline demo; StreamFair keeps GitHub only.
+- The paper: "DE-C3: Robust Kleihauer-Betke Test via Data-Efficient Contrastive Cell Classification" (Shen, Jin, Wang, Nanyam, Chadburn, Yuan, Mudgal, Xi; Columbia, Weill Cornell, University at Buffalo). The PDF Aryan supplied lists him as an author and carries the header "Under Review for MIDL 2025". The hero ledger's third row is now the paper ("Co-author ... submitted to MIDL 2025") with the PDF as its receipt; Phi Beta Kappa stays in Recognition. The row says "accepted" only when Aryan confirms acceptance.
+- Clean Campus keeps The Spectrum as its only receipt. A Clean Campus drive photo (Aryan and Chirag Ohri with bags) becomes a Leadership room once the file is in `Pictures/Clean-campus/`.
+- No Linde diagram; the Work section stays without a photo.
+- Test contract changes: no `autoplay` attribute on any media element (scripted, muted, in-view playback is allowed); no `<iframe>` in source or built HTML; the Video component must use an IntersectionObserver, `youtube-nocookie.com`, a muted parameter, `preload="none"`, and a reduced-motion branch; the built page carries at least five `data-video` figures and the Safeline file.

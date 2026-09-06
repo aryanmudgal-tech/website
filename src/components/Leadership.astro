@@ -1,6 +1,7 @@
 ---
 import { leadership, headings } from "../data/portfolio";
 import Source from "./Source.astro";
+import ChapterFigure from "./ChapterFigure.astro";
 ---
 
 <section id="leadership" class="chapter" aria-labelledby="leadership-title">
@@ -9,7 +10,7 @@ import Source from "./Source.astro";
     <h2 id="leadership-title">{headings.leadership}</h2>
   </header>
   {leadership.map((item) => (
-    <article class="row">
+    <article class="row" data-room={item.roomId}>
       <div class="row__meta">
         <strong>{item.title}</strong>
         <span>{item.role}</span>
@@ -17,6 +18,7 @@ import Source from "./Source.astro";
       </div>
       <div class="row__body">
         <p>{item.summary}</p>
+        {item.roomId && <ChapterFigure room={item.roomId} />}
         {item.receipts.length > 0 && (
           <div class="receipts">
             {item.receipts.map((receipt) => <Source receipt={receipt} />)}

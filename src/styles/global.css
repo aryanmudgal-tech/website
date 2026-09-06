@@ -603,6 +603,65 @@ main {
   font-style: italic;
 }
 
+/* Demo videos: poster until in view, then the player */
+
+.video {
+  display: grid;
+  row-gap: 0.5rem;
+  max-width: var(--measure);
+  margin-block: 0.4rem 0.6rem;
+}
+
+.video__poster {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--paper-3);
+}
+
+.video__poster img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.video__badge {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgb(20 20 20 / 0.72);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.video__frame {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: var(--radius);
+  background: #000;
+}
+
+.video__file {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 34rem;
+  margin-inline: auto;
+  border-radius: var(--radius);
+  background: #000;
+}
+
+.video__caption {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
 /* Route */
 
 .route li {
