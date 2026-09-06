@@ -106,9 +106,14 @@ test("each room has a chapter, a CSS timeline, and a caption without a denominat
   const source = components();
   const styles = css();
   assert.equal(rooms.length, 12);
-  const dynamicRooms = new Set([...portfolio.projects.map((project) => project.id), ...portfolio.recognitions.map((award) => award.id)]);
+  const dynamicRooms = new Set([
+    ...portfolio.projects.map((project) => project.id),
+    ...portfolio.recognitions.map((award) => award.id),
+    ...portfolio.leadership.map((item) => item.roomId).filter(Boolean),
+  ]);
   assert.match(read("src/components/Projects.astro"), /data-room=\{project\.id\}/);
   assert.match(read("src/components/Recognition.astro"), /data-room=\{award\.id\}/);
+  assert.match(read("src/components/Leadership.astro"), /data-room=\{item\.roomId\}/);
   for (const room of rooms) {
     if (!dynamicRooms.has(room.id)) {
       assert.match(source, new RegExp(`data-room=["']${room.id}["']`), `no chapter owns room ${room.id}`);
