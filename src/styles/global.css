@@ -911,7 +911,7 @@ main {
 
 @supports (animation-timeline: view()) {
   .rooms {
-    timeline-scope: --r-hero, --r-dots, --r-armie, --r-streamfair, --r-wod, --r-safeline, --r-research, --r-chancellor, --r-pillar, --r-pbk, --r-contact;
+    timeline-scope: --r-hero, --r-dots, --r-armie, --r-streamfair, --r-wod, --r-safeline, --r-research, --r-cleancampus, --r-chancellor, --r-pillar, --r-pbk, --r-contact;
   }
 
   :not(.room)[data-room="hero"] > :first-child { view-timeline-name: --r-hero; }
@@ -921,6 +921,7 @@ main {
   :not(.room)[data-room="wod"] > :first-child { view-timeline-name: --r-wod; }
   :not(.room)[data-room="safeline"] > :first-child { view-timeline-name: --r-safeline; }
   :not(.room)[data-room="research"] > :first-child { view-timeline-name: --r-research; }
+  :not(.room)[data-room="cleancampus"] > :first-child { view-timeline-name: --r-cleancampus; }
   :not(.room)[data-room="chancellor"] > :first-child { view-timeline-name: --r-chancellor; }
   :not(.room)[data-room="pillar"] > :first-child { view-timeline-name: --r-pillar; }
   :not(.room)[data-room="pbk"] > :first-child { view-timeline-name: --r-pbk; }
@@ -947,6 +948,7 @@ main {
   .room[data-room="wod"] { animation-timeline: --r-wod; }
   .room[data-room="safeline"] { animation-timeline: --r-safeline; }
   .room[data-room="research"] { animation-timeline: --r-research; }
+  .room[data-room="cleancampus"] { animation-timeline: --r-cleancampus; }
   .room[data-room="chancellor"] { animation-timeline: --r-chancellor; }
   .room[data-room="pillar"] { animation-timeline: --r-pillar; }
   .room[data-room="pbk"] { animation-timeline: --r-pbk; }

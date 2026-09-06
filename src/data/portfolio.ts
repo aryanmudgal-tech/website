@@ -167,7 +167,7 @@ export const ledger: readonly LedgerRow[] = [
   },
   {
     fraction: "Co-author",
-    text: "DE-C3, a deep-learning Kleihauer-Betke test for fetomaternal hemorrhage, submitted to MIDL 2025.",
+    text: "DE-C3, a deep-learning Kleihauer-Betke test for fetomaternal hemorrhage, accepted at MIDL 2025.",
     anchor: "#research",
     receipt: source.paper,
   },
@@ -303,7 +303,7 @@ export const research: readonly ResearchItem[] = [
     period: "February to December 2025",
     summary: "Automated the cell-level work behind the Kleihauer-Betke test, a slide assay that counts fetal red cells in maternal blood.",
     detail:
-      "Built a segmentation pipeline that seeds SAM2 with Grounding DINO detections, isolating 2.5 million individual cells into pixel-level masks and removing manual per-cell prompting. Ran Kleihauer-Betke slide data from a Cornell collaboration and improved detection accuracy from 89% to 92%. The condition is associated with around 4% of stillbirths. Co-author on the resulting paper with the Yuan and Xi groups at UB and collaborators at Weill Cornell and Columbia, submitted to MIDL 2025.",
+      "Built a segmentation pipeline that seeds SAM2 with Grounding DINO detections, isolating 2.5 million individual cells into pixel-level masks and removing manual per-cell prompting. Ran Kleihauer-Betke slide data from a Cornell collaboration and improved detection accuracy from 89% to 92%. The condition is associated with around 4% of stillbirths. Co-author on the resulting paper with the Yuan and Xi groups at UB and collaborators at Weill Cornell and Columbia, accepted at MIDL 2025.",
     receipts: [source.paper, source.resume],
   },
 ];
@@ -333,6 +333,7 @@ export const leadership: readonly LeadershipItem[] = [
     exception: "men-in-green",
   },
   {
+    roomId: "cleancampus",
     title: "Clean Campus",
     role: "Co-founder, with Chirag Ohri",
     period: "Since spring 2024",

@@ -13,6 +13,7 @@ export type ChapterId =
   | "wod"
   | "safeline"
   | "research"
+  | "cleancampus"
   | "chancellor"
   | "pillar"
   | "pbk"
@@ -106,6 +107,15 @@ export const rooms: readonly Room[] = [
     alt: "Aryan in a black hoodie standing in a lab room at the University at Buffalo",
     caption: "University at Buffalo, 2025. Research assistant, fetomaternal hemorrhage detection.",
     receipt: { label: "Resume", href: "resume.pdf" },
+  },
+  {
+    id: "cleancampus",
+    source: "Clean-campus/clean-campus-drive.png",
+    focal: { x: 0.5, y: 0.4 },
+    minCover: 1,
+    alt: "Aryan and Clean Campus co-founder Chirag Ohri in white Clean Campus shirts and blue gloves holding bags of collected litter on a lawn at the University at Buffalo",
+    caption: "University at Buffalo, 2024. A Clean Campus drive with co-founder Chirag Ohri.",
+    receipt: { label: "The Spectrum", href: "https://www.ubspectrum.com/article/2024/12/clean-campus-has-students-step-up-to-clean-ub-one-weekend-at-a-time" },
   },
   {
     id: "pillar",

@@ -72,8 +72,8 @@ test("built images reserve space, describe themselves, and load in the right ord
   }
   assert.equal((html.match(/fetchpriority="high"/g) ?? []).length, 1, "exactly one image is high priority");
   const lazy = images.filter((image) => /loading="lazy"/.test(image)).length;
-  assert.equal(lazy, images.length - 11, "every image outside the eleven frame rooms is lazy");
-  assert.equal((html.match(/loading="eager"/g) ?? []).length, 11, "the eleven frame rooms load eagerly so they are painted before they fade in");
+  assert.equal(lazy, images.length - 12, "every image outside the twelve frame rooms is lazy");
+  assert.equal((html.match(/loading="eager"/g) ?? []).length, 12, "the twelve frame rooms load eagerly so they are painted before they fade in");
   assert.ok((html.match(/<picture\b/g) ?? []).length >= 22);
   assert.match(html, /type="image\/avif"/);
 });
@@ -93,7 +93,7 @@ test("built frame has eleven rooms, popovers, and no hidden focusable content", 
   const html = read(client("index.html"));
   const frame = html.match(/<div class="frame"[\s\S]*?<\/aside>/)?.[0] ?? "";
   assert.ok(frame.length > 0, "frame markup missing");
-  assert.equal((frame.match(/data-room="/g) ?? []).length, 11);
+  assert.equal((frame.match(/data-room="/g) ?? []).length, 12);
   for (const room of rooms) {
     const count = (html.match(new RegExp(`data-room="${room.id}"`, "g")) ?? []).length;
     assert.ok(count >= 2, `room ${room.id} must appear in the frame and on its chapter (found ${count})`);

@@ -105,7 +105,7 @@ test("retired figures and stories are gone from the source", () => {
 test("each room has a chapter, a CSS timeline, and a caption without a denominator", () => {
   const source = components();
   const styles = css();
-  assert.equal(rooms.length, 11);
+  assert.equal(rooms.length, 12);
   const dynamicRooms = new Set([...portfolio.projects.map((project) => project.id), ...portfolio.recognitions.map((award) => award.id)]);
   assert.match(read("src/components/Projects.astro"), /data-room=\{project\.id\}/);
   assert.match(read("src/components/Recognition.astro"), /data-room=\{award\.id\}/);
