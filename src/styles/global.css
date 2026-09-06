@@ -620,6 +620,10 @@ main {
   background: var(--paper-3);
 }
 
+.video__poster[hidden] {
+  display: none;
+}
+
 .video__poster img {
   width: 100%;
   aspect-ratio: 16 / 9;
