@@ -1,22 +1,19 @@
 ---
-import { interests, places } from "../data/portfolio";
+import { about, headings } from "../data/portfolio";
+import Source from "./Source.astro";
 ---
 
-<section id="about" class="section section--about" aria-labelledby="about-title">
-  <div class="about-human shell reveal">
-    <div>
-      <h2 id="about-title">Outside the work</h2>
-      <ul class="interest-list" role="list">
-        {interests.map((interest) => <li>{interest}</li>)}
-      </ul>
-    </div>
-    <div class="about-human__note">
-      <p>
-        Family, friends, hackathon teammates, lab partners, mentors, and the communities that trusted me all shaped this work.
-      </p>
-      <ul class="place-list" role="list" aria-label="Places that shaped the work">
-        {places.map((place) => <li>{place}</li>)}
-      </ul>
-    </div>
-  </div>
+<section id="about" class="chapter" aria-labelledby="about-title">
+  <header class="chapter__head">
+    <span class="label">About</span>
+    <h2 id="about-title">{headings.about}</h2>
+  </header>
+  <ul class="about-lines" role="list">
+    {about.map((line) => (
+      <li>
+        {line.text}
+        {line.href && <Source receipt={{ label: "GitHub", href: line.href }} prefix="" />}
+      </li>
+    ))}
+  </ul>
 </section>

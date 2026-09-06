@@ -1,64 +1,28 @@
-# Aryan Mudgal portfolio
+# Aryan Mudgal, portfolio (v3)
 
-A proof-first portfolio for recruiters and hiring managers. The site presents professional experience, selected builds, research, leadership, recognition, personal context, and contact information in a fast editorial scan with optional depth.
+One page. A recruiter reads the facts and the proofs in the first screen; a sticky frame beside the text dissolves through eleven photographs of Aryan at the events on the page, face held to one point, driven by scroll with no JavaScript.
 
-## Run locally
+## Stack
 
-```sh
-npm install
-npm run dev
-```
+Astro 7, static output, deployed to GitHub Pages by `.github/workflows/deploy-pages.yml`. No framework, no external script. Fonts from Google Fonts (Newsreader, Instrument Sans).
 
-Astro prints the local address. Open that address in a browser.
+## Content
 
-## Verify and build
+- `src/data/portfolio.ts` holds every fact. Each claim carries `receipts` (a URL, a photo or a document); three claims Aryan asked to keep without a public record are marked with `exception` and render without a Source link.
+- `src/data/rooms.ts` is the photo manifest: source file, hand-set focal point, caption, receipt. Rooms map to chapters with `data-room`.
+- Raw photos live in the untracked `Pictures/` folder. `npm run rooms` cuts 3:2 crops (face at 50%, 40% where the photo allows) into `src/assets/rooms/`, full-size popover copies into `src/assets/full/`, the social image into `public/og.jpg`, and copies the resume. Outputs are committed; sources are not.
 
-```sh
-npm test
-npm run build
-npm run test:build
-```
+## Commands
 
-The complete verification sequence is also available as:
+Node 24 is required (`.nvmrc`). On a Mac with Homebrew: `export PATH=/opt/homebrew/opt/node@24/bin:$PATH`.
 
-```sh
-npm run check
-```
+- `npm run dev`
+- `npm run rooms` (after adding or re-cropping a photo)
+- `npm test` (source contracts and the Pages workflow)
+- `npm run build`
+- `npm run test:build` (built output)
+- `npm run check` (all three)
 
-The static production site is generated in `dist/client/`, with a small asset-serving worker in `dist/server/` for Sites hosting.
+## Design notes
 
-## Site structure
-
-| Section | Purpose |
-|---|---|
-| Hero and proof band | Establishes Aryan's direction and five credibility signals in the first viewport |
-| Work | Shows the Linde, Meta Layer Initiative, and HCLTech experience in recruiter-first order |
-| Projects | Presents Dots, ARMIE, StreamFair, and W.O.D. with visible proof links |
-| Trajectory | Connects work, builds, research, leadership, and recognition across 2023 through 2026 in one keyboard-operable interaction |
-| Research | Separates the MIDL-accepted work from an ongoing medical-AI project |
-| Leadership | Gives student representation, budget, nonprofit, and civic work clear scale |
-| Recognition | Pairs the three institutional honors with real photographs and exact selection data |
-| About | Covers personal interests, locations, and collaborator gratitude |
-| Contact | Provides direct email, LinkedIn, and GitHub paths |
-
-## Editing content
-
-Factual content and external links live in `src/data/portfolio.ts`. Page composition lives in `src/pages/index.astro`, and visual tokens and responsive layouts live in `src/styles/global.css`.
-
-Photographs are sourced from `assets/` and copied to `public/assets/` for the static build. The previous soundtrack is intentionally not loaded.
-
-## Design and accessibility constraints
-
-- Semantic landmarks, ordered headings, a skip link, and visible focus states.
-- Every key fact is visible without hover.
-- The core page remains readable without client JavaScript.
-- The trajectory supports pointer input, arrow keys, Home, and End.
-- All multi-column layouts collapse below 48rem.
-- Every primary navigation link remains available on mobile.
-- Light and dark system themes use the same cobalt accent family.
-- Reduced-motion preferences remove nonessential movement.
-- No preloader, WebGL, sound, custom cursor, game, marquee, or scroll hijacking.
-
-## Project notes
-
-The current refinement specification is in `docs/superpowers/specs/2026-07-20-portfolio-tonal-chapters-design.md`. The corresponding build plan is in `docs/superpowers/plans/2026-07-20-portfolio-tonal-chapters.md`.
+`docs/superpowers/specs/2026-09-06-me-in-every-photo-design.md` records the design, the confirmed facts, the receipts, the accepted exceptions, the voice policy and the anti-slop bans. `docs/superpowers/plans/2026-09-06-me-in-every-photo.md` is the implementation plan.

@@ -101,7 +101,8 @@ export const links = {
 const source = {
   ubnowChancellor: { label: "UBNow", href: "https://www.buffalo.edu/ubnow/stories/2026/04/student-chancellors-awards.html" },
   sunyRelease: { label: "SUNY", href: "https://www.suny.edu/suny-news/press-releases/4-26/4-27-26-3/case.html" },
-  ubLeadershipAwards: { label: "UB Student Life", href: "https://www.buffalo.edu/studentlife/who-we-are/departments/engagement/leadership-awards.html" },
+  ubLeadershipAwards: { label: "UB Student Life", href: "https://www.buffalo.edu/studentlife/life-on-campus/clubs-and-activities/event-calendars/ceremonies-and-celebrations/leadership-awards.html" },
+  ubStudentEngagement: { label: "UB Student Life", href: "https://www.buffalo.edu/studentlife/who-we-are/departments/engagement.host.html/content/shared/www/studentlife/units/uls/student-engagement/signature-opportunities/student-engagement-ambassador1.detail.html" },
   ubPbk: { label: "UB Arts and Sciences", href: "https://arts-sciences.buffalo.edu/phi-beta-kappa.html" },
   spectrumCleanCampus: { label: "The Spectrum", href: "https://www.ubspectrum.com/article/2024/12/clean-campus-has-students-step-up-to-clean-ub-one-weekend-at-a-time" },
   ceremonyVideo: { label: "Hear Aryan speak at the ceremony, 2:56", href: "https://www.youtube.com/watch?v=Aru9b8gWmtE&t=176s" },
@@ -323,8 +324,15 @@ export const leadership: readonly LeadershipItem[] = [
     title: "Clean Campus",
     role: "Co-founder, with Chirag Ohri",
     period: "Since spring 2024",
-    summary: "Ten cleanup drives, about 150 pounds of litter, chapters started at NYU and Boston University, about 500 dollars raised through UB's Get Seeded competition.",
-    receipts: [source.spectrumCleanCampus],
+    summary: "Ten cleanup drives, more than 150 pounds of litter, chapters started at NYU and Boston University, about 500 dollars raised through UB's Get Seeded competition, and a Spectrum News feature.",
+    receipts: [source.spectrumCleanCampus, source.ubnowChancellor],
+  },
+  {
+    title: "UB Student Engagement",
+    role: "Event Intern and Peer Mentor",
+    period: "Student Life, University at Buffalo",
+    summary: "Ran and staffed campus engagement events for Student Life.",
+    receipts: [source.ubStudentEngagement],
   },
   {
     title: "Student Issue Portal",

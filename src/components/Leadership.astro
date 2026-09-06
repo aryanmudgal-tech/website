@@ -1,22 +1,28 @@
 ---
-import { leadershipItems } from "../data/portfolio";
+import { leadership, headings } from "../data/portfolio";
+import Source from "./Source.astro";
 ---
 
-<section id="leadership" class="section section--leadership" aria-labelledby="leadership-title">
-  <div class="shell">
-    <header class="section-heading section-heading--compact reveal">
-      <h2 id="leadership-title">Leadership with a real constituency</h2>
-      <p>Representation, budgets, public-health work, and civic infrastructure at campus and community scale.</p>
-    </header>
-
-    <div class="leadership-mosaic">
-      {leadershipItems.map((item) => (
-        <article class:list={["leadership-item", `leadership-item--${item.scale}`, "reveal"]}>
-          <p class="leadership-item__value">{item.value}</p>
-          <h3>{item.title}</h3>
-          <p>{item.context}</p>
-        </article>
-      ))}
-    </div>
-  </div>
+<section id="leadership" class="chapter" aria-labelledby="leadership-title">
+  <header class="chapter__head">
+    <span class="label">Leadership</span>
+    <h2 id="leadership-title">{headings.leadership}</h2>
+  </header>
+  {leadership.map((item) => (
+    <article class="row">
+      <div class="row__meta">
+        <strong>{item.title}</strong>
+        <span>{item.role}</span>
+        <span>{item.period}</span>
+      </div>
+      <div class="row__body">
+        <p>{item.summary}</p>
+        {item.receipts.length > 0 && (
+          <div class="receipts">
+            {item.receipts.map((receipt) => <Source receipt={receipt} />)}
+          </div>
+        )}
+      </div>
+    </article>
+  ))}
 </section>

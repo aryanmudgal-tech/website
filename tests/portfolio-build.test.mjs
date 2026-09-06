@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -9,6 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFileSync(join(root, relativePath), "utf8");
 const client = (relativePath) => `dist/client/${relativePath}`;
 const portfolio = await import(new URL("../src/data/portfolio.ts", import.meta.url).href);
+const { rooms } = await import(new URL("../src/data/rooms.ts", import.meta.url).href);
 
 test("built homepage exposes semantic recruiter content and social metadata", () => {
   const html = read(client("index.html"));
@@ -63,7 +64,7 @@ test("built images reserve space, describe themselves, and load in the right ord
   for (const image of images) {
     assert.match(image, /\bwidth="\d+"/);
     assert.match(image, /\bheight="\d+"/);
-    assert.match(image, /\balt="/);
+    assert.match(image, /\balt(?:="|[\s/>])/, `image without alt: ${image.slice(0, 120)}`);
   }
   assert.equal((html.match(/fetchpriority="high"/g) ?? []).length, 1, "exactly one image is high priority");
   const lazy = images.filter((image) => /loading="lazy"/.test(image)).length;
@@ -88,10 +89,17 @@ test("built frame has eleven rooms, popovers, and no hidden focusable content", 
   const frame = html.match(/<div class="frame"[\s\S]*?<\/aside>/)?.[0] ?? "";
   assert.ok(frame.length > 0, "frame markup missing");
   assert.equal((frame.match(/data-room="/g) ?? []).length, 11);
+  for (const room of rooms) {
+    const count = (html.match(new RegExp(`data-room="${room.id}"`, "g")) ?? []).length;
+    assert.ok(count >= 2, `room ${room.id} must appear in the frame and on its chapter (found ${count})`);
+  }
   assert.ok((html.match(/\spopover(?:=""|\s|>)/g) ?? []).length >= 12, "one popover per room plus the phone menu");
   assert.ok((html.match(/popovertarget="/g) ?? []).length >= 12);
   assert.doesNotMatch(frame, /aria-hidden="true"/, "the frame must not hide its buttons from assistive technology");
-  assert.match(html, /timeline-scope/);
+  const cssFiles = readdirSync(join(root, "dist", "client", "_astro")).filter((name) => name.endsWith(".css"));
+  const builtCss = cssFiles.map((name) => read(client(`_astro/${name}`))).join("\n");
+  assert.match(builtCss, /timeline-scope/);
+  assert.match(builtCss, /animation-timeline/);
 });
 
 test("built HTML stays small and the deploy folder has no server leftovers", () => {

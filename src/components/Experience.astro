@@ -1,33 +1,29 @@
 ---
-import { experiences } from "../data/portfolio";
+import { experiences, headings } from "../data/portfolio";
+import Source from "./Source.astro";
 ---
 
-<section id="work" class="section section--work" aria-labelledby="work-title">
-  <div class="shell">
-    <header class="section-heading reveal">
-      <h2 id="work-title">Professional experience</h2>
-      <p>
-        Three roles, moving from market strategy to human-AI product infrastructure and deployed industrial machine learning.
-      </p>
-    </header>
-
-    <ol class="experience-list" role="list">
-      {experiences.map((experience, index) => (
-        <li class:list={["experience", { "experience--featured": experience.featured }, "reveal"]}>
-          <div class="experience__index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
-          <div class="experience__identity">
-            <p class="meta">{experience.period}</p>
-            <h3>{experience.company}</h3>
-            <p class="experience__role">{experience.role}</p>
-          </div>
-          <div class="experience__outcome">
-            <p>{experience.summary}</p>
-            <ul class="inline-list" role="list" aria-label={`${experience.company} capabilities`}>
-              {experience.capabilities.map((capability) => <li>{capability}</li>)}
-            </ul>
-          </div>
-        </li>
-      ))}
-    </ol>
-  </div>
+<section id="work" class="chapter" aria-labelledby="work-title">
+  <header class="chapter__head">
+    <span class="label">Work</span>
+    <h2 id="work-title">{headings.work}</h2>
+  </header>
+  {experiences.map((job) => (
+    <article class="row">
+      <div class="row__meta">
+        <strong>{job.company}</strong>
+        <span>{job.role}</span>
+        <span>{job.period}</span>
+        <span>{job.place}</span>
+      </div>
+      <div class="row__body">
+        <h3>{job.outcome}</h3>
+        <p>{job.detail}</p>
+        <p class="my-part"><strong>My part:</strong> {job.myPart}</p>
+        <div class="receipts">
+          {job.receipts.map((receipt) => <Source receipt={receipt} />)}
+        </div>
+      </div>
+    </article>
+  ))}
 </section>

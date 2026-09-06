@@ -1,0 +1,32 @@
+---
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { rooms, type ChapterId } from "../data/rooms";
+import Source from "./Source.astro";
+
+interface Props {
+  room: ChapterId;
+}
+
+const { room: id } = Astro.props;
+const room = rooms.find((candidate) => candidate.id === id);
+if (!room) throw new Error(`unknown room ${id}`);
+
+const images = import.meta.glob<{ default: ImageMetadata }>("../assets/rooms/*.jpg", { eager: true });
+const image = images[`../assets/rooms/${id}.jpg`]?.default;
+if (!image) throw new Error(`missing crop for room ${id}; run npm run rooms`);
+const widths = [480, 960, 1440].filter((width) => width < image.width).concat(image.width);
+---
+
+<figure class="chapter-figure">
+  <Picture
+    src={image}
+    widths={widths}
+    sizes="(min-width: 64rem) 46rem, 100vw"
+    formats={["avif", "webp"]}
+    alt={room.alt}
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>{room.caption} <Source receipt={room.receipt} /></figcaption>
+</figure>

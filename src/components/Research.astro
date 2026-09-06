@@ -1,41 +1,29 @@
 ---
-import { researchItems } from "../data/portfolio";
-
-const featuredResearch = researchItems.find((item) => item.featured) ?? researchItems[0];
-const ongoingResearch = researchItems.filter((item) => item !== featuredResearch);
+import { research, headings } from "../data/portfolio";
+import Source from "./Source.astro";
+import ChapterFigure from "./ChapterFigure.astro";
 ---
 
-<section id="research" class="section section--research" aria-labelledby="research-title">
-  <div class="shell">
-    <header class="section-heading reveal">
-      <h2 id="research-title">Research for earlier, better signals</h2>
-      <p>Applied medical AI focused on the moments when a faint signal can change the next clinical decision.</p>
-    </header>
-
-    <div class="research-layout">
-      <article class="research-feature reveal">
-        <p class="research-status">{featuredResearch.status}</p>
-        <h3>{featuredResearch.title}</h3>
-        <p class="research-subject">{featuredResearch.subject}</p>
-        <p>{featuredResearch.summary}</p>
-        <ul class="inline-list" role="list" aria-label={`${featuredResearch.title} capabilities`}>
-          {featuredResearch.capabilities.map((capability) => <li>{capability}</li>)}
-        </ul>
-      </article>
-
-      <div class="research-notes">
-        {ongoingResearch.map((item) => (
-          <article class="research-note reveal">
-            <p class="meta">{item.status}</p>
-            <h3>{item.title}</h3>
-            <p class="research-subject">{item.subject}</p>
-            <p>{item.summary}</p>
-            <ul class="inline-list" role="list" aria-label={`${item.title} capabilities`}>
-              {item.capabilities.map((capability) => <li>{capability}</li>)}
-            </ul>
-          </article>
-        ))}
+<section id="research" class="chapter" aria-labelledby="research-title" data-room="research">
+  <header class="chapter__head">
+    <span class="label">Research</span>
+    <h2 id="research-title">{headings.research}</h2>
+  </header>
+  {research.map((item) => (
+    <article class="row">
+      <div class="row__meta">
+        <strong>{item.role}</strong>
+        <span>{item.period}</span>
       </div>
-    </div>
-  </div>
+      <div class="row__body">
+        <h3>{item.title}</h3>
+        <p>{item.summary}</p>
+        <p>{item.detail}</p>
+        <ChapterFigure room="research" />
+        <div class="receipts">
+          {item.receipts.map((receipt) => <Source receipt={receipt} />)}
+        </div>
+      </div>
+    </article>
+  ))}
 </section>

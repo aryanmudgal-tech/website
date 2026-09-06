@@ -123,7 +123,7 @@ export const rooms: readonly Room[] = [
     minCover: 1,
     alt: "Aryan holding the Pillar of Leadership plaque for the Innovative Student Leadership Award in front of a University at Buffalo backdrop",
     caption: "University at Buffalo, April 2026. Award for Innovative Student Leadership.",
-    receipt: { label: "UB Student Life", href: "https://www.buffalo.edu/studentlife/who-we-are/departments/engagement/leadership-awards.html" },
+    receipt: { label: "UB Student Life", href: "https://www.buffalo.edu/studentlife/life-on-campus/clubs-and-activities/event-calendars/ceremonies-and-celebrations/leadership-awards.html" },
   },
   {
     id: "pbk",

@@ -1,18 +1,26 @@
 ---
-import { links } from "../data/portfolio";
+import { colophon, headings, links } from "../data/portfolio";
+import { publicAssetUrl } from "../lib/site-url";
+import ChapterFigure from "./ChapterFigure.astro";
 ---
 
-<footer id="contact" class="site-footer" aria-labelledby="contact-title">
-  <div class="site-footer__inner shell">
-    <div class="site-footer__prompt">
-      <h2 id="contact-title">Let’s build what matters next.</h2>
-      <a class="contact-link" href={links.email}>Email Aryan<span aria-hidden="true">↗</span></a>
-    </div>
-    <div class="site-footer__meta">
-      <nav aria-label="External profiles">
-        <a href={links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<span class="sr-only"> opens in a new tab</span></a>
-        <a href={links.github} target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> opens in a new tab</span></a>
-      </nav>
+<footer id="contact" class="site-footer" aria-labelledby="contact-title" data-room="contact">
+  <div class="site-footer__inner">
+    <span class="label">Contact</span>
+    <h2 id="contact-title">{headings.contact}</h2>
+    <a class="contact-link" href={links.email}>aryanmudgal4493@gmail.com</a>
+    <nav class="profiles" aria-label="Profiles and documents">
+      <a href={links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<span class="sr-only"> opens in a new tab</span></a>
+      <a href={links.github} target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> opens in a new tab</span></a>
+      <a href={links.devpost} target="_blank" rel="noopener noreferrer">Devpost<span class="sr-only"> opens in a new tab</span></a>
+      <a href={publicAssetUrl(links.resume)}>Resume (PDF)</a>
+    </nav>
+    <ChapterFigure room="contact" />
+    <div class="colophon">
+      <p>{colophon.version}</p>
+      <p>{colophon.photos}</p>
+      <p>{colophon.type}</p>
+      <p>{colophon.corrections}</p>
       <p>© 2026 Aryan Mudgal</p>
     </div>
   </div>

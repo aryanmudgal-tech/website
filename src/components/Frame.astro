@@ -1,0 +1,91 @@
+---
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { extras, rooms } from "../data/rooms";
+import Source from "./Source.astro";
+
+const roomImages = import.meta.glob<{ default: ImageMetadata }>("../assets/rooms/*.jpg", { eager: true });
+const fullImages = import.meta.glob<{ default: ImageMetadata }>("../assets/full/*.jpg", { eager: true });
+
+function roomImage(id: string): ImageMetadata {
+  const image = roomImages[`../assets/rooms/${id}.jpg`]?.default;
+  if (!image) throw new Error(`missing crop for room ${id}; run npm run rooms`);
+  return image;
+}
+
+function fullImage(id: string): ImageMetadata {
+  const image = fullImages[`../assets/full/${id}.jpg`]?.default;
+  if (!image) throw new Error(`missing full-size copy for ${id}; run npm run rooms`);
+  return image;
+}
+
+const roomWidths = (image: ImageMetadata) => [480, 960, 1440].filter((width) => width < image.width).concat(image.width);
+const fullWidths = (image: ImageMetadata) => [800, 1600].filter((width) => width < image.width).concat(image.width);
+---
+
+<aside class="frame-col" aria-label="Photographs from the events on this page">
+  <div class="frame">
+    {rooms.map((room, index) => {
+      const image = roomImage(room.id);
+      return (
+        <figure class={`room room--${index + 1}`} data-room={room.id}>
+          <button class="room__open" type="button" popovertarget={`photo-${room.id}`} aria-label={`Open full photo: ${room.caption}`}>
+            <Picture
+              src={image}
+              widths={roomWidths(image)}
+              sizes="(min-width: 64rem) 30rem, 100vw"
+              formats={["avif", "webp"]}
+              alt=""
+              loading={index === 0 ? "eager" : "lazy"}
+              fetchpriority={index === 0 ? "high" : "low"}
+              decoding="async"
+            />
+          </button>
+          <figcaption class="room__caption">{room.caption} <Source receipt={room.receipt} /></figcaption>
+        </figure>
+      );
+    })}
+  </div>
+
+  {rooms.map((room) => {
+    const full = fullImage(room.id);
+    const roomExtras = extras.filter((extra) => extra.room === room.id);
+    return (
+      <div id={`photo-${room.id}`} class="photo-popover" popover>
+        <div class="photo-popover__body">
+          <Picture
+            src={full}
+            widths={fullWidths(full)}
+            sizes="min(96vw, 64rem)"
+            formats={["avif", "webp"]}
+            alt={room.alt}
+            loading="lazy"
+            decoding="async"
+          />
+          <p class="photo-popover__caption">
+            <span>{room.caption}</span>
+            <Source receipt={room.receipt} />
+          </p>
+          {roomExtras.map((extra) => {
+            const extraImage = fullImage(extra.id);
+            return (
+              <figure>
+                <Picture
+                  src={extraImage}
+                  widths={fullWidths(extraImage)}
+                  sizes="min(96vw, 64rem)"
+                  formats={["avif", "webp"]}
+                  alt={extra.alt}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption class="photo-popover__caption">{extra.caption}</figcaption>
+              </figure>
+            );
+          })}
+          <button class="photo-popover__close" type="button" popovertarget={`photo-${room.id}`} popovertargetaction="hide">Close</button>
+        </div>
+      </div>
+    );
+  })}
+</aside>

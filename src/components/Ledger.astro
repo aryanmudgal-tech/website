@@ -1,0 +1,13 @@
+---
+import { ledger } from "../data/portfolio";
+import Source from "./Source.astro";
+---
+
+<ol class="ledger" aria-label="Three proofs">
+  {ledger.map((row) => (
+    <li class:list={["ledger__row", row.bold && "ledger__row--bold"]}>
+      <a class="ledger__fraction" href={row.anchor}>{row.fraction}</a>
+      <span class="ledger__text">{row.text} <Source receipt={row.receipt} /></span>
+    </li>
+  ))}
+</ol>

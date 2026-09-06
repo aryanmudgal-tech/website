@@ -1,15 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { siteBaseUrl } from "../lib/site-url";
-
-const homeUrl = siteBaseUrl;
 ---
 
 <BaseLayout title="Page not found | Aryan Mudgal" description="The requested page could not be found.">
   <main id="main-content" class="not-found shell">
-    <p class="meta">404</p>
+    <p class="label">404</p>
     <h1>Page not found</h1>
-    <p>The link may have moved, but the portfolio is still right where it should be.</p>
-    <a class="action action--primary" href={homeUrl}>Return home</a>
+    <p>The link may have moved. The portfolio is one page, and it is right here.</p>
+    <a class="action action--primary" href={siteBaseUrl}>Return home</a>
   </main>
 </BaseLayout>

@@ -105,8 +105,13 @@ test("each room has a chapter, a CSS timeline, and a caption without a denominat
   const source = components();
   const styles = css();
   assert.equal(rooms.length, 11);
+  const dynamicRooms = new Set([...portfolio.projects.map((project) => project.id), ...portfolio.recognitions.map((award) => award.id)]);
+  assert.match(read("src/components/Projects.astro"), /data-room=\{project\.id\}/);
+  assert.match(read("src/components/Recognition.astro"), /data-room=\{award\.id\}/);
   for (const room of rooms) {
-    assert.match(source, new RegExp(`data-room=["']${room.id}["']`), `no chapter owns room ${room.id}`);
+    if (!dynamicRooms.has(room.id)) {
+      assert.match(source, new RegExp(`data-room=["']${room.id}["']`), `no chapter owns room ${room.id}`);
+    }
     assert.ok(styles.includes(`--r-${room.id}`), `no timeline for room ${room.id}`);
     assert.doesNotMatch(room.caption, /\b1 of \d+/, `room ${room.id} caption repeats a denominator`);
     assert.ok(room.alt.length >= 30, `room ${room.id} alt is too short`);

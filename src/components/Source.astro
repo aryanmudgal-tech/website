@@ -1,0 +1,26 @@
+---
+import type { Receipt } from "../data/rooms";
+import { publicAssetUrl } from "../lib/site-url";
+
+interface Props {
+  receipt: Receipt;
+  /** Text before the colon. Pass an empty string to print the label alone. */
+  prefix?: string;
+  class?: string;
+}
+
+const { receipt, prefix = "Source", class: className } = Astro.props;
+const external = receipt.href.startsWith("http");
+const href = external || receipt.href.startsWith("#") ? receipt.href : publicAssetUrl(receipt.href);
+const text = prefix ? `${prefix}: ${receipt.label}` : receipt.label;
+---
+
+{
+  external ? (
+    <a class:list={["source", className]} href={href} target="_blank" rel="noopener noreferrer">
+      {text}<span class="sr-only"> opens in a new tab</span>
+    </a>
+  ) : (
+    <a class:list={["source", className]} href={href}>{text}</a>
+  )
+}

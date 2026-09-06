@@ -1,43 +1,20 @@
 ---
-import { links, proofPoints } from "../data/portfolio";
+import { identity, links } from "../data/portfolio";
 import { publicAssetUrl } from "../lib/site-url";
-
+import Ledger from "./Ledger.astro";
+import ChapterFigure from "./ChapterFigure.astro";
 ---
 
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero" aria-labelledby="hero-title" data-room="hero">
   <div class="hero__copy">
-    <h1 id="hero-title">Aryan<br />Mudgal</h1>
-    <p class="hero__positioning">
-      Engineer and researcher building applied AI across industrial operations, human-AI interaction, and healthcare.
-    </p>
-    <div class="hero__actions" aria-label="Primary actions">
-      <a class="action action--primary" href="#work">View experience</a>
-      <a class="action action--text" href={links.email}>Email Aryan</a>
+    <h1 id="hero-title">{identity.name}</h1>
+    <p class="fixation fixation--long">{identity.fixationLine}</p>
+    <p class="fixation fixation--short">{identity.fixationLineShort}</p>
+    <Ledger />
+    <div class="hero__actions">
+      <a class="action action--primary" href={links.email}>Email Aryan</a>
+      <a class="action action--text" href={publicAssetUrl(links.resume)}>Resume (PDF)</a>
     </div>
   </div>
-  <div class="proof-band" aria-label="Selected proof">
-    <ul class="proof-band__inner shell" role="list">
-      {proofPoints.map((proof) => (
-        <li class="proof-point">
-          <strong aria-hidden={proof.ariaLabel ? "true" : undefined}>{proof.value}</strong>
-          {proof.ariaLabel && <span class="sr-only">{proof.ariaLabel}</span>}
-          <span aria-hidden={proof.ariaLabel ? "true" : undefined}>{proof.label}</span>
-        </li>
-      ))}
-    </ul>
-  </div>
-  <figure class="hero__figure">
-    <img
-      src={publicAssetUrl("assets/award-leader.jpg")}
-      width="1195"
-      height="793"
-      alt="Aryan holding the Award for Innovative Student Leadership at the University at Buffalo"
-      fetchpriority="high"
-      decoding="async"
-    />
-    <figcaption>
-      <span>Award for Innovative Student Leadership</span>
-      <span>1 of 2 among 20,000 students</span>
-    </figcaption>
-  </figure>
+  <ChapterFigure room="hero" />
 </section>
