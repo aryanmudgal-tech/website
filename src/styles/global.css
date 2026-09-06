@@ -828,24 +828,24 @@ main {
   }
 }
 
-/* The dissolve: one scroll-driven timeline per room, no script */
+/* The dissolve: one scroll-driven timeline per room, no script. Subjects are the chapters, never the frame figures. */
 
 @supports (animation-timeline: view()) {
   .rooms {
     timeline-scope: --r-hero, --r-dots, --r-armie, --r-streamfair, --r-wod, --r-safeline, --r-research, --r-chancellor, --r-pillar, --r-pbk, --r-contact;
   }
 
-  [data-room="hero"] { view-timeline-name: --r-hero; }
-  [data-room="dots"] { view-timeline-name: --r-dots; }
-  [data-room="armie"] { view-timeline-name: --r-armie; }
-  [data-room="streamfair"] { view-timeline-name: --r-streamfair; }
-  [data-room="wod"] { view-timeline-name: --r-wod; }
-  [data-room="safeline"] { view-timeline-name: --r-safeline; }
-  [data-room="research"] { view-timeline-name: --r-research; }
-  [data-room="chancellor"] { view-timeline-name: --r-chancellor; }
-  [data-room="pillar"] { view-timeline-name: --r-pillar; }
-  [data-room="pbk"] { view-timeline-name: --r-pbk; }
-  [data-room="contact"] { view-timeline-name: --r-contact; }
+  :not(.room)[data-room="hero"] { view-timeline-name: --r-hero; }
+  :not(.room)[data-room="dots"] { view-timeline-name: --r-dots; }
+  :not(.room)[data-room="armie"] { view-timeline-name: --r-armie; }
+  :not(.room)[data-room="streamfair"] { view-timeline-name: --r-streamfair; }
+  :not(.room)[data-room="wod"] { view-timeline-name: --r-wod; }
+  :not(.room)[data-room="safeline"] { view-timeline-name: --r-safeline; }
+  :not(.room)[data-room="research"] { view-timeline-name: --r-research; }
+  :not(.room)[data-room="chancellor"] { view-timeline-name: --r-chancellor; }
+  :not(.room)[data-room="pillar"] { view-timeline-name: --r-pillar; }
+  :not(.room)[data-room="pbk"] { view-timeline-name: --r-pbk; }
+  :not(.room)[data-room="contact"] { view-timeline-name: --r-contact; }
 
   .room {
     animation: room-in linear both;
