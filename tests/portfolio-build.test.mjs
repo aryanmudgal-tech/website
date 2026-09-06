@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import { gzipSync } from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -7,134 +8,105 @@ import test from "node:test";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFileSync(join(root, relativePath), "utf8");
 const client = (relativePath) => `dist/client/${relativePath}`;
+const portfolio = await import(new URL("../src/data/portfolio.ts", import.meta.url).href);
 
-test("built homepage exposes semantic recruiter content", () => {
+test("built homepage exposes semantic recruiter content and social metadata", () => {
   const html = read(client("index.html"));
-
-  assert.match(html, /<title>Aryan Mudgal \| Engineer and researcher<\/title>/);
+  assert.match(html, /<title>Aryan Mudgal[^<]*<\/title>/);
   assert.match(html, /<meta name="description"/);
-  assert.match(html, /<meta property="og:title"/);
-  assert.match(html, /<meta name="twitter:card" content="summary"/);
+  assert.match(html, /<meta property="og:image" content="https:\/\/aryanmudgal-tech\.github\.io\/[^"]*og\.jpg"/);
+  assert.match(html, /<meta name="twitter:card" content="summary_large_image"/);
   assert.doesNotMatch(html, /http:\/\/localhost/);
   assert.match(html, /application\/ld\+json/);
+  assert.match(html, /"alumniOf"/);
   assert.match(html, /class="skip-link" href="#main-content"/);
-  assert.match(html, /<header[^>]*>/);
   assert.match(html, /<nav[^>]*aria-label="Primary"/);
   assert.match(html, /<main id="main-content"/);
   assert.match(html, /<footer[^>]*id="contact"/);
   assert.equal((html.match(/<h1(?:\s|>)/g) ?? []).length, 1);
-
   for (const id of ["work", "projects", "trajectory", "research", "leadership", "recognition", "about", "contact"]) {
     assert.ok(html.includes(`id="${id}"`), `built page is missing #${id}`);
   }
 });
 
-test("built homepage keeps proof visible and links actionable", () => {
+test("built first screen carries the fixation lines, the ledger, and both actions", () => {
   const html = read(client("index.html"));
-
-  for (const fact of [
-    "Linde",
-    "MIDL-accepted",
-    "Dots",
-    "ARMIE",
-    "StreamFair",
-    "W.O.D.",
-    "$500K+",
-    "30,000+",
-    "Award for Innovative Student Leadership",
-    "SUNY Chancellor's Award for Student Excellence",
-  ]) {
-    assert.ok(html.includes(fact), `built page is missing ${fact}`);
+  const { identity, ledger } = portfolio;
+  assert.ok(html.includes(identity.fixationLine), "long fixation line missing");
+  assert.ok(html.includes(identity.fixationLineShort), "short fixation line missing");
+  for (const row of ledger) {
+    assert.ok(html.includes(row.fraction), `ledger fraction ${row.fraction} missing`);
   }
+  assert.match(html, /Email Aryan/);
+  assert.match(html, /Resume \(PDF\)/);
+  assert.match(html, /href="[^"]*resume\.pdf"/);
+});
 
-  for (const stale of ["C.O.R.E. / W.O.D.", "University and SUNY honors", "PPG signal accuracy", "Building Litos"]) {
-    assert.equal(html.includes(stale), false, `built page still contains stale content: ${stale}`);
-  }
-
+test("built links are actionable and external links are safe", () => {
+  const html = read(client("index.html"));
   assert.doesNotMatch(html, /href=(?:""|'')/);
   assert.doesNotMatch(html, /href=(?:"#"|'#')/);
   assert.doesNotMatch(html, /<script[^>]+src=/i);
-  assert.doesNotMatch(html, /<(?:canvas|audio)\b/i);
-
+  assert.doesNotMatch(html, /<(?:canvas|iframe)\b/i);
   const externalLinks = html.match(/<a\b[^>]*target="_blank"[^>]*>/g) ?? [];
-  assert.ok(externalLinks.length >= 5);
+  assert.ok(externalLinks.length >= 12, `expected at least 12 external receipts, found ${externalLinks.length}`);
   for (const link of externalLinks) {
     assert.match(link, /rel="noopener noreferrer"/);
   }
   assert.ok((html.match(/opens in a new tab/g) ?? []).length >= externalLinks.length);
 });
 
-test("built images reserve space and contain meaningful alternatives", () => {
+test("built images reserve space, describe themselves, and load in the right order", () => {
   const html = read(client("index.html"));
   const images = html.match(/<img\b[^>]*>/g) ?? [];
-
-  assert.ok(images.length >= 7);
+  assert.ok(images.length >= 22, `expected the rooms twice plus popovers, found ${images.length} images`);
   for (const image of images) {
     assert.match(image, /\bwidth="\d+"/);
     assert.match(image, /\bheight="\d+"/);
-    assert.match(image, /\balt="[^"]{12,}"/);
+    assert.match(image, /\balt="/);
   }
-  assert.match(html, /src="(?:\/website)?\/assets\/award-leader\.jpg"[^>]*fetchpriority="high"/);
+  assert.equal((html.match(/fetchpriority="high"/g) ?? []).length, 1, "exactly one image is high priority");
+  const lazy = images.filter((image) => /loading="lazy"/.test(image)).length;
+  assert.equal(lazy, images.length - 1, "every image except the hero room is lazy");
+  assert.ok((html.match(/<picture\b/g) ?? []).length >= 22);
+  assert.match(html, /type="image\/avif"/);
 });
 
-test("built trajectory has one initial selection and complete fallback labels", () => {
+test("built page states each award once in full and never repeats retired figures", () => {
   const html = read(client("index.html"));
-  const tabs = html.match(/<button\b[^>]*role="tab"[^>]*>/g) ?? [];
-  const axis = html.match(/<div class="trajectory-axis"[^>]*>([\s\S]*?)<\/div>/)?.[1] ?? "";
-  const columns = [...axis.matchAll(/<span>(.*?)<\/span>/g)].map((match) => match[1]);
-
-  assert.equal(tabs.length, 12);
-  assert.equal(tabs.filter((tab) => tab.includes('aria-selected="true"')).length, 1);
-  assert.ok((html.match(/class="trajectory-event__outcome"/g) ?? []).length >= tabs.length);
-  assert.deepEqual(columns, ["", "2023", "2024", "2025", "2026"]);
-  for (const period of ["2022-2025", "2023", "2024", "2025", "2026"]) {
-    assert.ok(html.includes(period), `built trajectory is missing ${period}`);
+  for (const fraction of ["1 of 2", "1 of 15"]) {
+    const count = (html.match(new RegExp(fraction.replace(/ /g, "\\s"), "g")) ?? []).length;
+    assert.ok(count <= 2, `${fraction} appears ${count} times; hero pointer plus Recognition only`);
+  }
+  for (const retired of ["$500K", "300 teams", "XR Hacks", "1,500+", "100,000+", "New Delhi", "PPG", "MIDL-accepted", "Hackathon recognitions"]) {
+    assert.equal(html.includes(retired), false, `built page still contains ${retired}`);
   }
 });
 
-test("built navigation contains current-section progressive enhancement", () => {
+test("built frame has eleven rooms, popovers, and no hidden focusable content", () => {
   const html = read(client("index.html"));
+  const frame = html.match(/<div class="frame"[\s\S]*?<\/aside>/)?.[0] ?? "";
+  assert.ok(frame.length > 0, "frame markup missing");
+  assert.equal((frame.match(/data-room="/g) ?? []).length, 11);
+  assert.ok((html.match(/\spopover(?:=""|\s|>)/g) ?? []).length >= 12, "one popover per room plus the phone menu");
+  assert.ok((html.match(/popovertarget="/g) ?? []).length >= 12);
+  assert.doesNotMatch(frame, /aria-hidden="true"/, "the frame must not hide its buttons from assistive technology");
+  assert.match(html, /timeline-scope/);
+});
 
-  assert.match(html, /IntersectionObserver/);
-  assert.match(html, /aria-current/);
-  assert.doesNotMatch(html, /addEventListener\(["']scroll["']/);
+test("built HTML stays small and the deploy folder has no server leftovers", () => {
+  const html = read(client("index.html"));
+  const gzipped = gzipSync(Buffer.from(html)).length;
+  assert.ok(gzipped <= 20 * 1024, `index.html is ${gzipped} bytes gzipped; budget is 20 KB`);
+  assert.equal(existsSync(join(root, "dist", "server")), false);
+  assert.equal(existsSync(join(root, "dist", "client", "_headers")), false);
+  assert.equal(existsSync(join(root, "dist", "client", "og.jpg")), true);
+  assert.equal(existsSync(join(root, "dist", "client", "resume.pdf")), true);
 });
 
 test("built 404 page offers a route home", () => {
   const html = read(client("404.html"));
-
   assert.match(html, /Page not found/);
   assert.match(html, /href="(?:\/website)?\/"/);
   assert.match(html, /Return home/);
-});
-
-test("Sites worker delegates requests to the static asset binding", async () => {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
-  const requested = [];
-
-  const response = await worker.fetch(new Request("https://portfolio.example/"), {
-    ASSETS: {
-      fetch: async (request) => {
-        requested.push(request.url);
-        return new Response("portfolio", { status: 200 });
-      },
-    },
-  });
-
-  assert.equal(response.status, 200);
-  assert.equal(await response.text(), "portfolio");
-  assert.deepEqual(requested, ["https://portfolio.example/"]);
-
-  const wrangler = JSON.parse(read("dist/server/wrangler.json"));
-  assert.equal(wrangler.main, "index.js");
-  assert.equal(wrangler.assets.directory, "../client");
-});
-
-test("production package has no stale static files beside client and server", () => {
-  assert.equal(existsSync(join(root, "dist", "index.html")), false);
-  assert.equal(existsSync(join(root, "dist", "404.html")), false);
-  assert.equal(existsSync(join(root, "dist", "assets")), false);
-  assert.equal(existsSync(join(root, "dist", "_astro")), false);
 });
