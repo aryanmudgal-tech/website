@@ -321,10 +321,13 @@ main {
 
 .frame {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
 }
 
 .room {
   grid-area: 1 / 1;
+  min-width: 0;
   opacity: 0;
   visibility: hidden;
 }
@@ -347,8 +350,14 @@ main {
 
 .room__open img {
   width: 100%;
+  max-width: 100%;
   aspect-ratio: 3 / 2;
   object-fit: cover;
+}
+
+.room__open picture {
+  display: block;
+  width: 100%;
 }
 
 .room__caption {
@@ -858,6 +867,11 @@ main {
 
   .room--1 {
     animation: none;
+  }
+
+  /* The footer is the last chapter and may never travel far; finish its dissolve early in its range. */
+  .room[data-room="contact"] {
+    animation-range: cover 6% cover 16%;
   }
 
   .room[data-room="dots"] { animation-timeline: --r-dots; }
