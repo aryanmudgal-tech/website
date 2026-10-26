@@ -139,6 +139,19 @@ export const identity = {
     "Aryan Mudgal: computer science at the University at Buffalo (December 2026), software engineer intern at Linde, two-time hackathon track winner, SUNY Chancellor's Award recipient. Seeking new-grad software roles in New York City.",
 } as const;
 
+/** The fixation lines as three labelled rows (spec 4.2). Splits the sentences; adds no words. */
+export type TitleRow = {
+  readonly label: "Study" | "Work" | "Next";
+  readonly long: readonly string[];
+  readonly short: readonly string[];
+};
+
+export const titleBlock: readonly TitleRow[] = [
+  { label: "Study", long: ["B.S. Computer Science, University at Buffalo, December 2026, GPA 3.93."], short: ["CS, University at Buffalo, Dec 2026."] },
+  { label: "Work", long: ["Software Engineer Intern at Linde, Summer 2026; before that Meta Layer Initiative (2025) and HCLTech, Dubai (2024)."], short: ["SWE Intern, Linde, 2026."] },
+  { label: "Next", long: ["Seeking new-grad software or forward-deployed engineering roles from January 2027.", "New York City, open to relocation."], short: ["Seeking new-grad SWE roles from Jan 2027.", "NYC, open to relocation."] },
+];
+
 /** One sentence per section; nav labels stay conventional, headings do the talking. */
 export const headings = {
   work: "Three summers, one app that replaced paper on a plant floor",

@@ -221,3 +221,12 @@ test("the 1 of 2 receipt is the same everywhere it renders", () => {
     assert.equal(other.href, ledgerReceipt.href);
   }
 });
+
+test("the title block splits the fixation lines word for word", () => {
+  const { titleBlock, identity } = portfolio;
+  assert.deepEqual(titleBlock.map((row) => row.label), ["Study", "Work", "Next"]);
+  assert.equal(titleBlock.flatMap((row) => row.long).join(" "), identity.fixationLine);
+  assert.equal(titleBlock.flatMap((row) => row.short).join(" "), identity.fixationLineShort);
+  assert.equal(titleBlock[2].long.length, 2);
+  assert.equal(titleBlock[2].short.length, 2);
+});
