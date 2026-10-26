@@ -122,3 +122,7 @@ test("built 404 page offers a route home", () => {
   assert.match(html, /href="(?:\/website)?\/"/);
   assert.match(html, /Return home/);
 });
+
+test("no theme toggle ships", () => {
+  assert.doesNotMatch(read(client("index.html")), /data-theme/);
+});
