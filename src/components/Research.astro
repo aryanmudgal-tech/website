@@ -1,28 +1,30 @@
 ---
 import { research, headings } from "../data/portfolio";
 import Source from "./Source.astro";
-import ChapterFigure from "./ChapterFigure.astro";
+import Print from "./Print.astro";
 ---
 
-<section id="research" class="chapter" aria-labelledby="research-title" data-room="research">
+<section id="research" class="chapter" aria-labelledby="research-title">
   <header class="chapter__head">
     <span class="label">Research</span>
     <h2 id="research-title">{headings.research}</h2>
   </header>
   {research.map((item) => (
-    <article class="row">
-      <div class="row__meta">
-        <strong>{item.role}</strong>
+    <article class="card">
+      <div class="card__meta">
+        <strong class="meta-lead">{item.role}</strong>
         <span>{item.period}</span>
       </div>
-      <div class="row__body">
+      <div class="card__body">
         <h3>{item.title}</h3>
-        <p>{item.summary}</p>
+        <p class="card__lede">{item.summary}</p>
         <p>{item.detail}</p>
-        <ChapterFigure room="research" />
         <div class="receipts">
           {item.receipts.map((receipt) => <Source receipt={receipt} />)}
         </div>
+      </div>
+      <div class="card__margin">
+        <Print room="research" variant="margin" />
       </div>
     </article>
   ))}

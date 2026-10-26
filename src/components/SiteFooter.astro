@@ -1,10 +1,10 @@
 ---
 import { colophon, headings, links } from "../data/portfolio";
 import { publicAssetUrl } from "../lib/site-url";
-import ChapterFigure from "./ChapterFigure.astro";
+import Print from "./Print.astro";
 ---
 
-<footer id="contact" class="site-footer" aria-labelledby="contact-title" data-room="contact">
+<footer id="contact" class="site-footer" aria-labelledby="contact-title">
   <div class="site-footer__inner">
     <span class="label">Contact</span>
     <h2 id="contact-title">{headings.contact}</h2>
@@ -15,7 +15,7 @@ import ChapterFigure from "./ChapterFigure.astro";
       <a href={links.devpost} target="_blank" rel="noopener noreferrer">Devpost<span class="sr-only"> opens in a new tab</span></a>
       <a href={publicAssetUrl(links.resume)}>Resume (PDF)</a>
     </nav>
-    <ChapterFigure room="contact" />
+    <Print room="contact" variant="footer" />
     <div class="colophon">
       <p>{colophon.version}</p>
       <p>{colophon.photos}</p>

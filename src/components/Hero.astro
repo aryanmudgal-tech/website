@@ -2,11 +2,12 @@
 import { identity, links } from "../data/portfolio";
 import { publicAssetUrl } from "../lib/site-url";
 import Ledger from "./Ledger.astro";
-import ChapterFigure from "./ChapterFigure.astro";
+import Print from "./Print.astro";
+import PhotoPopover from "./PhotoPopover.astro";
 ---
 
-<section class="hero" aria-labelledby="hero-title" data-room="hero">
-  <div class="hero__copy">
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__facts">
     <h1 id="hero-title">{identity.name}</h1>
     <p class="fixation fixation--long">{identity.fixationLine}</p>
     <p class="fixation fixation--short">{identity.fixationLineShort}</p>
@@ -16,5 +17,8 @@ import ChapterFigure from "./ChapterFigure.astro";
       <a class="action action--text" href={publicAssetUrl(links.resume)}>Resume (PDF)</a>
     </div>
   </div>
-  <ChapterFigure room="hero" />
+  <div class="hero-art">
+    <Print room="pillar" variant="hero" loading="eager" popover={false} />
+  </div>
+  <PhotoPopover room="pillar" />
 </section>

@@ -20,7 +20,7 @@ export type ChapterId =
   | "contact";
 
 export type Room = {
-  /** Output filename stem and the value of data-room on the chapter that owns it. */
+  /** Output filename stem and the value of data-room on the print that shows it. */
   readonly id: ChapterId;
   /** Path under Pictures/ (untracked). */
   readonly source: string;
@@ -31,8 +31,8 @@ export type Room = {
    * 1 keeps the whole photo (plaques and certificates stay legible); lower values zoom toward the face.
    */
   readonly minCover?: number;
-  /** "contain" letterboxes on the paper color instead of cropping (used for the drawing). */
-  readonly fit?: "cover" | "contain";
+  /** Print shape: "3:2" (default) crops around the face; "4:5" is the hero portrait; "natural" keeps the whole photo. */
+  readonly aspect?: "3:2" | "4:5" | "natural";
   readonly alt: string;
   readonly caption: string;
   readonly receipt: Receipt;
@@ -77,7 +77,7 @@ export const rooms: readonly Room[] = [
     id: "streamfair",
     source: "CMU-win/cmu-streamfair-stage.jpg",
     focal: { x: 0.506, y: 0.625 },
-    fit: "contain",
+    aspect: "natural",
     alt: "Aryan and two teammates on stage at TartanHacks under a slide reading RIPPLE 1st place, Water Mellon",
     caption: "TartanHacks, Carnegie Mellon, February 2026. 1st, Ripple track.",
     receipt: { label: "GitHub", href: "https://github.com/aryanmudgal-tech/StreamFair" },
@@ -122,6 +122,7 @@ export const rooms: readonly Room[] = [
     source: "Pillars-award/innovative-student-leader-award-3.png",
     focal: { x: 0.53, y: 0.23 },
     minCover: 1,
+    aspect: "4:5",
     alt: "Aryan holding the Pillar of Leadership plaque for the Innovative Student Leadership Award in front of a University at Buffalo backdrop",
     caption: "University at Buffalo, April 2026. Award for Innovative Student Leadership.",
     receipt: { label: "UB Student Life", href: "https://www.buffalo.edu/studentlife/life-on-campus/clubs-and-activities/event-calendars/ceremonies-and-celebrations/leadership-awards.html" },
@@ -148,7 +149,7 @@ export const rooms: readonly Room[] = [
     id: "contact",
     source: "Chancellors-award/scribble.png",
     focal: { x: 0.49, y: 0.485 },
-    fit: "contain",
+    aspect: "natural",
     alt: "A pencil self-portrait of Aryan in a suit with a handwritten arrow labelled me in every photo",
     caption: "Pencil, drawn on the train to Albany, April 2026. Me in every photo.",
     receipt: { label: "Drawn by Aryan", href: "#about" },
@@ -166,5 +167,5 @@ export const extras: readonly Extra[] = [
   { id: "pillar-pair", source: "Pillars-award/innovative-student-leader-award-1.png", alt: "Aryan and Shaurya Jain each holding a Pillar of Leadership plaque", caption: "With Shaurya Jain, who received the Exemplary Student Leader Award the same evening.", room: "pillar" },
 ];
 
-/** The 1.91:1 social image is cut from this room. */
-export const ogRoom: ChapterId = "hero";
+/** The social image is composed around this room's photo (spec 5.8). */
+export const ogRoom: ChapterId = "pillar";

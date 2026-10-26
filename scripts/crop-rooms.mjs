@@ -1,7 +1,8 @@
-import { copyFile, mkdir, stat } from "node:fs/promises";
+import { copyFile, mkdir, readFile, stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import sharp from "sharp";
-import { extras, ogRoom, rooms } from "../src/data/rooms.ts";
+import { extras, rooms } from "../src/data/rooms.ts";
+import { readTokens } from "./paper/tokens.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const sources = resolve(root, "Pictures");
@@ -9,12 +10,14 @@ const roomsOut = resolve(root, "src", "assets", "rooms");
 const fullOut = resolve(root, "src", "assets", "full");
 const publicOut = resolve(root, "public");
 
-const ROOM_RATIO = 3 / 2;
+const RATIOS = { "3:2": 3 / 2, "4:5": 4 / 5 };
 const ROOM_MAX_WIDTH = 1440;
 const FULL_MAX_SIDE = 1600;
 const REGISTER = { x: 0.5, y: 0.4 };
 const DEFAULT_MIN_COVER = 0.7;
-const PAPER = { r: 243, g: 242, b: 238 };
+// Transparent sources and the drawing sit on the print's fibre paper, read from the token so they match in both themes.
+const fibre = readTokens(await readFile(resolve(root, "src", "styles", "global.css"), "utf8"))["--fibre"];
+const PAPER = { r: parseInt(fibre.slice(1, 3), 16), g: parseInt(fibre.slice(3, 5), 16), b: parseInt(fibre.slice(5, 7), 16) };
 
 async function exists(path) {
   try {
@@ -57,19 +60,18 @@ async function writeRoom(room) {
   const { width, height } = await image.metadata();
   const out = resolve(roomsOut, `${room.id}.jpg`);
 
-  if (room.fit === "contain") {
-    const targetWidth = Math.min(ROOM_MAX_WIDTH, Math.round(Math.max(width, height * ROOM_RATIO)));
-    const targetHeight = Math.round(targetWidth / ROOM_RATIO);
+  if (room.aspect === "natural") {
     await image
       .flatten({ background: PAPER })
-      .resize(targetWidth, targetHeight, { fit: "contain", background: PAPER })
+      .resize({ width: ROOM_MAX_WIDTH, height: 1600, fit: "inside", withoutEnlargement: true })
       .jpeg({ quality: 84, mozjpeg: true })
       .toFile(out);
     return { out, faceY: null };
   }
 
-  const box = cropBox(width, height, ROOM_RATIO, room.focal, REGISTER, room.minCover ?? DEFAULT_MIN_COVER);
+  const box = cropBox(width, height, RATIOS[room.aspect ?? "3:2"], room.focal, REGISTER, room.minCover ?? DEFAULT_MIN_COVER);
   await image
+    .flatten({ background: PAPER })
     .extract(box)
     .resize({ width: Math.min(ROOM_MAX_WIDTH, box.width), withoutEnlargement: true })
     .jpeg({ quality: 84, mozjpeg: true })
@@ -91,17 +93,6 @@ async function writeFull(item) {
   return out;
 }
 
-async function writeOg() {
-  const room = rooms.find((candidate) => candidate.id === ogRoom);
-  const input = resolve(sources, room.source);
-  const image = sharp(input, { failOn: "none" }).rotate();
-  const { width, height } = await image.metadata();
-  const box = cropBox(width, height, 1200 / 630, room.focal, { x: 0.5, y: 0.45 }, 0.6);
-  const out = resolve(publicOut, "og.jpg");
-  await image.extract(box).resize(1200, 630, { fit: "fill" }).jpeg({ quality: 82, mozjpeg: true }).toFile(out);
-  return out;
-}
-
 await mkdir(roomsOut, { recursive: true });
 await mkdir(fullOut, { recursive: true });
 await mkdir(publicOut, { recursive: true });
@@ -109,7 +100,7 @@ await mkdir(publicOut, { recursive: true });
 for (const room of rooms) {
   const { out, faceY } = await writeRoom(room);
   const written = await sharp(out).metadata();
-  const face = faceY === null ? "contain" : `face at ${(faceY * 100).toFixed(0)}% of height`;
+  const face = faceY === null ? "natural" : `face at ${(faceY * 100).toFixed(0)}% of height`;
   console.log(`room  ${room.id.padEnd(11)} ${String(written.width).padStart(4)}x${written.height}  ${face}`);
 }
 for (const item of [...rooms, ...extras]) {
@@ -117,7 +108,6 @@ for (const item of [...rooms, ...extras]) {
   const written = await sharp(out).metadata();
   console.log(`full  ${item.id.padEnd(16)} ${written.width}x${written.height}`);
 }
-console.log(`og    ${await writeOg()}`);
 
 const resumeSource = resolve(sources, "resume.pdf");
 if (await exists(resumeSource)) {

@@ -11,8 +11,8 @@ const read = (relativePath) => readFileSync(join(root, relativePath), "utf8");
 const componentFiles = [
   "src/layouts/BaseLayout.astro",
   "src/components/SiteNav.astro",
-  "src/components/Frame.astro",
-  "src/components/ChapterFigure.astro",
+  "src/components/Print.astro",
+  "src/components/PhotoPopover.astro",
   "src/components/Ledger.astro",
   "src/components/Source.astro",
   "src/components/Video.astro",
@@ -33,7 +33,7 @@ const css = () => read("src/styles/global.css");
 
 // Node 24 strips TypeScript types on import, so the data files are loaded as real modules.
 const portfolio = await import(new URL("../src/data/portfolio.ts", import.meta.url).href);
-const { rooms, extras } = await import(new URL("../src/data/rooms.ts", import.meta.url).href);
+const { rooms, extras, ogRoom } = await import(new URL("../src/data/rooms.ts", import.meta.url).href);
 
 const KNOWN_EXCEPTIONS = new Set(["armie-honorable-mention", "men-in-green", "safeline-remarks"]);
 
@@ -46,14 +46,15 @@ function assertSourced(items, label) {
   }
 }
 
-test("sections keep the approved order and the frame wraps main and footer", () => {
+test("sections keep the approved order", () => {
   const page = read("src/pages/index.astro");
   let previous = -1;
-  for (const marker of ['<div class="rooms"', "<Frame", "<main", "<Hero", "<Experience", "<Projects", "<Trajectory", "<Research", "<Leadership", "<Recognition", "<About", "</main>", "<SiteFooter", "</div>"]) {
+  for (const marker of ["<SiteNav", "<main", "<Hero", "<Experience", "<Projects", "<Trajectory", "<Research", "<Leadership", "<Recognition", "<About", "</main>", "<SiteFooter"]) {
     const position = page.indexOf(marker);
     assert.ok(position > previous, `${marker} must appear after the previous marker`);
     previous = position;
   }
+  assert.doesNotMatch(page, /<Frame|class="rooms"/);
 });
 
 test("navigation labels and section ids are complete", () => {
@@ -103,30 +104,28 @@ test("retired figures and stories are gone from the source", () => {
   assert.doesNotMatch(source, /\bpublished\b/i);
 });
 
-test("each room has a chapter, a CSS timeline, and a caption without a denominator", () => {
-  const source = components();
-  const styles = css();
+test("rooms stay twelve, captioned, and owned", () => {
   assert.equal(rooms.length, 12);
-  const dynamicRooms = new Set([
-    ...portfolio.projects.map((project) => project.id),
-    ...portfolio.recognitions.map((award) => award.id),
-    ...portfolio.leadership.map((item) => item.roomId).filter(Boolean),
-  ]);
-  assert.match(read("src/components/Projects.astro"), /data-room=\{project\.id\}/);
-  assert.match(read("src/components/Recognition.astro"), /data-room=\{award\.id\}/);
-  assert.match(read("src/components/Leadership.astro"), /data-room=\{item\.roomId\}/);
+  assert.equal(extras.length, 8);
   for (const room of rooms) {
-    if (!dynamicRooms.has(room.id)) {
-      assert.match(source, new RegExp(`data-room=["']${room.id}["']`), `no chapter owns room ${room.id}`);
-    }
-    assert.ok(styles.includes(`--r-${room.id}`), `no timeline for room ${room.id}`);
     assert.doesNotMatch(room.caption, /\b1 of \d+/, `room ${room.id} caption repeats a denominator`);
     assert.ok(room.alt.length >= 30, `room ${room.id} alt is too short`);
+    assert.equal("fit" in room, false, `room ${room.id} still has fit`);
+    assert.ok(room.aspect === undefined || ["3:2", "4:5", "natural"].includes(room.aspect), `room ${room.id} aspect ${room.aspect}`);
   }
-  assert.ok(styles.includes("timeline-scope:"));
-  for (const extra of extras) {
-    assert.ok(rooms.some((room) => room.id === extra.room), `extra ${extra.id} points at an unknown room`);
-  }
+  assert.equal(rooms.find((room) => room.id === "pillar").aspect, "4:5");
+  for (const id of ["streamfair", "contact"]) assert.equal(rooms.find((room) => room.id === id).aspect, "natural");
+  assert.equal(ogRoom, "pillar");
+  for (const extra of extras) assert.ok(rooms.some((room) => room.id === extra.room), `extra ${extra.id} points at an unknown room`);
+  const source = components();
+  for (const id of ["pillar", "hero", "research", "contact"]) assert.match(source, new RegExp(`<Print[^>]*\\broom=["']${id}["']`), `no print for room ${id}`);
+  assert.match(read("src/components/Projects.astro"), /room=\{project\.id\}/);
+  assert.match(read("src/components/Recognition.astro"), /room=\{award\.id\}/);
+  assert.match(read("src/components/Leadership.astro"), /room=\{item\.roomId\}/);
+  assert.match(read("src/components/Print.astro"), /data-room=\{room\}/);
+  assert.match(read("src/components/Print.astro"), /popovertarget=\{`photo-\$\{room\}`\}/);
+  const styles = css();
+  for (const room of rooms) assert.equal(styles.includes(`--r-${room.id}`), false, `frame timeline --r-${room.id} remains`);
 });
 
 // Animations are allowed anywhere; the only motion rule left is that reduced motion is handled.

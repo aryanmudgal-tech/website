@@ -1,0 +1,44 @@
+---
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { extras, rooms, type ChapterId } from "../data/rooms";
+import Source from "./Source.astro";
+
+interface Props {
+  room: ChapterId;
+}
+
+const { room: id } = Astro.props;
+const room = rooms.find((candidate) => candidate.id === id);
+if (!room) throw new Error(`unknown room ${id}`);
+
+const fullImages = import.meta.glob<{ default: ImageMetadata }>("../assets/full/*.jpg", { eager: true });
+function fullImage(name: string): ImageMetadata {
+  const image = fullImages[`../assets/full/${name}.jpg`]?.default;
+  if (!image) throw new Error(`missing full-size copy for ${name}; run npm run rooms`);
+  return image;
+}
+const widths = (image: ImageMetadata) => [800, 1600].filter((width) => width < image.width).concat(image.width);
+const full = fullImage(room.id);
+const roomExtras = extras.filter((extra) => extra.room === room.id);
+---
+
+<div id={`photo-${room.id}`} class="photo-popover" popover>
+  <div class="photo-popover__body">
+    <Picture src={full} widths={widths(full)} sizes="min(96vw, 64rem)" formats={["avif", "webp"]} alt={room.alt} loading="lazy" decoding="async" />
+    <p class="photo-popover__caption">
+      <span>{room.caption}</span>
+      <Source receipt={room.receipt} />
+    </p>
+    {roomExtras.map((extra) => {
+      const image = fullImage(extra.id);
+      return (
+        <figure>
+          <Picture src={image} widths={widths(image)} sizes="min(96vw, 64rem)" formats={["avif", "webp"]} alt={extra.alt} loading="lazy" decoding="async" />
+          <figcaption class="photo-popover__caption">{extra.caption}</figcaption>
+        </figure>
+      );
+    })}
+    <button class="photo-popover__close" type="button" popovertarget={`photo-${room.id}`} popovertargetaction="hide">Close</button>
+  </div>
+</div>

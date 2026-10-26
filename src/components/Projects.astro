@@ -1,7 +1,7 @@
 ---
 import { projects, headings } from "../data/portfolio";
 import Source from "./Source.astro";
-import ChapterFigure from "./ChapterFigure.astro";
+import Print from "./Print.astro";
 import Video from "./Video.astro";
 ---
 
@@ -12,22 +12,29 @@ import Video from "./Video.astro";
     <p class="chapter__lede">Hackathon builds, each finished in a day or two and shown to judges. Team size and my part are stated on every card.</p>
   </header>
   {projects.map((project) => (
-    <article class="card" id={`project-${project.id}`} data-room={project.id}>
-      <p class="card__event">
-        <span>{project.event}</span>
-        <span>{project.date}</span>
-        {project.pool && <span>{project.pool}</span>}
-      </p>
-      <h3>{project.name}</h3>
-      <p class="card__result">{project.result}</p>
-      <ChapterFigure room={project.id} />
-      <p>{project.built}</p>
-      {project.demo && <Video video={project.demo} />}
-      <p class="my-part"><strong>My part:</strong> {project.myPart}</p>
-      <p class="card__team">Team: {project.team.join(", ")}.</p>
-      {project.aside && <p class="card__aside">{project.aside}</p>}
-      <div class="receipts">
-        {project.receipts.map((receipt) => <Source receipt={receipt} />)}
+    <article class="card" id={`project-${project.id}`}>
+      <div class="card__meta">
+        <p class="card__event">
+          <span>{project.event}</span>
+          <span>{project.date}</span>
+          {project.pool && <span>{project.pool}</span>}
+        </p>
+        <p class="card__team">Team: {project.team.join(", ")}.</p>
+      </div>
+      <div class="card__body">
+        <h3>{project.name}</h3>
+        <p class="card__result">{project.result}</p>
+        <p>{project.built}</p>
+        {project.demo && <Video video={project.demo} />}
+        <p class="my-part"><strong>My part:</strong> {project.myPart}</p>
+        {project.aside && <p class="card__aside">{project.aside}</p>}
+        <div class="receipts">
+          {project.receipts.map((receipt) => <Source receipt={receipt} />)}
+        </div>
+      </div>
+      <div class="card__margin">
+        <Print room={project.id} variant="margin" tone="vermilion" />
+        {project.id === "dots" && <Print room="hero" variant="margin" tone="vermilion" />}
       </div>
     </article>
   ))}

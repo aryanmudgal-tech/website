@@ -1,7 +1,10 @@
 ---
 import { leadership, headings } from "../data/portfolio";
 import Source from "./Source.astro";
-import ChapterFigure from "./ChapterFigure.astro";
+import Print from "./Print.astro";
+
+/** Row ids: the title lowercased, each run of other characters a hyphen (spec 3). */
+const slug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 ---
 
 <section id="leadership" class="chapter" aria-labelledby="leadership-title">
@@ -10,21 +13,25 @@ import ChapterFigure from "./ChapterFigure.astro";
     <h2 id="leadership-title">{headings.leadership}</h2>
   </header>
   {leadership.map((item) => (
-    <article class="row" data-room={item.roomId}>
-      <div class="row__meta">
-        <strong>{item.title}</strong>
+    <article class="card card--leadership" id={`leadership-${slug(item.title)}`}>
+      <div class="card__meta">
+        <h3 class="meta-lead">{item.title}</h3>
         <span>{item.role}</span>
         <span>{item.period}</span>
       </div>
-      <div class="row__body">
+      <div class="card__body">
         <p>{item.summary}</p>
-        {item.roomId && <ChapterFigure room={item.roomId} />}
         {item.receipts.length > 0 && (
           <div class="receipts">
             {item.receipts.map((receipt) => <Source receipt={receipt} />)}
           </div>
         )}
       </div>
+      {item.roomId && (
+        <div class="card__margin">
+          <Print room={item.roomId} variant="margin" />
+        </div>
+      )}
     </article>
   ))}
 </section>

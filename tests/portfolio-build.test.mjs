@@ -9,7 +9,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFileSync(join(root, relativePath), "utf8");
 const client = (relativePath) => `dist/client/${relativePath}`;
 const portfolio = await import(new URL("../src/data/portfolio.ts", import.meta.url).href);
-const { rooms } = await import(new URL("../src/data/rooms.ts", import.meta.url).href);
+const { rooms, extras } = await import(new URL("../src/data/rooms.ts", import.meta.url).href);
+const { textOf, elements } = await import(new URL("./lib/html.mjs", import.meta.url).href);
+const withId = (value) => (tag) => tag.includes(` id="${value}"`);
 
 test("built homepage exposes semantic recruiter content and social metadata", () => {
   const html = read(client("index.html"));
@@ -63,17 +65,18 @@ test("built links are actionable and external links are safe", () => {
 test("built images reserve space, describe themselves, and load in the right order", () => {
   const html = read(client("index.html"));
   const images = html.match(/<img\b[^>]*>/g) ?? [];
-  assert.ok(images.length >= 22, `expected the rooms twice plus popovers, found ${images.length} images`);
+  assert.equal(images.length, 37, "13 prints, 12 popover photos, 8 popover extras, 4 YouTube posters");
   for (const image of images) {
     assert.match(image, /\bwidth="\d+"/);
     assert.match(image, /\bheight="\d+"/);
     assert.match(image, /\balt(?:="|[\s/>])/, `image without alt: ${image.slice(0, 120)}`);
   }
   assert.equal((html.match(/fetchpriority="high"/g) ?? []).length, 1, "exactly one image is high priority");
-  const lazy = images.filter((image) => /loading="lazy"/.test(image)).length;
-  assert.equal(lazy, images.length - 12, "every image outside the twelve frame rooms is lazy");
-  assert.equal((html.match(/loading="eager"/g) ?? []).length, 12, "the twelve frame rooms load eagerly so they are painted before they fade in");
-  assert.ok((html.match(/<picture\b/g) ?? []).length >= 22);
+  const eager = images.filter((image) => /loading="eager"/.test(image));
+  assert.equal(eager.length, 1, "only the hero print loads eagerly");
+  assert.ok(elements(html, (tag) => /class="[^"]*\bprint--hero\b/.test(tag))[0].includes('loading="eager"'));
+  assert.equal(images.filter((image) => /loading="lazy"/.test(image)).length, images.length - 1);
+  assert.equal((html.match(/<picture\b/g) ?? []).length, 33);
   assert.match(html, /type="image\/avif"/);
 });
 
@@ -88,28 +91,48 @@ test("built page states each award once in full and never repeats retired figure
   }
 });
 
-test("built frame has eleven rooms, popovers, and no hidden focusable content", () => {
+test("each room renders once beside its claim", () => {
   const html = read(client("index.html"));
-  const frame = html.match(/<div class="frame"[\s\S]*?<\/aside>/)?.[0] ?? "";
-  assert.ok(frame.length > 0, "frame markup missing");
-  assert.equal((frame.match(/data-room="/g) ?? []).length, 12);
+  const owners = {
+    pillar: (tag) => /class="[^"]*\bhero-art\b/.test(tag), hero: withId("project-dots"), dots: withId("project-dots"),
+    armie: withId("project-armie"), streamfair: withId("project-streamfair"), wod: withId("project-wod"), safeline: withId("project-safeline"),
+    research: withId("research"), cleancampus: withId("leadership-clean-campus"), chancellor: withId("recognition-chancellor"),
+    pbk: withId("recognition-pbk"), contact: withId("contact"),
+  };
   for (const room of rooms) {
-    const count = (html.match(new RegExp(`data-room="${room.id}"`, "g")) ?? []).length;
-    assert.ok(count >= 2, `room ${room.id} must appear in the frame and on its chapter (found ${count})`);
+    assert.equal((html.match(new RegExp(`data-room="${room.id}"`, "g")) ?? []).length, 1, `room ${room.id} renders once`);
+    assert.ok(elements(html, owners[room.id]).some((element) => element.includes(`data-room="${room.id}"`)), `room ${room.id} sits inside its owner`);
+    const popovers = elements(html, withId(`photo-${room.id}`));
+    assert.equal(popovers.length, 1, `#photo-${room.id} renders once`);
+    assert.match(popovers[0].slice(0, 300), /\spopover(?:=""|\s|>)/);
   }
-  assert.ok((html.match(/\spopover(?:=""|\s|>)/g) ?? []).length >= 12, "one popover per room plus the phone menu");
-  assert.ok((html.match(/popovertarget="/g) ?? []).length >= 12);
-  assert.doesNotMatch(frame, /aria-hidden="true"/, "the frame must not hide its buttons from assistive technology");
-  const cssFiles = readdirSync(join(root, "dist", "client", "_astro")).filter((name) => name.endsWith(".css"));
-  const builtCss = cssFiles.map((name) => read(client(`_astro/${name}`))).join("\n");
-  assert.match(builtCss, /timeline-scope/);
-  assert.match(builtCss, /animation-timeline/);
+  assert.equal(elements(html, (tag, name) => ["section", "article", "footer"].includes(name) && /data-room=/.test(tag)).length, 0, "data-room sits only on prints");
+  assert.equal(elements(html, (tag) => /\spopover(?:=""|\s|>)/.test(tag) && /data-room=/.test(tag)).length, 0);
+  for (const art of elements(html, (tag) => /class="[^"]*\bhero-art\b/.test(tag))) assert.doesNotMatch(art, /\spopover(?:=""|\s|>)/, "no popover inside the zoomed hero art");
+  for (const extra of extras) assert.ok(textOf(elements(html, withId(`photo-${extra.room}`))[0]).includes(extra.caption), `${extra.id} caption is in its popover`);
+  const pair = elements(html, (tag) => tag.includes('data-extra="pillar-pair"'));
+  assert.equal(pair.length, 1);
+  assert.ok(elements(html, withId("recognition-pillar"))[0].includes('data-extra="pillar-pair"'));
+  assert.ok(textOf(pair[0]).includes("With Shaurya Jain, who received the Exemplary Student Leader Award the same evening."));
+  assert.doesNotMatch(textOf(pair[0]), /Source:/);
+  assert.ok((html.match(/popovertarget="/g) ?? []).length >= 13);
+});
+
+test("hidden subtrees hold nothing focusable or described", () => {
+  const html = read(client("index.html"));
+  for (const hidden of elements(html, (tag) => /aria-hidden="true"/.test(tag))) {
+    assert.doesNotMatch(hidden, /<a\b|<button\b|tabindex=|<input\b|\spopover(?:=""|\s|>)/, `hidden subtree holds a control: ${hidden.slice(0, 120)}`);
+    for (const image of hidden.match(/<img\b[^>]*>/g) ?? []) assert.match(image, /alt=""/);
+  }
 });
 
 test("built HTML stays small and the deploy folder has no server leftovers", () => {
   const html = read(client("index.html"));
   const gzipped = gzipSync(Buffer.from(html)).length;
   assert.ok(gzipped <= 20 * 1024, `index.html is ${gzipped} bytes gzipped; budget is 20 KB`);
+  const cssFiles = readdirSync(join(root, "dist", "client", "_astro")).filter((name) => name.endsWith(".css"));
+  const cssGzip = gzipSync(Buffer.from(cssFiles.map((name) => read(client(`_astro/${name}`))).join("\n"))).length;
+  assert.ok(cssGzip <= 18 * 1024, `built CSS is ${cssGzip} bytes gzipped; budget is 18 KB`);
   assert.equal(existsSync(join(root, "dist", "server")), false);
   assert.equal(existsSync(join(root, "dist", "client", "_headers")), false);
   assert.equal(existsSync(join(root, "dist", "client", "og.jpg")), true);

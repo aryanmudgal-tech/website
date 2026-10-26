@@ -1,7 +1,7 @@
 ---
 import { recognitions, headings } from "../data/portfolio";
 import Source from "./Source.astro";
-import ChapterFigure from "./ChapterFigure.astro";
+import Print from "./Print.astro";
 import Video from "./Video.astro";
 ---
 
@@ -11,17 +11,21 @@ import Video from "./Video.astro";
     <h2 id="recognition-title">{headings.recognition}</h2>
   </header>
   {recognitions.map((award) => (
-    <article class="award" id={`recognition-${award.id}`} data-room={award.id}>
-      <p class="award__fraction">{award.fraction}</p>
-      <div class="award__body">
+    <article class="card" id={`recognition-${award.id}`}>
+      <div class="card__meta">
+        <p>{award.date}.</p>
+      </div>
+      <div class="card__body">
+        <p class="award__line"><span class="award__fig">{award.fraction}</span> <span class="award__den">{award.denominator}</span>.</p>
         <h3>{award.title}</h3>
-        <p class="award__denominator">{award.denominator}. {award.date}.</p>
         <p>{award.context}</p>
-        <ChapterFigure room={award.id} />
         {award.video && <Video video={award.video} />}
         <div class="receipts">
           {award.receipts.map((receipt) => <Source receipt={receipt} />)}
         </div>
+      </div>
+      <div class="card__margin">
+        {award.id === "pillar" ? <Print extra="pillar-pair" variant="margin" /> : <Print room={award.id} variant="margin" />}
       </div>
     </article>
   ))}
