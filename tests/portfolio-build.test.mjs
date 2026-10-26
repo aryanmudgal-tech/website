@@ -171,7 +171,7 @@ test("built HTML stays small and the deploy folder has no server leftovers", () 
   assert.ok(gzipped <= 20 * 1024, `index.html is ${gzipped} bytes gzipped; budget is 20 KB`);
   const cssFiles = readdirSync(join(root, "dist", "client", "_astro")).filter((name) => name.endsWith(".css"));
   const cssGzip = gzipSync(Buffer.from(cssFiles.map((name) => read(client(`_astro/${name}`))).join("\n"))).length;
-  assert.ok(cssGzip <= 18 * 1024, `built CSS is ${cssGzip} bytes gzipped; budget is 18 KB`);
+  assert.ok(cssGzip <= 20 * 1024, `built CSS is ${cssGzip} bytes gzipped; budget is 20 KB (spec 9)`);
   assert.equal(existsSync(join(root, "dist", "server")), false);
   assert.equal(existsSync(join(root, "dist", "client", "_headers")), false);
   assert.equal(existsSync(join(root, "dist", "client", "og.jpg")), true);

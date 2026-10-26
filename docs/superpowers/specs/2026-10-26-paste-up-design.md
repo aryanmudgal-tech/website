@@ -572,7 +572,7 @@ It is applied only as a `background-image` layer over a stock or fibre `backgrou
 - **The face and the arrow.** The face centre lands at about (612, 218): 50% across and 23% down the 360x450 image, moved 2.5px by the print's tilt. By calculation from the hero geometry (7.1), the arrow's extended line passes through it and the tip stops 100px short. The scrap stays inside the canvas and clear of the head box (x 559 to 665, y 141 to 280). Milestone 6 checks that the arrow line passes within 16px of the face centre.
 - **No text.** The card's `og:title` carries the name. The face sits inside every platform's centre crop.
 - **Data:** `ogRoom` becomes `"pillar"`, and the `og` job reads its photo from `rooms.find((r) => r.id === ogRoom).source`, so `ogRoom` stays meaningful. `crop-rooms.mjs` stops writing `og.jpg`.
-- **Checks at milestone 6:** a visual check of `og.jpg`, and a pixel check that the image is not blank at the face position (a photo, not the ground colour).
+- **Checks at milestone 6:** a visual check of `og.jpg`, and a pixel check that the image is not blank at the face position (a photo, not the ground colour). As built: `og.jpg` is 46,773 B; the face centre lands at (612.5, 217.5) and the arrow's extended line passes 7.6px from it; `tests/paper.test.mjs` checks the size and that a 24px patch at the face is photograph. The job reads the 4:5 crop that `crop-rooms.mjs` made of the `ogRoom` source (`src/assets/rooms/pillar.jpg`), so the card and the hero share one crop.
 - **Head tags:** `og:image:width` and `og:image:height` stay 1200 and 630. JSON-LD `image` keeps pointing at `og.jpg`.
 
 `theme-color` metas become #FBF8F2 (light) and #161512 (dark).
@@ -1199,7 +1199,7 @@ The cell field on the plate is the only drawing. No pipeline diagram ships.
 
 ### 7.10 Contact and footer (`footer#contact`)
 
-- **Edge:** `footer.site-footer.slab`, 120px below About (phone 88px). It opens with `div.slab__tear[aria-hidden=true]`: 40px tall, full bleed, the periodic edge strips in `--fibre` (fringe) and `--slab`.
+- **Edge:** `footer.site-footer.slab`, 120px below About (phone 88px). It opens with `div.slab__tear[aria-hidden=true]`: 40px tall, full bleed, the periodic edge strips in `--fibre` (fringe) and `--slab`. As built, the footer is the last sheet, so those 120px are the ivory desk (the sheet's own background stays clear): the slab reads as a torn dark sheet laid on the desk, both when About crumples away to reveal it and in the still page. The tear is the 16px strip itself.
 - **Slab:** `--slab` background, padding 40px 0 72px (phone 40px 0 88px).
 - **Inner grid:** `minmax(0, 1fr) 300px`, `column-gap: 64px`, from 64rem up. One column below 64rem, `row-gap: 48px`, so the 34/44 address never breaks mid-word in a narrow column.
   - **Left:**
@@ -1212,7 +1212,7 @@ The cell field on the plate is the only drawing. No pipeline diagram ships.
     - The caption is `--on-slab-muted` with the inline "Source: Drawn by Aryan" (`Source.astro`, default prefix), and the same receipt shows in `#photo-contact`.
     - The sheet is never inverted in dark mode.
 - **Colophon:** full width, 48px below, sans 13/19 `--on-slab-muted`: the four `colophon` lines, then "© 2026 Aryan Mudgal".
-- **Page end:** `div#page-end` (empty, 1px) closes the footer. The section observer cannot see it: its `rootMargin` of `-20% 0px -58% 0px` limits it to a band from 20% to 42% of the viewport height, and a 1px element at the end of the document never enters that band. So SiteNav adds a second IntersectionObserver on `#page-end` with the default root margin and `threshold: 0`. While it intersects, Contact is current and the section map is ignored; when it stops, the section map decides again. A probe checks Contact at maximum scroll (7.11).
+- **Page end:** `div#page-end` (empty, 1px) closes the footer. (As built, the section observer watches the runways, 8.4, so Contact is already current at maximum scroll; the `#page-end` observer stays as the spec's safety net.) The section observer cannot see it: its `rootMargin` of `-20% 0px -58% 0px` limits it to a band from 20% to 42% of the viewport height, and a 1px element at the end of the document never enters that band. So SiteNav adds a second IntersectionObserver on `#page-end` with the default root margin and `threshold: 0`. While it intersects, Contact is current and the section map is ignored; when it stops, the section map decides again. A probe checks Contact at maximum scroll (7.11).
 - **Dark mode:** the only change is `--slab` #25231F, which reads as a sheet on the darker desk.
 
 ### 7.11 Nav, popovers and layout probes
@@ -1374,7 +1374,7 @@ Screen readers hear the title block as three term and definition pairs ("Study, 
 | Item | Budget |
 |---|---|
 | `index.html` | 20 KB gzipped or less (unchanged; v3 is 16.0 KB) |
-| Built CSS | 18 KB gzipped or less (18,431 of 18,432 B at the end of milestone 5, after folding the v3 base type rules into the v4 ones; milestone 6 removes the v3 footer rules as it adds the slab) |
+| Built CSS | 20 KB gzipped or less. Raised from 18 KB at milestone 6: the 18 KB figure predates decisions 9 and 10, and the crumple keyframes, the nine sheets, the page colours and the slab footer measure 18,771 B with the v3 base type rules already folded into the v4 ones (18,431 B at the end of milestone 5). Aryan to confirm at review. |
 | Inline `<svg>` in `index.html` | 1,024 bytes raw or less |
 | Inline scripts (the existing two, both inline) | 3 KB gzipped or less in total |
 | Fonts, woff2, latin | 180,000 bytes or less in total (171,736 B measured on 26 October 2026, section 5.3). If over, drop opsz from the roman request (50,952 B without it) and set the h1 and figures without optical sizing. |
@@ -1527,7 +1527,7 @@ Every milestone ends green, so each assertion lands in the milestone that builds
 
 - **Scripts stay inline (M2).** `index.html` holds a `<script type="module">` with no `src` whose body contains `site-menu` (SiteNav), and another whose body contains `youtube-nocookie.com` (Video). No file under `dist/client/_astro` has a name starting `SiteNav.astro` or `Video.astro` and ending `.js`. This catches the inline-limit regression of section 6.4 without banning external scripts in general, which `8b5fc4b` allows.
 - **No theme toggle (M1).** `index.html` contains no `data-theme`.
-- **CSS budget (M3).** Built CSS is 18 KB gzipped or less.
+- **CSS budget (M3).** Built CSS is 20 KB gzipped or less (18 KB until milestone 6; section 9).
 - **Hidden subtrees (M3, extended at M4 and M5).**
   - No `aria-hidden="true"` subtree contains `<a`, `<button`, `tabindex`, `<input`, a `popover` attribute, or an `<img` whose `alt` is not empty.
   - No element whose class list includes `hl--sky` or `hl--marigold` also has the class `tape` or `aria-hidden="true"` (M4).

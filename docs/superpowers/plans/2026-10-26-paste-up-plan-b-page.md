@@ -126,9 +126,9 @@ export function elements(html, test) {
 ## Milestone 6: Footer, 404, print, OG (spec 7.10, 5.6 to 5.8)
 
 ### Task 11
-- [ ] `SiteFooter.astro` slab with the torn edge, the contact print as a fibre sheet with two tapes, the colophon (v3 strings until Aryan answers Pending 2), `div#page-end`; `SiteNav.astro` second observer (10.1 item 6).
-- [ ] `404.astro` per 5.7; the print stylesheet per 5.6; `og` job in `scripts/paper/images.mjs` per 5.8, registered in `aryanJobs` for `public/og.jpg`; `npm run paper`; README describes v4.
-- [ ] Probe: Contact current at maximum scroll; OG not blank at the face. Commit, push.
+- [x] `SiteFooter.astro` slab with the torn edge, the contact print as a fibre sheet with two tapes, the colophon (v3 strings until Aryan answers Pending 2), `div#page-end`; `SiteNav.astro` second observer (10.1 item 6).
+- [x] `404.astro` per 5.7; the print stylesheet per 5.6; `og` job in `scripts/paper/images.mjs` per 5.8, registered in `aryanJobs` for `public/og.jpg`; `npm run paper`; README describes v4.
+- [x] Probe: Contact current at maximum scroll; OG not blank at the face. Commit, push.
 
 ## Milestone 7: QA (spec 11)
 

@@ -175,6 +175,9 @@ test("navigation exposes the current section without scroll listeners or swap ho
   assert.match(nav, /popovertarget="site-menu"/);
   assert.doesNotMatch(nav, /window\.addEventListener\(["']scroll["']/);
   assert.doesNotMatch(components(), /astro:after-swap/);
+  assert.match(nav, /page-end/);
+  assert.equal((nav.match(/new IntersectionObserver/g) ?? []).length, 2, "one observer for the runways, one for the page end");
+  assert.match(read("src/components/SiteFooter.astro"), /<div id="page-end"><\/div>/);
 });
 
 test("every section heading is a sentence, not a bucket label", () => {

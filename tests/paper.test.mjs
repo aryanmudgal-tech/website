@@ -15,6 +15,7 @@ const fromRoot = (asset) => /^(?:public|src)\//.test(asset.file);
 const at = (asset) => (fromRoot(asset) ? join(root, asset.file) : join(DIR, asset.file));
 const tokens = readTokens(readFileSync(join(root, "src", "styles", "global.css"), "utf8"));
 const inFolder = paperAssets.filter((asset) => !fromRoot(asset));
+const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 
 test("the manifest lists exactly the files in src/assets/paper and how each was made", () => {
   assert.deepEqual(readdirSync(DIR).sort(), inFolder.map((asset) => asset.file).sort());
@@ -86,4 +87,17 @@ test("the crumple strips hold 25 frames each, and crumple.css comes from crumple
     assert.ok(hasAlpha, `${file} keeps its alpha`);
   }
   assert.equal(readFileSync(join(root, "src", "styles", "crumple.css"), "utf8"), crumpleCss(data), "src/styles/crumple.css is stale; run npm run crumple");
+});
+
+test("the social card is the hero's collage, with a photo where the face is", async () => {
+  const file = join(root, "public", "og.jpg");
+  const { width, height } = await sharp(file).metadata();
+  assert.deepEqual([width, height], [1200, 630]);
+  // spec 5.8: the face centre lands at about (612, 218); a patch there is photograph, not the ground
+  const { data, info } = await sharp(file).extract({ left: 600, top: 206, width: 24, height: 24 }).raw().toBuffer({ resolveWithObject: true });
+  const values = [...data];
+  const mean = values.reduce((a, b) => a + b, 0) / values.length;
+  const spread = Math.sqrt(values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length);
+  const ground = channels(tokens["--paper"]).reduce((a, b) => a + b, 0) / 3;
+  assert.ok(Math.abs(mean - ground) > 40 || spread > 20, `the face patch looks like the ground (mean ${mean.toFixed(0)}, spread ${spread.toFixed(0)}, ${info.channels} channels)`);
 });

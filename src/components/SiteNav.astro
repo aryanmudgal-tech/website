@@ -42,17 +42,29 @@ import { navItems } from "../data/portfolio";
   const runways = Array.from(document.querySelectorAll<HTMLElement>(".runway"));
   const after = new Map(runways.map((runway) => [runway, document.querySelector(`[data-in="${runway.id}"] .content > [id]`)?.id ?? null]));
   const passed = new Map<Element, boolean>();
+  const lastPassed = () => {
+    const last = runways.filter((runway) => passed.get(runway)).pop();
+    return last ? after.get(last) ?? null : null;
+  };
   if (runways.length > 0) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => passed.set(entry.target, entry.isIntersecting));
-        const last = runways.filter((runway) => passed.get(runway)).pop();
-        setCurrent(last ? after.get(last) ?? null : null);
+        setCurrent(lastPassed());
       },
       // Everything above the line counts as passed, so a jump of any size still crosses the line and fires.
       { rootMargin: "100000px 0px -80% 0px", threshold: 0 },
     );
     runways.forEach((runway) => observer.observe(runway));
+  }
+
+  // At the very end of the page Contact is current, whatever the runways say (spec 7.10).
+  const pageEnd = document.getElementById("page-end");
+  if (pageEnd) {
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setCurrent("contact");
+      else setCurrent(lastPassed());
+    }, { threshold: 0 }).observe(pageEnd);
   }
 
   const menu = document.getElementById("site-menu");

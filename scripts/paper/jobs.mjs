@@ -4,7 +4,9 @@ import { join } from 'node:path';
 import { paper, tape, tapeEnd, edgeStrip, ribbonBand, solidMask, playGlyph } from './art.mjs';
 import { floorPlan, productionLog, braille, aboutTick, route, cellField, bracket, graphTile, grainTile } from './drawings.mjs';
 import { maskDoc, pencilDoc, colourDoc, path } from './svg.mjs';
-import { pencilAlpha, duotone } from './images.mjs';
+import { readFileSync } from 'node:fs';
+import { pencilAlpha, duotone, ogCard } from './images.mjs';
+import { readTokens } from './tokens.mjs';
 
 const T = (o = {}) => ({ kind: 'torn', ...o });
 const C = (o = {}) => ({ kind: 'cut', ...o });
@@ -67,4 +69,14 @@ export const aryanJobs = {
   'hand.png': (e, root) => pencilAlpha(join(root, e.from.path), { left: e.from.region[0], top: e.from.region[1], width: e.from.region[2], height: e.from.region[3] }, e.size),
   'arena.jpg': (e, root) => duotone(join(root, e.from.path), 840, [0, 0.03, 1, 0.18]),
   'cleancampus.jpg': (e, root) => duotone(join(root, e.from.path), 680, [0, 0.02, 0.8, 0.28], e.size),
+  // The photo is the 4:5 crop that scripts/crop-rooms.mjs made of from.path for the ogRoom (src/data/rooms.ts).
+  'public/og.jpg': async (e, root) => {
+    const { ogRoom } = await import('../../src/data/rooms.ts');
+    return ogCard({
+      photo: readFileSync(join(root, 'src', 'assets', 'rooms', `${ogRoom}.jpg`)),
+      hand: readFileSync(join(root, 'src', 'assets', 'paper', 'hand.png')),
+      paper: (file) => readFileSync(join(root, 'src', 'assets', 'paper', file), 'utf8'),
+      tokens: readTokens(readFileSync(join(root, 'src', 'styles', 'global.css'), 'utf8')),
+    });
+  },
 };
