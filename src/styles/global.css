@@ -1029,6 +1029,80 @@ main {
   }
 }
 
+/* v4 type on the v3 layout (spec 5.3). Plan B moves each rule into its rebuilt component. */
+
+body { font: 400 18px/28px var(--serif); font-optical-sizing: auto; font-variant-numeric: tabular-nums lining-nums; }
+h1 { font: 600 72px/72px var(--serif); font-variation-settings: "opsz" 60; letter-spacing: -0.02em; }
+h2 { font: 400 44px/50px var(--serif); font-variation-settings: "opsz" 48; letter-spacing: -0.012em; max-width: 900px; text-wrap: balance; }
+h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; letter-spacing: -0.008em; }
+
+.wordmark { font: 600 20px/24px var(--serif); letter-spacing: -0.005em; }
+.site-nav a { display: inline-flex; flex-direction: column; justify-content: center; font: 400 15px/20px var(--sans); border-bottom: 3px solid transparent; }
+.site-nav a::after { content: attr(data-label) / ""; height: 0; overflow: hidden; visibility: hidden; font-weight: 600; pointer-events: none; }
+.site-nav a[aria-current="location"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+.site-nav--menu a { font: 500 16px/20px var(--sans); }
+
+.label { font: 600 11.5px/16px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.fixation { font: 400 17px/25px var(--serif); color: var(--ink); }
+.ledger { border-top-color: var(--ink); }
+.ledger__row { grid-template-columns: 168px minmax(0, 1fr); align-items: start; }
+.ledger__fraction { font: 600 34px/40px var(--serif); font-variation-settings: "opsz" 40; letter-spacing: -0.01em; white-space: nowrap; }
+.ledger__text { font: 400 16px/22px var(--sans); }
+.ledger__row--bold .ledger__text { font-weight: 600; }
+.action--primary { min-height: 48px; font: 600 16px/20px var(--sans); }
+.action--text { min-height: 48px; font: 600 15px/20px var(--sans); }
+
+.meta, .row__meta, .card__event, .card__team { font: 400 14px/20px var(--sans); color: var(--muted); }
+.row__meta strong { font: 600 22px/28px var(--serif); color: var(--ink); }
+.row__body h3 { font: 600 24px/32px var(--serif); }
+.chapter__lede { font: 400 20px/30px var(--serif); color: var(--ink-2); }
+.card__result { font: 600 18px/26px var(--serif); }
+.card__aside { font: italic 400 18px/28px var(--serif); color: var(--ink-2); }
+.source { font: 500 13px/18px var(--sans); }
+.video__caption, .room__caption, .chapter-figure figcaption, .photo-popover__caption { font: 400 13px/19px var(--sans); color: var(--muted); }
+.video__badge { font: 600 12px/16px var(--sans); }
+.route__period { font: 400 15px/22px var(--sans); color: var(--muted); }
+.route a { font: 400 18px/28px var(--serif); }
+.award__fraction { font: 600 64px/64px var(--serif); font-variation-settings: "opsz" 60; letter-spacing: -0.02em; }
+.award__denominator { font: italic 400 22px/30px var(--serif); color: var(--ink-2); }
+.about-lines { font: 400 22px/32px var(--serif); }
+.contact-link { font: 400 34px/44px var(--serif); font-variation-settings: "opsz" 40; }
+.profiles a { font: 500 16px/22px var(--sans); }
+.colophon { font: 400 13px/19px var(--sans); }
+.not-found h1 { font: 600 56px/60px var(--serif); }
+.chapter { padding-top: 96px; }
+
+@media (min-width: 64rem) and (max-width: 68.74rem) {
+  .ledger__row { grid-template-columns: 136px minmax(0, 1fr); }
+  .ledger__fraction { font-size: 28px; line-height: 34px; }
+  .contact-link { font-size: 26px; line-height: 34px; }
+}
+
+@media (max-width: 47.99rem) {
+  body { font-size: 17px; line-height: 26px; }
+  h1 { font-size: 40px; line-height: 44px; }
+  h2 { font-size: 30px; line-height: 34px; }
+  h3 { font-size: 22px; line-height: 28px; }
+  .wordmark { font-size: 18px; line-height: 22px; }
+  .fixation { font-size: 15px; line-height: 21px; }
+  .ledger__row { grid-template-columns: 112px minmax(0, 1fr); }
+  .ledger__fraction { font-size: 22px; line-height: 26px; }
+  .ledger__text { font-size: 15px; line-height: 21px; }
+  .row__meta strong { font-size: 20px; line-height: 26px; }
+  .row__body h3 { font-size: 21px; line-height: 28px; }
+  .chapter__lede { font-size: 18px; line-height: 27px; }
+  .card__result { font-size: 17px; line-height: 24px; }
+  .card__aside { font-size: 17px; line-height: 26px; }
+  .route__period { font-size: 14px; line-height: 20px; }
+  .route a { font-size: 17px; line-height: 26px; }
+  .award__fraction { font-size: 44px; line-height: 44px; }
+  .award__denominator { font-size: 18px; line-height: 26px; }
+  .about-lines { font-size: 19px; line-height: 28px; }
+  .contact-link { font-size: 22px; line-height: 30px; }
+  .not-found h1 { font-size: 40px; line-height: 44px; }
+  .chapter { padding-top: 72px; }
+}
+
 @media print {
   .site-header,
   .frame-col,
