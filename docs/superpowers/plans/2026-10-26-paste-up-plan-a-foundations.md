@@ -22,7 +22,7 @@
 
 1. **Stock hex reuse.** `--page-marigold` and `--page-sky` (5.2b) share the hex of `--stock-marigold` and `--stock-sky`. The stocks-and-hex test (10.2) therefore allows a stock hex in its own `--stock-*` declaration, in any `--page-*` declaration, and `#005BBB` as the light `--accent`.
 2. **Edge-strip seeds.** An edge's outer and inner masks must come from one tear to register, so `edge-top.outer.svg` and `edge-top.inner.svg` both use seed 51, and both bottom files use seed 53 (the spec listed 51, 52, 53, 54).
-3. **Simplification and budgets, measured on 26 October 2026.** Pencil strokes are simplified by default (`STROKE_EPS` 0.12 px). The sky pieces use `eps` 0.25 to fit 4,000 B. The production log uses `eps` 0.5 (spec said 0.15) to fit 16 KB. `hand.png` is a 16-colour palette PNG of 15,820 B, so its budget becomes 16,384 B (spec said 12 KB). The cell field draws each cell as one thin closed line, so `cells.svg` is about 13 KB.
+3. **Simplification and budgets, measured on 26 October 2026.** Pencil strokes are simplified by default (`STROKE_EPS` 0.12 px). The sky pieces use `eps` 0.25 to fit 4,000 B. The production log uses `eps` 0.5 (spec said 0.15) to fit 16 KB. `hand.png` is a 16-colour palette PNG; with the paper cut-off at L 206 (the scan's paper is 209 to 226) it is 3,983 B, inside the spec's 12 KB. The cell field draws each cell as one thin closed line, so `cells.svg` is about 13 KB.
 4. **Fallback-face metrics** are measured now (Task 5) rather than at milestone 1.
 
 ## File map
@@ -56,12 +56,12 @@
 - Create: `scripts/freeze-copy.mjs`, `tests/fixtures/copy-v3.json`
 - Modify: `tests/portfolio-source.test.mjs`
 
-- [ ] **Step 1: Confirm `src` is still v3**
+- [x] **Step 1: Confirm `src` is still v3**
 
 Run: `git diff --stat 4d67042 HEAD -- src`
 Expected: no output.
 
-- [ ] **Step 2: Write the failing test** (append to `tests/portfolio-source.test.mjs`)
+- [x] **Step 2: Write the failing test** (append to `tests/portfolio-source.test.mjs`)
 
 ```js
 const fixtureCopy = () => JSON.parse(read("tests/fixtures/copy-v3.json"));
@@ -94,12 +94,12 @@ test("the 1 of 2 receipt is the same everywhere it renders", () => {
 });
 ```
 
-- [ ] **Step 3: Run it and watch it fail**
+- [x] **Step 3: Run it and watch it fail**
 
 Run: `PATH=/opt/homebrew/opt/node@24/bin:$PATH npm test`
 Expected: "copy matches the v3 freeze" fails with ENOENT on `tests/fixtures/copy-v3.json`; "the 1 of 2 receipt" passes.
 
-- [ ] **Step 4: Write the freezer**
+- [x] **Step 4: Write the freezer**
 
 ```js
 // Writes tests/fixtures/copy-v3.json: every served string of the v3 data, so v4 cannot change copy by accident.
@@ -124,12 +124,12 @@ writeFileSync(file, `${JSON.stringify(copy, null, 2)}\n`);
 console.log("wrote tests/fixtures/copy-v3.json");
 ```
 
-- [ ] **Step 5: Freeze, then run the tests**
+- [x] **Step 5: Freeze, then run the tests**
 
 Run: `PATH=/opt/homebrew/opt/node@24/bin:$PATH node scripts/freeze-copy.mjs && PATH=/opt/homebrew/opt/node@24/bin:$PATH npm test`
 Expected: "wrote tests/fixtures/copy-v3.json", then all tests pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/freeze-copy.mjs tests/fixtures/copy-v3.json tests/portfolio-source.test.mjs
@@ -141,7 +141,7 @@ git push
 
 **Files:** Modify `src/data/portfolio.ts` (after `identity`), `tests/portfolio-source.test.mjs`
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 ```js
 test("the title block splits the fixation lines word for word", () => {
@@ -154,9 +154,9 @@ test("the title block splits the fixation lines word for word", () => {
 });
 ```
 
-- [ ] **Step 2: Run, expect failure** (`titleBlock` is undefined: "Cannot read properties of undefined (reading 'map')").
+- [x] **Step 2: Run, expect failure** (`titleBlock` is undefined: "Cannot read properties of undefined (reading 'map')").
 
-- [ ] **Step 3: Add the export after `identity`**
+- [x] **Step 3: Add the export after `identity`**
 
 ```ts
 /** The fixation lines as three labelled rows (spec 4.2). Splits the sentences; adds no words. */
@@ -173,23 +173,23 @@ export const titleBlock: readonly TitleRow[] = [
 ];
 ```
 
-- [ ] **Step 4: `npm test` passes** (the freeze ignores `titleBlock`).
-- [ ] **Step 5: Commit** `feat: titleBlock splits the fixation lines into Study, Work and Next`, push.
+- [x] **Step 4: `npm test` passes** (the freeze ignores `titleBlock`).
+- [x] **Step 5: Commit** `feat: titleBlock splits the fixation lines into Study, Work and Next`, push.
 
 ### Task 3: Widen the dash ban to rooms and CSS
 
 **Files:** Modify `tests/portfolio-source.test.mjs` (test "served source rejects theatre-era patterns, autoplay, and raw iframes")
 
-- [ ] **Step 1:** Replace `assert.doesNotMatch(source, /[—–]/, "no em or en dashes in served copy");` with
+- [x] **Step 1:** Replace `assert.doesNotMatch(source, /[—–]/, "no em or en dashes in served copy");` with
 `assert.doesNotMatch(source + read("src/data/rooms.ts") + css(), /[—–]/, "no em or en dashes in served copy, captions or CSS");`
-- [ ] **Step 2:** `npm test` passes (none exist today, checked 26 October 2026).
-- [ ] **Step 3: Commit** `test: the dash ban covers captions and CSS`, push.
+- [x] **Step 2:** `npm test` passes (none exist today, checked 26 October 2026).
+- [x] **Step 3: Commit** `test: the dash ban covers captions and CSS`, push.
 
 ### Task 4: Type is Source Serif 4 and Instrument Sans (test first)
 
 **Files:** Modify `tests/portfolio-source.test.mjs` (test "the visual system keeps one accent, theme and focus safeguards, and no template tells")
 
-- [ ] **Step 1: Add at the end of that test**
+- [x] **Step 1: Add at the end of that test**
 
 ```js
   const layout = read("src/layouts/BaseLayout.astro");
@@ -202,17 +202,17 @@ export const titleBlock: readonly TitleRow[] = [
   for (const accent of accents) assert.ok(["#005BBB", "#7DB0FF"].includes(accent), `--accent is ${accent}`);
 ```
 
-- [ ] **Step 2: Run, expect failure** on `/"Source Serif 4"/`.
+- [x] **Step 2: Run, expect failure** on `/"Source Serif 4"/`.
 
 ### Task 5: Fonts, fallback faces and v4 tokens
 
 **Files:** Modify `src/layouts/BaseLayout.astro`, `src/styles/global.css`, `src/components/Video.astro` (none: the hexes live in CSS)
 
-- [ ] **Step 1: Font link.** In `BaseLayout.astro` replace the Google Fonts `href` with
+- [x] **Step 1: Font link.** In `BaseLayout.astro` replace the Google Fonts `href` with
 `https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,20,400&display=swap`
 and the two `theme-color` contents with `#FBF8F2` (light) and `#161512` (dark).
 
-- [ ] **Step 2: Tokens.** In `global.css` replace the light `:root { ... }` block and the dark `@media (prefers-color-scheme: dark) { :root { ... } }` block (everything before `*,`) with:
+- [x] **Step 2: Tokens.** In `global.css` replace the light `:root { ... }` block and the dark `@media (prefers-color-scheme: dark) { :root { ... } }` block (everything before `*,`) with:
 
 ```css
 /* Fallback faces, measured 26 October 2026 against the real fixation line, so the font swap does not move the first screen. */
@@ -292,7 +292,7 @@ and the two `theme-color` contents with `#FBF8F2` (light) and `#161512` (dark).
 }
 ```
 
-- [ ] **Step 3: Rename retired tokens** (exact, whole-file):
+- [x] **Step 3: Rename retired tokens** (exact, whole-file):
 
 ```bash
 sed -i '' -e 's/var(--font-display)/var(--serif)/g' -e 's/var(--font-text)/var(--sans)/g' \
@@ -302,19 +302,19 @@ sed -i '' -e 's/var(--font-display)/var(--serif)/g' -e 's/var(--font-text)/var(-
   -e 's/var(--line-2)/var(--ink)/g' src/styles/global.css
 ```
 
-- [ ] **Step 4: Tokenise the v3 video hexes.** In `.video__badge` replace `background: rgb(20 20 20 / 0.72);` with `background: var(--fibre);` and `color: #fff;` with `color: var(--on-stock);`. In `.video__frame` and `.video__file` replace `background: #000;` with `background: var(--on-stock);`.
+- [x] **Step 4: Tokenise the v3 video hexes.** In `.video__badge` replace `background: rgb(20 20 20 / 0.72);` with `background: var(--fibre);` and `color: #fff;` with `color: var(--on-stock);`. In `.video__frame` and `.video__file` replace `background: #000;` with `background: var(--on-stock);`.
 
-- [ ] **Step 5: Focus.** Change `:focus-visible { outline: 2px solid var(--accent); ...}` to `outline: 3px solid var(--accent);`.
+- [x] **Step 5: Focus.** Change `:focus-visible { outline: 2px solid var(--accent); ...}` to `outline: 3px solid var(--accent);`.
 
-- [ ] **Step 6: Run** `npm test`: Task 4's assertions now pass. Then `npm run check` green.
+- [x] **Step 6: Run** `npm test`: Task 4's assertions now pass. Then `npm run check` green.
 
-- [ ] **Step 7: Commit** `feat: v4 tokens, Source Serif 4 with measured fallback faces`, push.
+- [x] **Step 7: Commit** `feat: v4 tokens, Source Serif 4 with measured fallback faces`, push.
 
 ### Task 6: Stocks and hex stay in their place
 
 **Files:** Create `tests/lib/css.mjs`; modify `tests/portfolio-source.test.mjs`
 
-- [ ] **Step 1: The splitter**
+- [x] **Step 1: The splitter**
 
 ```js
 // Splits our own stylesheet into rules, each with the at-rule preludes around it. Not a general CSS parser:
@@ -344,7 +344,7 @@ export function rules(css) {
     } else if (char === "}") {
       stack.pop();
       buffer = "";
-    } else if (char === ";" && !buffer.includes("{")) {
+    } else if (char === ";") {
       buffer = "";
     } else {
       buffer += char;
@@ -361,7 +361,7 @@ export function declarations(rule) {
 }
 ```
 
-- [ ] **Step 2: The test** (import at the top: `import { rules, declarations } from "./lib/css.mjs";`)
+- [x] **Step 2: The test** (import at the top: `import { rules, declarations } from "./lib/css.mjs";`)
 
 ```js
 // Spec 5.2: the only selectors each stock may paint (::before and ::after are ignored when matching).
@@ -420,16 +420,16 @@ test("stocks are declared once, paint only their selectors, and hex stays in the
 });
 ```
 
-- [ ] **Step 3: Run** `npm test`. Expected: pass (stocks are declared and not yet used; the video hexes were tokenised in Task 5). If it fails on a hex, the message names the rule; tokenise it.
-- [ ] **Step 4: Commit** `test: stocks paint only their selectors and hex stays in the token blocks`, push.
+- [x] **Step 3: Run** `npm test`. Expected: pass (stocks are declared and not yet used; the video hexes were tokenised in Task 5). If it fails on a hex, the message names the rule; tokenise it.
+- [x] **Step 4: Commit** `test: stocks paint only their selectors and hex stays in the token blocks`, push.
 
 ### Task 7: Type scale, nav and ledger on the v3 layout
 
 **Files:** Modify `src/components/SiteNav.astro`, `src/styles/global.css`
 
-- [ ] **Step 1: Reserve bold width in the nav.** In both `navItems.map` blocks of `SiteNav.astro` change `<li><a href={item.href}>{item.label}</a></li>` to `<li><a href={item.href} data-label={item.label}>{item.label}</a></li>`.
+- [x] **Step 1: Reserve bold width in the nav.** In both `navItems.map` blocks of `SiteNav.astro` change `<li><a href={item.href}>{item.label}</a></li>` to `<li><a href={item.href} data-label={item.label}>{item.label}</a></li>`.
 
-- [ ] **Step 2: Append before `@media print` in `global.css`:**
+- [x] **Step 2: Append before `@media print` in `global.css`:**
 
 ```css
 /* v4 type on the v3 layout (spec 5.3). Plan B moves each rule into its rebuilt component. */
@@ -507,14 +507,14 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
 }
 ```
 
-- [ ] **Step 3:** `npm run check` green.
-- [ ] **Step 4: Commit** `feat: v4 type scale, nav bar and ledger on the v3 layout`, push.
+- [x] **Step 3:** `npm run check` green.
+- [x] **Step 4: Commit** `feat: v4 type scale, nav bar and ledger on the v3 layout`, push.
 
 ### Task 8: No theme toggle ships
 
 **Files:** Modify `tests/portfolio-build.test.mjs`
 
-- [ ] **Step 1:** Add
+- [x] **Step 1:** Add
 
 ```js
 test("no theme toggle ships", () => {
@@ -522,14 +522,14 @@ test("no theme toggle ships", () => {
 });
 ```
 
-- [ ] **Step 2:** `npm run check` green. **Commit** `test: the built page has no theme toggle`, push.
+- [x] **Step 2:** `npm run check` green. **Commit** `test: the built page has no theme toggle`, push.
 
 ### Task 9: Milestone 1 visual check (scratchpad, not committed)
 
-- [ ] **Step 1:** Build with the dist base path and serve it: `BASE_URL=/ PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run build`, then shoot `dist/client/index.html` with Playwright's Chromium (`~/.npm/_npx/9833c18b2d85bc59/node_modules/playwright`, executable `~/Library/Caches/ms-playwright/chromium-1243/...`) at 1280x800, 1024x768, 390x844 and 320x640 in light and dark, recording `document.documentElement.scrollWidth` at each.
-- [ ] **Step 2:** Pass when `scrollWidth` equals the viewport width at all four sizes, the h1 sits on one line at 1280 and two at 390, "Co-author" does not wrap, and Email sits above the fold at 390x844.
-- [ ] **Step 3:** CLS with late fonts: route `fonts.gstatic.com` with a 1,500 ms delay, collect `layout-shift` entries with a `PerformanceObserver` (`buffered: true`), and require a total at or below 0.05 at 1280x800 and 390x844.
-- [ ] **Step 4:** Show Aryan the screenshots.
+- [x] **Step 1:** Build with the dist base path and serve it: `BASE_URL=/ PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run build`, then shoot `dist/client/index.html` with Playwright's Chromium (`~/.npm/_npx/9833c18b2d85bc59/node_modules/playwright`, executable `~/Library/Caches/ms-playwright/chromium-1243/...`) at 1280x800, 1024x768, 390x844 and 320x640 in light and dark, recording `document.documentElement.scrollWidth` at each.
+- [x] **Step 2:** Pass when `scrollWidth` equals the viewport width at all four sizes, the h1 sits on one line at 1280 and two at 390, "Co-author" does not wrap, and Email sits above the fold at 390x844.
+- [x] **Step 3:** CLS with late fonts: route `fonts.gstatic.com` with a 1,500 ms delay, collect `layout-shift` entries with a `PerformanceObserver` (`buffered: true`), and require a total at or below 0.05 at 1280x800 and 390x844.
+- [x] **Step 4:** Show Aryan the screenshots.
 
 ---
 
@@ -539,22 +539,22 @@ test("no theme toggle ships", () => {
 
 **Files:** Modify `package.json`, `tests/portfolio-source.test.mjs` (test "package pins Astro 7, Node 24, and Sharp for the crop pipeline")
 
-- [ ] **Step 1: Failing test.** Add to that test:
+- [x] **Step 1: Failing test.** Add to that test:
 
 ```js
   assert.equal(packageJson.devDependencies["perfect-freehand"], "1.2.2");
   assert.equal(packageJson.dependencies, undefined);
 ```
 
-- [ ] **Step 2:** `npm test` fails on perfect-freehand.
-- [ ] **Step 3:** `PATH=/opt/homebrew/opt/node@24/bin:$PATH npm install --save-dev --save-exact perfect-freehand@1.2.2`, then set `"version": "4.0.0"` and add `"paper": "node scripts/paper.mjs"` to `scripts`.
-- [ ] **Step 4:** `npm test` passes. **Commit** `chore: pin perfect-freehand 1.2.2 for the paper pipeline`, push.
+- [x] **Step 2:** `npm test` fails on perfect-freehand.
+- [x] **Step 3:** `PATH=/opt/homebrew/opt/node@24/bin:$PATH npm install --save-dev --save-exact perfect-freehand@1.2.2`, then set `"version": "4.0.0"` and add `"paper": "node scripts/paper.mjs"` to `scripts`.
+- [x] **Step 4:** `npm test` passes. **Commit** `chore: pin perfect-freehand 1.2.2 for the paper pipeline`, push.
 
 ### Task 11: Generators, recipes and the manifest
 
 **Files:** Create `scripts/paper/art.mjs`, `scripts/paper/drawings.mjs`, `scripts/paper/svg.mjs`, `scripts/paper/images.mjs`, `scripts/paper/tokens.mjs`, `scripts/paper/jobs.mjs`, `src/data/paper.ts`
 
-- [ ] **Step 1: `art.mjs`.** Copy `docs/superpowers/mocks/2026-10-26-paste-up/tools/art.mjs`, then:
+- [x] **Step 1: `art.mjs`.** Copy `docs/superpowers/mocks/2026-10-26-paste-up/tools/art.mjs`, then:
   - export `rdp` and `edgeModel`;
   - after `const R1 = ...` add `export const STROKE_EPS = 0.12;` and give `strokeToD(stroke, eps = 0)` a first line `if (eps > 0) stroke = rdp(stroke, eps);`;
   - `pline` and `pstroke` pass `o.eps ?? STROKE_EPS` as `strokeToD`'s second argument; `tick` passes `eps: o.eps ?? STROKE_EPS` to `pstroke`;
@@ -619,7 +619,7 @@ export function playGlyph() {
 }
 ```
 
-- [ ] **Step 2: `drawings.mjs`.** Copy the mock's `tools/drawings.mjs`, then turn its CSS classes into SVG attributes so each file works alone as a mask:
+- [x] **Step 2: `drawings.mjs`.** Copy the mock's `tools/drawings.mjs`, then turn its CSS classes into SVG attributes so each file works alone as a mask:
   - import `toD` too;
   - `floorPlan`: swing segments lose `class="stk"`; the return wraps them as `<g fill="none" stroke="#000" stroke-width="1.05" stroke-linecap="round">...</g>` inside the light group; `class="faint"` becomes `opacity=".36"`, `class="light"` becomes `opacity=".72"`;
   - `productionLog(eps = 0.15)` takes an `eps` used by every `pstroke` and `tick` call; the second scribble per row uses `letters: 4`; the printed group becomes `<g opacity=".46"><g fill="none" stroke="#000">lines</g>heads</g>` and the hand group `<g opacity=".86">`;
@@ -703,7 +703,7 @@ export function grainTile() {
 }
 ```
 
-- [ ] **Step 3: `svg.mjs`**
+- [x] **Step 3: `svg.mjs`**
 
 ```js
 // SVG document writers for the paper assets. Masks carry no colour; colour files carry 6-digit token hex.
@@ -727,7 +727,7 @@ export function colourDoc(w, h, body) {
 }
 ```
 
-- [ ] **Step 4: `images.mjs`**
+- [x] **Step 4: `images.mjs`**
 
 ```js
 // Raster jobs from Aryan's own photos (source: "aryan"). They read Pictures/, which is untracked,
@@ -740,7 +740,8 @@ export async function pencilAlpha(src, region, size) {
     .resize(size[0], size[1], { kernel: 'lanczos3' }).raw().toBuffer({ resolveWithObject: true });
   const out = Buffer.alloc(info.width * info.height * 4);
   for (let i = 0; i < info.width * info.height; i++) {
-    const a = Math.pow(Math.max(0, Math.min(1, (236 - data[i * info.channels]) / 172)), 0.82);
+    // the scan's paper sits at L 209 to 226 (measured 26 October 2026), so 206 is the clear point: paper drops out, ink stays
+    const a = Math.pow(Math.max(0, Math.min(1, (206 - data[i * info.channels]) / 142)), 0.82);
     out[i * 4 + 3] = Math.round(a * 255);
   }
   // black plus alpha, quantised to a 16-colour palette: the alpha is all the mask needs
@@ -765,7 +766,7 @@ export async function duotone(src, width, crop, size, quality = 74) {
 }
 ```
 
-- [ ] **Step 5: `tokens.mjs`**
+- [x] **Step 5: `tokens.mjs`**
 
 ```js
 // Reads token values from the first :root block of global.css, so generated colours follow the CSS.
@@ -778,7 +779,7 @@ export function readTokens(css) {
 }
 ```
 
-- [ ] **Step 6: `jobs.mjs`.** One recipe per manifest file. `codeJobs[file](entry, tokens)` returns the file's text; `aryanJobs[file](entry, root)` returns a Buffer. The torn pieces use the mock's side options; `eps` comes from the manifest.
+- [x] **Step 6: `jobs.mjs`.** One recipe per manifest file. `codeJobs[file](entry, tokens)` returns the file's text; `aryanJobs[file](entry, root)` returns a Buffer. The torn pieces use the mock's side options; `eps` comes from the manifest.
 
 ```js
 // Every paper asset's recipe, keyed by its path under src/assets/paper/. scripts/paper.mjs and
@@ -853,7 +854,7 @@ export const aryanJobs = {
 };
 ```
 
-- [ ] **Step 7: `src/data/paper.ts`**
+- [x] **Step 7: `src/data/paper.ts`**
 
 ```ts
 /** Provenance manifest and job list for the paper assets (spec 6.3, 6.4). scripts/paper.mjs writes exactly these files. */
@@ -913,20 +914,20 @@ export const paperAssets: readonly PaperAsset[] = [
   { file: "tape-end-sky-r.svg", kind: "colour", source: "code", generator: "tapeEnd", seed: 72, size: [8, 40], tokens: ["--stock-sky"], budget: 500 },
   { file: "tape-end-marigold-l.svg", kind: "colour", source: "code", generator: "tapeEnd", seed: 73, size: [8, 40], tokens: ["--stock-marigold"], budget: 500 },
   { file: "tape-end-marigold-r.svg", kind: "colour", source: "code", generator: "tapeEnd", seed: 74, size: [8, 40], tokens: ["--stock-marigold"], budget: 500 },
-  { file: "hand.png", kind: "raster", source: "aryan", generator: "pencilAlpha", size: [240, 234], from: { path: "Pictures/Chancellors-award/scribble.png", region: [297, 16, 187, 182] }, budget: 16384 },
+  { file: "hand.png", kind: "raster", source: "aryan", generator: "pencilAlpha", size: [240, 234], from: { path: "Pictures/Chancellors-award/scribble.png", region: [297, 16, 187, 182] }, budget: 12000 },
   { file: "arena.jpg", kind: "raster", source: "aryan", generator: "duotone", size: [840, 82], from: { path: "Pictures/LA-hacks/IMG_9046.jpg" }, budget: 28000 },
   { file: "cleancampus.jpg", kind: "raster", source: "aryan", generator: "duotone", size: [544, 177], from: { path: "Pictures/Clean-campus/clean-campus-drive.png" }, budget: 22000 },
   { file: "public/og.jpg", kind: "raster", source: "aryan", generator: "og", size: [1200, 630], from: { path: "Pictures/Pillars-award/innovative-student-leader-award-3.png" }, budget: 122880 },
 ];
 ```
 
-- [ ] **Step 8:** Commit after Task 14 together with the generated files (the generators alone produce nothing to test).
+- [x] **Step 8:** Commit after Task 14 together with the generated files (the generators alone produce nothing to test).
 
 ### Task 12: The paper tests (before the CLI and the files)
 
 **Files:** Create `tests/paper.test.mjs`; modify `package.json` (`test` script)
 
-- [ ] **Step 1: Write the test**
+- [x] **Step 1: Write the test**
 
 ```js
 import assert from "node:assert/strict";
@@ -1001,8 +1002,8 @@ test("paper SVGs are inert decoration, and colour comes only from tokens", () =>
 });
 ```
 
-- [ ] **Step 2:** In `package.json` set `"test": "node --test tests/portfolio-source.test.mjs tests/github-pages-workflow.test.mjs tests/paper.test.mjs"`.
-- [ ] **Step 3: Run** `npm test`. Expected: the manifest test fails with ENOENT on `src/assets/paper` (no files yet).
+- [x] **Step 2:** In `package.json` set `"test": "node --test tests/portfolio-source.test.mjs tests/github-pages-workflow.test.mjs tests/paper.test.mjs"`.
+- [x] **Step 3: Run** `npm test`. Expected: the manifest test fails with ENOENT on `src/assets/paper` (no files yet).
 
 ### Task 13: The CLI
 
@@ -1054,15 +1055,15 @@ if (check && stale) { console.error(`${stale} stale file(s); run npm run paper`)
 
 ### Task 14: Generate, test, commit
 
-- [ ] **Step 1:** `PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run paper`. Expected: a "wrote" line for each of the 45 files in the folder and "skip public/og.jpg".
-- [ ] **Step 2:** `npm test`: all paper tests pass. `node scripts/paper.mjs --check` exits 0.
-- [ ] **Step 3: Commit** the generators, manifest, CLI, test and assets: `feat: seeded paper pipeline with its manifest, recipes and committed assets`, push.
+- [x] **Step 1:** `PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run paper`. Expected: a "wrote" line for each of the 45 files in the folder and "skip public/og.jpg".
+- [x] **Step 2:** `npm test`: all paper tests pass. `node scripts/paper.mjs --check` exits 0.
+- [x] **Step 3: Commit** the generators, manifest, CLI, test and assets: `feat: seeded paper pipeline with its manifest, recipes and committed assets`, push.
 
 ### Task 15: Inline limit, Safari prefixes, grain token, scripts stay inline
 
 **Files:** Modify `astro.config.mjs`, `src/styles/global.css`, `tests/portfolio-build.test.mjs`
 
-- [ ] **Step 1: Build test first**
+- [x] **Step 1: Build test first**
 
 ```js
 test("both component scripts stay inline", () => {
@@ -1075,8 +1076,8 @@ test("both component scripts stay inline", () => {
 });
 ```
 
-- [ ] **Step 2:** `npm run check`: passes on the default config (it guards the next step).
-- [ ] **Step 3:** Add to `defineConfig`:
+- [x] **Step 2:** `npm run check`: passes on the default config (it guards the next step).
+- [x] **Step 3:** Add to `defineConfig`:
 
 ```js
   vite: {
@@ -1090,8 +1091,8 @@ test("both component scripts stay inline", () => {
   },
 ```
 
-- [ ] **Step 4:** In the light `:root` add `--grain: url(../assets/paper/grain.svg);` after `--sans`.
-- [ ] **Step 5:** `npm run check` green. **Commit** `build: inline small SVGs, keep Safari prefixes, grain token`, push.
+- [x] **Step 4:** In the light `:root` add `--grain: url(../assets/paper/grain.svg);` after `--sans`.
+- [x] **Step 5:** `npm run check` green. **Commit** `build: inline small SVGs, keep Safari prefixes, grain token`, push.
 
 ### Task 16: No pencil or line art on marigold
 
@@ -1107,10 +1108,10 @@ test("no pencil or line art sits on marigold", async () => {
 });
 ```
 
-- [ ] `npm test` passes (no CSS uses the files yet). **Commit** `test: no pencil or line art on marigold`, push.
+- [x] `npm test` passes (no CSS uses the files yet). **Commit** `test: no pencil or line art on marigold`, push.
 
 ### Task 17: Contact sheet for Aryan, and the spec deviations
 
-- [ ] **Step 1:** In the session scratchpad (not the repo), build a page that shows every piece with the production approach: each torn piece as a wrapper with `filter: drop-shadow(0 1px 1px var(--lift)) drop-shadow(0 6px 10px var(--lift-far))`, its `::before` masked by the outer file in `--fibre` and its `::after` masked by the inner file in its stock with the grain multiplied; pencil files as masks coloured `--pencil` on kraft and fibre; the cell field on UB blue; the ticks, bracket and graph tile on paper; the two text-tape caps around a wrapped sentence; the duotones multiplied on vermilion and leaf. Screenshot it at 1x and 2x in Chromium; check the duotones at full size for any head or face.
-- [ ] **Step 2:** Show Aryan the sheet; milestone 3 starts after "not mechanical".
-- [ ] **Step 3:** Record the four deviations above in the spec (10.2 stocks-and-hex rule, the edge seeds in 6.4, the eps and budget values in 6.4, fallback metrics in 5.3). **Commit** `docs: record Plan A's measured values in the spec`, push.
+- [x] **Step 1:** In the session scratchpad (not the repo), build a page that shows every piece with the production approach: each torn piece as a wrapper with `filter: drop-shadow(0 1px 1px var(--lift)) drop-shadow(0 6px 10px var(--lift-far))`, its `::before` masked by the outer file in `--fibre` and its `::after` masked by the inner file in its stock with the grain multiplied; pencil files as masks coloured `--pencil` on kraft and fibre; the cell field on UB blue; the ticks, bracket and graph tile on paper; the two text-tape caps around a wrapped sentence; the duotones multiplied on vermilion and leaf. Screenshot it at 1x and 2x in Chromium; check the duotones at full size for any head or face.
+- [x] **Step 2:** Show Aryan the sheet; milestone 3 starts after "not mechanical".
+- [x] **Step 3:** Record the four deviations above in the spec (10.2 stocks-and-hex rule, the edge seeds in 6.4, the eps and budget values in 6.4, fallback metrics in 5.3). **Commit** `docs: record Plan A's measured values in the spec`, push.

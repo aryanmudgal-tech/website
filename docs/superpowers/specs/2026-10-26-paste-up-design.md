@@ -428,11 +428,11 @@ The Google Fonts link replaces v3's in `BaseLayout.astro`. The preconnects stay.
 - Instrument Sans is loaded at weights 400 to 700, roman only.
 - Measured on 26 October 2026 (latin woff2, Chrome user agent, HEAD requests to fonts.gstatic.com): Instrument Sans 29,904 B, Source Serif 4 roman 122,168 B, italic at opsz 20 19,664 B. Total 171,736 B. The italic with the full opsz range would cost 50,560 B, and narrowing the roman weights saves nothing, because Google serves the same file for 400 to 600 and 400 to 700.
 - `body` sets `font: 400 18px/28px var(--serif); font-optical-sizing: auto; font-variant-numeric: tabular-nums lining-nums`.
-- **Fallback faces,** so the swap does not move the first screen. Each has its own `size-adjust`, `ascent-override` and `descent-override`, measured at milestone 1:
-  - `"Source Serif 4 Fallback"`: `src: local("Georgia")` (Apple and Windows);
-  - `"Source Serif 4 Fallback Noto"`: `src: local("Noto Serif")` (Android, which has no Georgia);
-  - `"Instrument Sans Fallback"`: `src: local("Arial"), local("Helvetica")`;
-  - `"Instrument Sans Fallback Roboto"`: `src: local("Roboto")`.
+- **Fallback faces,** so the swap does not move the first screen. Each has its own `size-adjust`, `ascent-override` and `descent-override`, measured on 26 October 2026 against the fixation line with fontkit (CLS with fonts delayed 1.5s: 0.0008 at 1280x800, 0 at 390x844):
+  - `"Source Serif 4 Fallback"`: `src: local("Georgia")` (Apple and Windows): 99.75%, 103.86%, 33.58%;
+  - `"Source Serif 4 Fallback Noto"`: `src: local("Noto Serif")` (Android, which has no Georgia): 93.71%, 110.55%, 35.75%;
+  - `"Instrument Sans Fallback"`: `src: local("Arial"), local("Helvetica")`: 102.83%, 94.33%, 24.31%;
+  - `"Instrument Sans Fallback Roboto"`: `src: local("Roboto")`: 104.01%, 93.26%, 24.04%.
 
   The ledger claims, labels, stubs and buttons are sans, and the ledger sets where the actions sit, so the sans fallback matters as much as the serif one. Milestone 1 measures CLS with the font requests blocked.
 
@@ -656,15 +656,15 @@ All files live under `src/assets/paper/` unless noted. Seeds follow the mock whe
 
 | File | Size | Seed | Generator | Used by |
 |---|---|---|---|---|
-| `sky.outer.svg`, `sky.inner.svg` | 416x496 | 11 | `paper` | `.p-sky` desktop (fibre fringe, sky face) |
-| `sky-sm.outer.svg`, `sky-sm.inner.svg` | 300x320 | 12 | `paper` | `.p-sky` phone |
+| `sky.outer.svg`, `sky.inner.svg` | 416x496 | 11, `eps` 0.25 to fit 4,000 B | `paper` | `.p-sky` desktop (fibre fringe, sky face) |
+| `sky-sm.outer.svg`, `sky-sm.inner.svg` | 300x320 | 12, `eps` 0.25 | `paper` | `.p-sky` phone |
 | `braille.outer.svg`, `braille.inner.svg` | 64x320, torn top and bottom | 23 | `paper` | `.p-braille` (also 48x240 on phone, a uniform 0.75 scale) |
 | `plan.outer.svg`, `plan.inner.svg` | 144x124 | 37 | `paper` | `.p-plan` (also 104x90 on phone) |
 | `hand.outer.svg` | 156x120 | 41 | `paper` | the handwriting scrap (fibre only) |
 | `log.outer.svg` | 248x114 | 43 | `paper` | the Work plate scrap (fibre only) |
 | `graph.outer.svg` | 248x112 | 47 | `paper` | the About plate scrap (fibre only) |
 | `band.outer.svg`, `band.inner.svg` | 48x150, notched foot | 49 | `ribbonBand` | the Recognition ribbon band |
-| `edge-top.outer.svg`, `edge-top.inner.svg`, `edge-bottom.outer.svg`, `edge-bottom.inner.svg` | 1200x16, periodic | 51, 52, 53, 54 | `edgeStrip` | every plate and the footer tear, tiled with `repeat-x`; budget 8,000 B each |
+| `edge-top.outer.svg`, `edge-top.inner.svg`, `edge-bottom.outer.svg`, `edge-bottom.inner.svg` | 1200x16, periodic | 51 (both top files), 53 (both bottom files): outer and inner come from one tear, so they register | `edgeStrip` | every plate and the footer tear, tiled with `repeat-x`; budget 8,000 B each |
 | `solid.svg` | 1x1 | 0 | `solidMask` | the middle layer of the plate and "1 of 2" tape masks (gradients stay banned); budget 200 B |
 | `tape-a.svg` | 88x26 | 61 | `tape` | print tapes; budget 600 B |
 | `tape-b.svg` | 64x20 | 63 | `tape` | scrap tapes; budget 600 B |
@@ -677,7 +677,7 @@ All files live under `src/assets/paper/` unless noted. Seeds follow the mock whe
 | File | Kind | Size | Seed | Generator | Colour (CSS) | Sits on | Budget |
 |---|---|---|---|---|---|---|---|
 | `plan.pencil.svg`, the floor plan of Dots (mock geometry: walls with a door gap, swing, interior wall, table, dimension line, tactile dots) | pencil | 180x140 | 1000 | `floorPlan` | `--pencil` | kraft | 14 KB |
-| `log.pencil.svg`, a paper production log of the kind the Linde app replaced (printed form, illegible scribble, three ticks) | pencil | 200x92 | 2000 | `productionLog`, `eps` 0.15 | `--pencil` | fibre | 16 KB (the mock's inline version was 70 KB: fewer scribble letters, coarser simplification) |
+| `log.pencil.svg`, a paper production log of the kind the Linde app replaced (printed form, illegible scribble, three ticks) | pencil | 200x92 | 2000 | `productionLog`, `eps` 0.5 (0.15 measured 24.6 KB) | `--pencil` | fibre | 16 KB (the mock's inline version was 70 KB: fewer scribble letters, coarser simplification) |
 | `route.pencil.svg` and `route-sm.pencil.svg`, Pune to Buffalo to New York City | pencil | 1184x112 and 358x72 | 3000, 3100 | `route` | `--pencil` | kraft | 12 KB and 8 KB |
 | `tick-1.svg` to `tick-5.svg`, About ticks (mock `aboutTick`) | line | 20x16 | 4001 to 4005 | `aboutTick` | `--muted` | paper | 1,000 B each |
 | `bracket.svg`, the aside bracket (mock path, perfect-freehand outline) | line | 12x100 | 4100 | `bracket` | `--muted` | paper | 1,000 B |
@@ -686,7 +686,7 @@ All files live under `src/assets/paper/` unless noted. Seeds follow the mock whe
 
 The route drawing is one solid pencil arc from a pressed stop at x 72 (Pune) to a pressed stop at x 860 (Buffalo). A dashed pencil leg follows to an open stop at x 1112 (New York City), over a faint straight construction line. It has no labels and no scale. Solid means done and dashed means planned, matching route rows 1 to 12 and row 13.
 
-The cell field is about 110 Poisson-disc cells, each a wobbly freehand ellipse 10 to 16px across. About one in ten is filled at alpha .5. It is captioned by the plate note (section 4.4 row 5). It depicts no data, and no count appears anywhere.
+The cell field is about 110 Poisson-disc cells, each one wobbly closed line 10 to 16px across (a stroke, not a filled pen outline, which kept `cells.svg` near 13 KB instead of 100 KB). About one in ten is filled at alpha .5. It is captioned by the plate note (section 4.4 row 5). It depicts no data, and no count appears anywhere.
 
 The floor plan, the production log and the route are drawn in code, not by Aryan. Whether they need a disclosure like the Research note is Pending 9.
 
@@ -705,7 +705,7 @@ The mock filled Braille dots with #F7F2E6. The build uses `--fibre` (#FFFDF6) so
 
 | File | Generator | From | Treatment | Budget |
 |---|---|---|---|---|
-| `hand.png` | `pencilAlpha` | `Pictures/Chancellors-award/scribble.png` (497x618), region left 297, top 16, 187x182 (the mock's region scaled from its 640x800 copy) | Greyscale, alpha = ((236 minus L) / 172) to the power 0.82, Lanczos to 240x234, grey plus alpha PNG. Used as a mask coloured `--pencil`, so it is never inverted, and always shown at its own aspect (section 7.1). | 12 KB |
+| `hand.png` | `pencilAlpha` | `Pictures/Chancellors-award/scribble.png` (497x618), region left 297, top 16, 187x182 (the mock's region scaled from its 640x800 copy) | Greyscale, alpha = ((206 minus L) / 142) to the power 0.82 (the scan's paper sits at L 209 to 226, so it drops out; the mock's 236 left a grey box), Lanczos to 240x234, black plus alpha, 16-colour palette PNG (3,983 B). Used as a mask coloured `--pencil`, so it is never inverted, and always shown at its own aspect (section 7.1). | 12 KB |
 | `arena.jpg` | `duotone` | `Pictures/LA-hacks/IMG_9046.jpg` (1063x688) | Resize to 840 wide (840x544). Crop 840x82 from 3% to 18% of the height (rows 16 to 98): seats and the dark roof, above every head. The first draft's 27% band (rows 16 to 147) caught the top of a stranger's head from about row 107, and the mock's 38% strip caught the back of another; both bands were rendered at full size and checked on 26 October 2026. Then greyscale, normalise 1 to 99, levels .05 to .9, gamma .42, JPEG q74. | 28 KB |
 | `cleancampus.jpg` | `duotone` | `Pictures/Clean-campus/clean-campus-drive.png` | Crop x 0 to 80%, y 2% to 28%: tree line and UB buildings, above both heads and clear of the "Clean Campus" watermark at the top right. Same tone treatment, 544x177, JPEG q74. | 22 KB |
 | `public/og.jpg` | `og` | the source of room `ogRoom` (`Pictures/Pillars-award/innovative-student-leader-award-3.png`), plus `hand.png` and the masks above | section 5.8 | 120 KB |
@@ -1486,7 +1486,7 @@ Every milestone ends green, so each assertion lands in the milestone that builds
 - **Stocks and hex (M1).** Parse `global.css`:
   - each of the six `--stock-*` custom properties is declared exactly once, in the light `:root`, and none in the dark block or `.slab`;
   - hex literals (`#[0-9a-fA-F]{3,8}\b`) and `%23` appear only in the light `:root`, the dark `:root`, `.slab` and the `@media print` block;
-  - compared case-insensitively, each stock hex appears in exactly one `--stock-*` declaration, and the only other place a stock hex may appear is `#005BBB` as the light `--accent` value;
+  - compared case-insensitively, each stock hex appears in exactly one `--stock-*` declaration; the only other places a stock hex may appear are a `--page-*` declaration (5.2b: marigold and sky pages share their stock's hex) and `#005BBB` as the light `--accent` value;
   - `var(--stock-` appears only in `background` or `background-color` declarations: never in a custom-property declaration, and never in `color`, `outline*`, `border*`, `text-decoration*`, `stroke`, `fill`, `box-shadow`, `filter` or `caret-color`;
   - a rule that uses `var(--stock-X)` passes when every selector in its list, with `::before` or `::after` removed, equals or ends with one of X's selectors in 5.2 (also compared with `::before` and `::after` removed);
   - each of the rules `.fig--tape`, `.hl--sky` and `.hl--marigold` that exists declares `color: var(--on-stock)`; from M5, all three must exist.
