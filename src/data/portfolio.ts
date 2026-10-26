@@ -409,9 +409,9 @@ export const about: readonly AboutLine[] = [
 ];
 
 export const colophon = {
-  version: "v3, September 2026. v2 (July 2026) was a plain page. v1 (June 2026) had a projector and a mini-golf game.",
+  version: "v4, October 2026. v3 (September 2026) dissolved its photos as you scrolled. v2 (July 2026) was a plain page. v1 (June 2026) had a projector and a mini-golf game.",
   photos: "Photos by event photographers and by me. The last one is pencil.",
-  type: "Set in Newsreader and Instrument Sans.",
+  type: "Set in Source Serif 4 and Instrument Sans.",
   corrections: "Figures aligned to UBNow, SUNY and Devpost, September 2026.",
 } as const;
 

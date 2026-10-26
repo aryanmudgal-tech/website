@@ -243,6 +243,8 @@ The frame's label "Photographs from the events on this page" and the section eye
 | 7 | `colophon.version` | v4, {merge month} 2026. v3 (September 2026) dissolved its photos as you scrolled. v2 (July 2026) was a plain page. v1 (June 2026) had a projector and a mini-golf game. | Replaces "v3, September 2026. v2 (July 2026) was a plain page. v1 (June 2026) had a projector and a mini-golf game." | Held at the v3 string until Aryan answers at milestone 0; ships only on Aryan's yes. {merge month} is the month the branch merges to main, written in at milestone 7. |
 | 8 | Room print button, accessible name | {alt} Open full photo | UI label, changed from v3's `aria-label` "Open full photo: {caption}" | ships |
 
+**Answered 26 October 2026:** Aryan approved rows 6 and 7 as written, with October as the merge month; both shipped the same day and `tests/fixtures/copy-v3.json` was regenerated in that commit, so the copy-freeze test now holds the colophon exactly.
+
 Rows 6 and 7 are not UI labels, so decision 7 does not cover them. They exist only because shipping v4 makes the current sentences untrue. The colophon commit lands in milestone 6, after Aryan's answer. If Aryan declines row 6, Aryan picks the replacement (another wording, or no type line); the v3 type line, false once Newsreader is gone, is not merged to main. Rows 6 and 7 are the only `portfolio.ts` strings the copy-freeze test lets differ without a fixture change (section 10.2).
 
 ### 4.5 Pending content item
@@ -1641,7 +1643,7 @@ Commits are authored as Aryan with no co-author or tool trailers, per their stan
 ### Pending (Aryan supplies or confirms)
 
 1. **A better source for "1 of 2".** "Source: UB Student Life" on ledger row "1 of 2" (and on the hero caption, in the `#photo-pillar` popover and on the Recognition stub) points at a generic Pillars of Leadership page. When checked on 26 October 2026, it did not name Aryan, the Innovative Student Leadership award or the 130+ nominations. Aryan should supply a page that does. Until then the link ships unchanged, and this spec invents none.
-2. **The New copy table (4.4),** including the two colophon replacements, which go beyond decision 7's UI-label scope and exist only because the v3 sentences would become untrue. Needed before milestone 6.
+2. **Answered 26 October 2026 (colophon rows 6 and 7 approved and shipped).** **The New copy table (4.4),** including the two colophon replacements, which go beyond decision 7's UI-label scope and exist only because the v3 sentences would become untrue. Needed before milestone 6.
 3. **Optional:** a higher-resolution original of the Pillar portrait (current source 1195x793).
 4. **The re-aimed handwriting.** The scrap is moved and turned 2 degrees so its arrow points at Aryan's face. The pencil marks themselves are unaltered and always shown at their own aspect.
 5. **The two duotone crops.** LA Hacks: seats and roof only (3% to 18% of the height, checked at full size). Clean Campus: trees and buildings only, with no faces and no watermark.
