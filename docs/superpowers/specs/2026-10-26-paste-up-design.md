@@ -6,7 +6,7 @@ Approved by Aryan Mudgal on 26 October 2026. Their words: "Go with Paste-Up. Use
 
 Work happens on branch `v4-paste-up`. Main and the live site do not change until Aryan approves the finished branch (section 11).
 
-Later the same day Aryan asked for two more things, folded in as decisions 8 and 9: "remove the tests that ban the animations. we can have animations" (done in commit `8b5fc4b`, "test: allow animations"), and paper animation between sections as you scroll. Section 10 describes the tests as they stand at `8b5fc4b`.
+Later the same day Aryan asked for three more things, folded in as decisions 8 to 10: "remove the tests that ban the animations. we can have animations" (done in commit `8b5fc4b`, "test: allow animations"); the whole page crumpling between sections, with the next page coming up from behind (approved on the prototype: "Yes, this is it. Use the whole-page crumple between sections"); and "make it bright and colorful - should look artistic". Section 10 describes the tests as they stand at `8b5fc4b`.
 
 ### Decisions (approved 26 October 2026)
 
@@ -24,7 +24,8 @@ Later the same day Aryan asked for two more things, folded in as decisions 8 and
    - New microcopy is limited to UI labels, all listed in the "New copy" table (section 4.4).
    - The Route heading is not reworded.
 8. **Animations are allowed.** The test bans on scroll-timeline gating, the reduced-motion property list, infinite animation, three.js, WebGL, ScrollTrigger, `<canvas>` and `<script src>` are gone (commit `8b5fc4b`). A reduced-motion block is still required.
-9. **Section transitions.** Aryan wants "a paper crumbling as we scroll and then becoming the different picture" and chose **between sections**: as each plate scrolls into view, the previous section's paper crumples, tears or folds away and reveals the plate's own stock and picture (section 8.4). Three prototypes were built; the technique is Pending 10, default **tear**.
+9. **The whole page crumples between sections.** Every section is a sheet. When the reader reaches the end of one, its last screen holds still for one screen of scrolling while the whole sheet, live text and photos included, wrinkles, balls up and rolls away, and the next sheet is revealed underneath (section 8.4). Strip-only transitions (crumple, tear, fold) were prototyped first and set aside. The approved prototype is `docs/superpowers/mocks/2026-10-26-whole-page-crumple/`.
+10. **Bright, colourful pages.** Every section after the hero is printed on its own sheet of coloured paper: marigold, sky, mint, coral, rose, lilac (section 5.2b). The hero stays on ivory so the first screen reads at a glance; the footer stays the ink slab.
 
 **Out of scope:** any new claim; diagrams of the Linde app or the research pipeline; voice features.
 
@@ -39,9 +40,7 @@ Later the same day Aryan asked for two more things, folded in as decisions 8 and
 7. The `identity.description` observation.
 8. A check on Aryan's own phone.
 9. Whether the code-drawn pencil art needs a disclosure like the Research note.
-10. Which section transition: crumple, tear or fold (section 8.4). Default: tear.
-
-Milestone 0 does not gate milestones 1 to 4. Pending 10 must be answered before milestone 5, which builds the plates and their transitions. Pending 2 must be answered before milestone 6, which owns the colophon.
+Milestone 0 does not gate milestones 1 to 5. Pending 2 must be answered before milestone 6, which owns the colophon.
 
 ## 2. North star and design read
 
@@ -49,15 +48,16 @@ The north star is unchanged from v3. A recruiter should see, inside five seconds
 
 Aryan asked to keep that clarity and said the UI "is not the best": they want it simple but more engaging, brighter and more vibrant. They pointed at the hand-made, paper-and-pencil feel of Anthropic's Claude Opus 5.5 launch page.
 
-Paste-Up answers both halves with one rule: **facts stay on plain ivory paper, and colour lives in paper that is pasted beside them.**
+Paste-Up answers both halves with one idea: **the site is a stack of paper.** The hero's facts are typed on ivory with a collage pasted beside them; every later section is printed on its own sheet of coloured paper, and turning to the next section crumples the sheet you just read.
 
 - **The hero.** The record is typed on the left. The right holds a collage built around Aryan's own photo and handwriting:
   - the award portrait in full colour;
   - their handwritten "me in every photo" with its arrow on their face;
   - Aryan's name in embossed, uncontracted Braille (five letter cells, no capital sign; drawn in code);
   - a pencil-style floor plan of Dots (drawn in code).
-- **The plates.** Every section opens on a torn plate of coloured stock carrying one subject drawn from that section's evidence. Colour therefore lasts the whole page instead of living inside one photo.
-- **Colour never sets text.** Text sits on paper. The only text on a stock is ink on three tapes.
+- **The pages.** Each section after the hero is a full sheet of coloured paper (5.2b), so colour fills the whole screen from Work onward. Text on every page is ink, chosen to pass AA even on the grain's darkest speck.
+- **The plates.** Every section opens on a torn plate of a contrasting stock carrying one subject drawn from that section's evidence.
+- **The crumple.** At the end of each section the whole sheet balls up and rolls away, revealing the next colour underneath (8.4).
 
 The design borrows the language of the Anthropic pages: paper, torn edges, pencil, flat colour blocks, serif type and generous white space. It borrows no asset, font, layout or illustration. There are no flanking strips, no centre panel and no scroll growth, no pencil sits on marigold, and the grain uses its own frequency.
 
@@ -299,6 +299,13 @@ All tokens live in `src/styles/global.css`.
 | `--stock-leaf` | #2F9E5B | see 5.2 |
 | `--stock-kraft` | #D6BC92 | see 5.2 |
 | `--stock-ub` | #005BBB | see 5.2 |
+| `--page-marigold` | #F2A516 | Work page (5.2b) |
+| `--page-sky` | #9CC8EE | Projects and About pages |
+| `--page-mint` | #8FD3A8 | Route page |
+| `--page-coral` | #F59A80 | Research page |
+| `--page-rose` | #F2A9BF | Leadership page |
+| `--page-lilac` | #CDB8F0 | Recognition page |
+| `--page-ink-2` | #312E29 | secondary text on every coloured page |
 
 **The slab.** The footer is a dark sheet in both themes. Inside it, `.slab { --accent: #7DB0FF; --on-accent: #0B1220; }` reuses the dark-theme accent. This replaces the mock's `--slab-link: #9CC8EE`, which reused the sky stock hex. There is still one interactive hue; every `--accent:` declaration is #005BBB or #7DB0FF. Light `--accent` and `--stock-ub` share #005BBB on purpose; the hex test allows exactly that one repeat (section 10.2).
 
@@ -340,6 +347,17 @@ The four fallback faces are defined in section 5.3. A family whose `local()` sou
 | `--on-stock` on UB blue | 2.66 | 2.22 | never |
 | `--accent` on marigold | 3.16 | | never: links never sit on a stock |
 
+| Text on a coloured page (both themes) | `--ink` nominal / worst grain | `--page-ink-2` nominal / worst grain |
+|---|---|---|
+| marigold #F2A516 | 8.43 / 6.46 | 6.55 / 5.02 |
+| sky #9CC8EE | 9.87 / 7.52 | 7.67 / 5.85 |
+| mint #8FD3A8 | 9.99 / 7.61 | 7.76 / 5.91 |
+| coral #F59A80 | 8.13 / 6.25 | 6.32 / 4.85 (the lowest pair) |
+| rose #F2A9BF | 9.28 / 7.09 | 7.21 / 5.51 |
+| lilac #CDB8F0 | 9.70 / 7.40 | 7.54 / 5.75 |
+
+`--ink-2` (#45413A) falls to 3.64 to 4.44 at worst grain on these pages and `--muted` to about 3.0 nominal, so neither is used on a coloured page. `--accent` fails on most of them, so links on a page are `--ink` (8.13 and up nominal, 6.25 and up at worst grain).
+
 **Non-text contrast.**
 
 | Element | Ratio |
@@ -368,7 +386,33 @@ Stocks are paper. They never change between themes, never colour text, outlines,
 | Vermilion | the Projects plate and its duotone box (`.plate--projects`, `.plate--projects .duo`); the demo mats (`.video--demo .video__mat`); print tapes inside `#projects` (`.tape--vermilion`) | |
 | UB blue | the Research plate (`.plate--research`); the Recognition ribbon band (`.plate__band`) | |
 
-Pencil and line art may sit only on fibre, kraft or sky (pencil), on paper (the About ticks and the aside bracket, in `--muted`) or on UB blue (fibre lines of the cell field). The ceremony video in Recognition uses the plain mat (`--paper-2` with a 1px `--line` border), not a stock.
+Pencil and line art may sit only on fibre, kraft or sky (pencil), on a page (the About ticks and the aside bracket, in `--page-ink-2`) or on UB blue (fibre lines of the cell field). The ceremony video in Recognition uses the plain mat (`--paper-2` with a 1px `--line` border), not a stock.
+
+### 5.2b The pages
+
+Decision 10. Each `section` after the hero is a sheet (8.4) whose background is one page colour with the grain on top. Page colours are paper: the same in both themes. Only the hero (`--paper`) and the footer slab follow the theme.
+
+| Sheet | Page colour | Its plate stock (7.3) | Reads as |
+|---|---|---|---|
+| Hero | `--paper` (ivory, dark in dark mode) | none (the collage) | the record, calm |
+| Work | `--page-marigold` | sky | warm yellow page, blue torn band |
+| Projects | `--page-sky` | vermilion | blue page, red band |
+| Route | `--page-mint` | kraft | green page, brown band |
+| Research | `--page-coral` | UB blue | coral page, blue band |
+| Leadership | `--page-rose` | leaf | pink page, green band |
+| Recognition | `--page-lilac` | marigold | lilac page, yellow band |
+| About | `--page-sky` | kraft | blue page, brown band |
+| Footer | `--slab` | none | the ink slab |
+
+No two neighbouring sheets share a colour, and no plate shares its page's colour, so every crumple reveals a new colour.
+
+**Rules on a coloured page.**
+
+- Text is `--ink`; secondary text (meta, ledes, captions, denominators, asides, index results) is `--page-ink-2`. Never `--ink-2`, `--muted` or `--accent`.
+- Links are `--ink` with a 0.08em underline. Focus is a 2px `--ink` outline. Source stubs keep their ink border and fill with `--fibre` instead of `--paper`.
+- Hairlines are `--ink` at 28% (`rgba(27, 26, 23, .28)`), decorative only.
+- Prints keep their `--fibre` borders and shadows; the plain video mat stays `--paper-2`; result tapes stay marigold except on the Work page, which has none.
+- The hero's text tapes (sky Next tape, marigold "1 of 2") sit on ivory and are unchanged.
 
 **Two kinds of tape, two class names.** `.tape` is always decoration: an empty element, `aria-hidden`, hidden in print. The text tapes that carry facts (the Next sentence and the five results) are `span.hl--sky` and `span.hl--marigold`, a separate block. An `.hl--*` element never carries the class `tape` or `aria-hidden`, and a build test checks it (section 10.2). They are `span`, not `mark`, because screen readers announce `mark` as "highlight", and the tape is decoration, not emphasis.
 
@@ -782,6 +826,17 @@ Only the four 8x40 end caps carry a colour. `paper.mjs` writes it from the `--st
 
 This replaces the mock's three data-URI layers per tape, which hard-coded `%239CC8EE` and `%23F2A516` in the CSS.
 
+### 6.7 The crumple sequence (`scripts/crumple/`)
+
+The whole-page crumple of 8.4 uses one pre-rendered sequence per screen shape, shared by every sheet. It is a build tool's output, committed, never rendered in the browser.
+
+- **Model.** `scripts/crumple/page3d.js`, ported from the prototype (`docs/superpowers/mocks/2026-10-26-whole-page-crumple/tools/`). A subdivided white sheet in three.js: a seeded crease network grows in amplitude and pulls the paper in-plane; the sheet is gathered radially toward a point near its centre (horizontal distance weighted by `aniso` 0.6, plus a slow angular noise `irreg` 0.22, so the outline stays irregular and the corners trail as wings); gathered paper folds onto a lumpy, faceted ball. Lighting is one key light from above, ambient occlusion and cast shadow from a height map. 18 crumple frames at the prototype's frame times, then 7 roll frames of the finished ball turning.
+- **Render.** `scripts/crumple/render.mjs` serves the tool locally and drives it in headless Chromium (Playwright's Chromium, a devDependency) with WebGL. Two sheets: landscape 1280x800 (seed 21, ball radius 92) and portrait 390x844 (seed 9, ball radius 58).
+- **Pack.** `scripts/crumple/pack.mjs` resizes the frames (640x400 landscape, 270x584 portrait) and packs each set into one horizontal AVIF strip with alpha (quality 58): `src/assets/paper/crumple-d.avif` (about 160 KB) and `crumple-m.avif` (about 130 KB). It also writes `src/data/crumple.json`: frame times, roll count, and each frame's paper outline box as fractions of the sheet.
+- **CSS.** `scripts/crumple/css.mjs` turns `crumple.json` into `src/styles/crumple.css` (committed): the `mask-*`, `fx-*` and `content-*` keyframes of 8.4 for both shapes. `global.css` imports it.
+- **Provenance.** Both strips and `crumple.json` are listed in `src/data/paper.ts` with `source: "code"`, `generator: "scripts/crumple/page3d.js"`, `kind: "rendered"` and their seeds. GPU rendering is not byte-identical across machines, so `rendered` assets are exempt from the determinism test; the test checks instead that each strip's width is exactly 25 frames times the frame width and that `crumple.json` has 18 crumple and 7 roll entries.
+- **devDependencies added:** `three` 0.169.0, `simplex-noise` 4.0.3, `playwright` (pinned), used only by `npm run crumple`, never by `npm run build`.
+
 ## 7. Layout and components
 
 ### 7.0 Where the mock and its spec disagree
@@ -907,7 +962,8 @@ On the phone:
 |---|---|---|
 | `src/components/TitleBlock.astro` | **add** | none; reads `titleBlock` |
 | `src/components/Collage.astro` | **add** | none. Renders `div.hero-art` with `<Print room="pillar" variant="hero" loading="eager" popover={false} />` and the `aria-hidden` `div.collage` with exactly four `.piece` divs (`p-sky`, `p-braille`, `p-plan`, `p-hand`). Nothing focusable, no `<img>`, no text, no popover. |
-| `src/components/Plate.astro` | **add** | `name: "work" \| "projects" \| "route" \| "research" \| "leadership" \| "recognition" \| "about"`. Holds the plate table of 7.3 as a constant. Renders `div.plate.plate--<name>[aria-hidden=true]` with its subject: one `.piece`, or one `div.plate__art` for Route and Research. The Research plate also renders `p.plate-note` inside the same hidden wrapper. Every plate except Work also renders `div.plate__cover` in the previous plate's stock (taken from the same constant, in page order) for the section transition of 8.4. Duotones render through Astro `<Image>` with `alt=""`, `loading="lazy"`, `width` and `height`. |
+| `src/components/Plate.astro` | **add** | `name: "work" \| "projects" \| "route" \| "research" \| "leadership" \| "recognition" \| "about"`. Holds the plate table of 7.3 as a constant. Renders `div.plate.plate--<name>[aria-hidden=true]` with its subject: one `.piece`, or one `div.plate__art` for Route and Research. The Research plate also renders `p.plate-note` inside the same hidden wrapper. Duotones render through Astro `<Image>` with `alt=""`, `loading="lazy"`, `width` and `height`. |
+| `src/components/Sheet.astro` | **add** | `{ page: "paper" \| "marigold" \| "sky" \| "mint" \| "coral" \| "rose" \| "lilac" \| "slab"; out?: string; in?: string }`. Wraps one section (slot) as `div.sheet.sheet--<page>[data-in][data-out] > div.pin > div.crumple > (div.content, div.fx[aria-hidden=true])`, and when `out` is set renders `div.runway#<out>[aria-hidden=true]` after itself (8.4). The section element and its id stay inside the slot, unchanged. |
 | `src/components/Print.astro` | **add** (replaces `ChapterFigure.astro`) | Props below. Renders `figure.print.print--<variant>[data-room]` (or `[data-extra]`). Inside: a fibre `div.print__frame`; for rooms, a `button.print__open[popovertarget="photo-<id>"]` holding the `<Picture>` (alt from `rooms.ts`) and `<span class="sr-only">Open full photo</span>`; `aria-hidden` tapes; and a figcaption with the caption and an inline receipt (rooms) or the caption alone (extras). For rooms it also renders `<PhotoPopover>` as the figure's next sibling, unless `popover={false}`. |
 | `src/components/PhotoPopover.astro` | **add** | `{ room: ChapterId }`. Renders `div#photo-<id>.photo-popover[popover]`, moved from `Frame.astro`: the full image, caption, receipt, extras and Close. Used by Print, and by Hero for `pillar` outside `div.hero-art` (7.1). |
 | `src/lib/text.ts` | **add** | Plain TypeScript with no imports, so the Node 24 tests can import it. `numeralRuns(text: string): { text: string; num: boolean }[]` splits on `/\d[\d,]*\+?/g`. `researchParagraphs(detail: string): [string, string]` splits on `/(?<=\.) (?=[A-Z])/` and returns sentences 1 and 2, then 3 and 4. Leadership.astro and Research.astro use them. |
@@ -921,7 +977,8 @@ On the phone:
 | `src/components/SiteFooter.astro` | change | slab, sheet, `<Print room="contact" variant="footer" />`, colophon, `div#page-end` (7.10) |
 | `src/components/SiteNav.astro` | change | ink current bar; a second IntersectionObserver on `#page-end` (7.10, audit bug 6) |
 | `src/layouts/BaseLayout.astro` | change | font link, `theme-color` values |
-| `src/pages/index.astro` | change | `SiteNav`, `main#main-content` (Hero to About), `SiteFooter`; no `.rooms` wrapper |
+| `src/pages/index.astro` | change | `SiteNav`, `main#main-content` (Hero to About, each wrapped in `<Sheet>` with the page of 5.2b and the runway ids `r1` to `r8`), `SiteFooter` in the last `<Sheet page="slab">`; no `.rooms` wrapper |
+| `src/data/crumple.json`, `src/styles/crumple.css` | **add** | generated by `scripts/crumple/` (6.7) |
 | `src/pages/404.astro` | change | 5.7 |
 | `src/data/portfolio.ts` | change | adds `titleBlock` (milestone 1); the colophon strings change only after Aryan's answer (4.4, milestone 6) |
 | `src/data/rooms.ts` | change | `aspect` replaces `fit`; `ogRoom = "pillar"`; comments drop "frame" |
@@ -1201,7 +1258,7 @@ On first paint, everything is already in place: the sheet, every fact, the Pilla
 }
 ```
 
-The last piece lands by 1,220ms. The print, the text and the tapes never move. Plates change only through the section transition of 8.4.
+The last piece lands by 1,220ms. The print, the text and the tapes never move, except when their whole sheet crumples (8.4).
 
 ### 8.2 Phones
 
@@ -1232,25 +1289,33 @@ With no transition, `@starting-style` has no effect, so the Braille strip and th
 - **Browsers without `@starting-style`** (Safari before 17.5, Firefox before 129) ignore the block and show the finished board.
 - **Browsers without masks:** the torn pieces show as plain rectangles of the right colour. Elements whose only shape is a mask (pencil layers, ticks, the bracket, the cell field, the play glyph) are not rendered (section 6.6). Facts are unaffected.
 
-### 8.4 Section transitions
+### 8.4 The whole-page crumple
 
-Decision 9. Every plate after the first (Projects, Route, Research, Leadership, Recognition, About: six transitions) opens covered by a copy of the previous plate's stock. As the plate scrolls into view, that cover goes away like paper and reveals the plate's own stock and subject: sky to vermilion, vermilion to kraft, kraft to UB blue, UB blue to leaf, leaf to marigold, marigold to kraft. The Work plate, first after the hero, has no cover.
+Decision 9. The page is a stack of sheets (Hero, Work, Projects, Route, Research, Leadership, Recognition, About, footer: eight crumples). When the reader reaches the end of a sheet, its last screen holds still for one screen of scrolling. During that screen the whole sheet wrinkles, balls up into a paper ball and rolls off to the right, and the next sheet, already waiting underneath at the top of the screen, is revealed. Scrolling back up un-crumples it. The approved reference is `docs/superpowers/mocks/2026-10-26-whole-page-crumple/` (its `index.html`, CSS and `tools/`), which proves every mechanism below at 1280x800 and 390x844.
 
-**Techniques.** Three prototypes were built on the real plates and copy (crumple, tear, fold); Aryan picks one (Pending 10), and the chosen prototype is committed to `docs/superpowers/mocks/` as the reference for milestone 5.
+**Structure** (`Sheet.astro`, 7.2): `div.sheet[data-in][data-out] > div.pin > div.crumple > (div.content, div.fx)`, then `div.runway#rN` after every sheet but the footer. Sheets stack with descending `z-index` (hero highest, footer lowest); the sticky nav sits above all of them. `body` declares `timeline-scope: --r1, --r2, ..., --r8`, so the footer (outside `main`) can use `--r8`.
 
-- **Tear (default).** The cover rips along a seeded tear line near the plate's subject: the two pieces pull apart (one lifts and turns a few degrees, the other drops), with white fibre along both torn edges and a soft shadow, and the plate shows through the widening gap. The pieces are the same cover with complementary `clip-path` or mask tear paths generated by `scripts/paper.mjs` and listed in `src/data/paper.ts`. Adds about 0 KB of images.
-- **Fold.** The cover folds up on horizontal creases (`rotateX` panels with perspective, darkening as they turn), then the folded packet slides away. Adds under 40 KB of SVG.
-- **Crumple.** The cover balls up and drops out of frame. A live crumple would need WebGL, so the frames are pre-rendered offline by a build tool (committed output, listed in `paper.ts` with `source: "code"`) and played with `background-position` on `steps()`. Budget: 700 KB for all six transitions on desktop, smaller frames on phones.
+**How it moves** (all CSS, inside `@supports (animation-timeline: view())` and `@media (prefers-reduced-motion: no-preference)`):
 
-**Rules whatever the technique.**
+- `.runway` is `100svh` tall and declares `view-timeline: --rN block`. Every animation of a boundary runs over that runway's `animation-range: entry 0% entry 100%`: it starts when the outgoing sheet's bottom reaches the bottom of the screen and ends one screen later.
+- `.sheet[data-in]` has `margin-top: -100svh`, so the incoming sheet overlaps the runway exactly; total page height is unchanged.
+- **Hold** (on the outgoing `.pin`): `translate` from `0 0` to `0 100svh`, linear, which cancels the scroll so the last screen stays put; `filter: drop-shadow(0 10px 14px rgba(27, 26, 23, .22))` from 3%; `visibility: hidden` at 100%, so the gone sheet never takes clicks.
+- **Arrive** (on the incoming `.sheet`): `translate` from `0 -100svh` to `0 0`, linear, so the next sheet waits at the top of the screen, underneath, for the whole crumple.
+- **Outline** (on `.crumple`): `mask-image` is `none` until the first frame, then steps through `crumple-d.avif` with `mask-size: 2500% 100svh`, `mask-position: <frame> 100%` and `mask-repeat: no-repeat` (timing `step-end`, one keyframe per frame at its own progress), so only the last screen is visible and it takes each frame's paper outline. Prefixed `-webkit-mask-*` alongside.
+- **Creases** (on `.fx`, absolutely placed over the last screen): the same strip as a background, `mix-blend-mode: multiply`, opacity .82, stepping with the outline. `.crumple` sets `isolation: isolate` so the multiply only touches the sheet.
+- **The page shrinks with the paper** (on `.content`, `transform-origin: 50% calc(100% - 50svh)`): `translate` and non-uniform `scale` to each frame's outline box from `crumple.json`, linear between frames, so the live text and photos ball up inside the outline.
+- **Roll** (on `.crumple`, second animation): the crumple fills the first 72% of the runway; from 74% to 100% the ball steps through the roll frames while it translates to `78vw 4svh`. `.sheet` has `overflow-x: clip`, so the roll never widens the page.
+- Portrait screens (`max-aspect-ratio: 3/4`) use `crumple-m.avif` and the `-m` keyframes. A 1px fixed `.preload` element paints a 1px piece of the matching strip early, so the first crumple never stalls on image decode.
 
-- The cover is `div.plate__cover`, `aria-hidden="true"`, with no text and nothing focusable, clipped to its plate (`overflow: clip`), never over text. It covers the plate's stock and subject inside the plate box; any part of the subject that overhangs the plate edge (7.3) shows from the start, like a scrap pasted over the seam.
-- Motion is scroll-driven CSS: `animation-timeline: view()` on the plate with an `animation-range` taken from the chosen prototype. A probe at milestone 5 checks the cover is gone when the section's `h2` top is still at or below 50% of the viewport height, at 1280x800 and 390x844.
-- Only `transform` (and `translate`, `rotate`), `opacity`, `clip-path`, mask position or size, and `background-position` animate.
-- The keyframes sit inside `@supports (animation-timeline: view())` and `@media (prefers-reduced-motion: no-preference)`. Outside either, `.plate__cover` is `display: none` and the plate shows its own stock at rest. Firefox without scroll-driven animations gets that static page.
-- Phones play the same transition, simplified if needed, with no horizontal overflow.
+**Rules.**
 
-**Everything else stays still.** Transitions exist on `.collage .piece` (8.1), `.video__poster` (the 240ms opacity fade in 7.4) and the plate covers. Hover changes are instant, underline and colour only. The in-view muted video behaviour from v3 is unchanged. Nothing is JavaScript-driven.
+- Text never moves or fades while a sheet is being read; it moves only inside its own crumple. Facts are never covered at rest.
+- Nav and in-page links land exactly at the end of the crumple before their target: sections inside sheets set `scroll-margin-top: 0` within the motion block, so a jump shows the target sheet with the previous one already gone; the sticky nav overlaps only the plate band.
+- Only `translate`, `transform`, `opacity`, `filter`, `visibility`, `mask-image`, `mask-position` and `background-position` animate.
+- **Fallbacks:** without scroll-driven animation support (Firefox), or with reduced motion, the runways are `0` tall, `[data-in]` has no negative margin, nothing animates, and the stack is an ordinary scrolling page with coloured sections. A test checks the document height is the same either way.
+- **Pacing:** every boundary is a `Sheet` prop, so a crumple can be switched off for one boundary without touching CSS. All eight ship on; milestone 5's review on Aryan's own phone decides whether any is switched off.
+
+**Everything else stays still.** Besides the crumple, transitions exist only on `.collage .piece` (8.1) and `.video__poster` (the 240ms opacity fade in 7.4). Hover changes are instant, underline and colour only. The in-view muted video behaviour from v3 is unchanged. No motion is JavaScript-driven.
 
 ## 9. Accessibility and performance
 
@@ -1281,7 +1346,7 @@ No other control sits on a stock: the Next and result tapes hold no links.
 ### Layout limits
 
 - **No horizontal scroll from 320 to 390.**
-  - `overflow-x: clip` is allowed only on `.hero`, `.plate` and `.slab__tear`. Never on `html` or `body`, so real overflow cannot hide.
+  - `overflow-x: clip` is allowed only on `.hero`, `.plate`, `.slab__tear` and `.sheet` (which keeps the rolling ball of 8.4 inside the screen). Never on `html` or `body`, so real overflow cannot hide.
   - No width in `vw` above 100, and no negative margin wider than the gutter.
   - The probes check `scrollWidth` at 320, 360, 375, 384 and 390, which include both sides of each phone zoom tier (5.4).
 - **Email and Resume above the fold.**
@@ -1315,6 +1380,8 @@ Screen readers hear the title block as three term and definition pairs ("Study, 
 | Hero print (AVIF, 634w) | 60 KB or less |
 | Paper assets fetched at load (every mask and background file, wherever it sits on the page) | 110 KB transferred or less, measured from a cold load's network log |
 | First desktop load, lazy images excluded (HTML, CSS, fonts, scripts, hero print, paper assets) | 600 KB or less (v3's criterion was 900 KB) |
+| Crumple strip (8.4), one per visit, chosen by screen shape | 180 KB or less each (`crumple-d.avif` about 160 KB, `crumple-m.avif` about 130 KB); not counted in the first-load figure because it is only needed at the end of the hero, and it is not downloaded under reduced motion or without scroll-driven animation support |
+| `crumple.css` (generated keyframes) | 6 KB gzipped or less, counted inside the built CSS budget |
 
 ### Speed targets
 
@@ -1350,7 +1417,7 @@ Every milestone ends green, so each assertion lands in the milestone that builds
 1. **`componentFiles`** (M3, M4, M5). A file joins the list in the milestone that creates it, because `read()` throws on a missing file.
    - M3: remove `src/components/Frame.astro` and `src/components/ChapterFigure.astro`; add `Print.astro` and `PhotoPopover.astro`.
    - M4: add `TitleBlock.astro` and `Collage.astro`.
-   - M5: add `Plate.astro`.
+   - M5: add `Plate.astro` and `Sheet.astro`.
 2. **"sections keep the approved order and the frame wraps main and footer"** (M3). Renamed "sections keep the approved order".
    - Old: the markers `['<div class="rooms"', "<Frame", "<main", "<Hero", "<Experience", "<Projects", "<Trajectory", "<Research", "<Leadership", "<Recognition", "<About", "</main>", "<SiteFooter", "</div>"]` in order.
    - New: the markers `["<SiteNav", "<main", "<Hero", "<Experience", "<Projects", "<Trajectory", "<Research", "<Leadership", "<Recognition", "<About", "</main>", "<SiteFooter"]` in order, plus `assert.doesNotMatch(page, /<Frame|class="rooms"/)`.
@@ -1495,7 +1562,13 @@ Every milestone ends green, so each assertion lands in the milestone that builds
 
 **Removed by `8b5fc4b` at Aryan's request** ("remove the tests that ban the animations. we can have animations"), and they stay removed: the `@supports (animation-timeline: view())` gate; the reduced-motion property allowlist; the `animation-iteration-count: infinite` ban; the `three.js`, `webgl`, `scrolltrigger` and `<canvas` source bans; the built `<script src` and `<canvas` bans.
 
-**New for the section transitions (M5):** every `.plate__cover` in the built HTML is `aria-hidden="true"` and has no text and no focusable element; every rule that sets `animation-timeline` in `global.css` sits inside both `@supports (animation-timeline: view())` and `@media (prefers-reduced-motion: no-preference)`; outside those blocks `.plate__cover` is `display: none`.
+**New for the pages and the crumple (M5):**
+
+- **Sheets.** The built HTML has nine `.sheet` elements in page order (hero to footer) and eight `.runway` elements `#r1` to `#r8`, each directly after the sheet whose `data-out` names it; the next sheet's `data-in` names the same runway; the footer sheet has no `data-out`. Every `.fx` and `.runway` is `aria-hidden="true"` with no text and nothing focusable. Every section id of the nav test sits inside a sheet.
+- **Gates.** Every rule in `global.css` or `crumple.css` that sets `animation-timeline`, `view-timeline`, a negative `margin-top` on `[data-in]` or a non-zero `.runway` height sits inside both `@supports (animation-timeline: view())` and `@media (prefers-reduced-motion: no-preference)`.
+- **Same height either way.** A build probe loads the page with and without reduced motion at 1280x800 and 390x844; `document.documentElement.scrollHeight` is identical, and `scrollWidth` equals the viewport width at every runway's 0, 50 and 100% (the roll never widens the page).
+- **Page colours.** Each `--page-*` token is declared once in `:root`; `var(--page-` appears only in `.sheet--*` background rules; inside a coloured sheet no rule uses `--ink-2`, `--muted` or `--accent` for `color` (links and focus use `--ink`). A contrast test computes `--ink` and `--page-ink-2` against every `--page-*` value darkened by the grain factor 0.874 and requires 4.5 or more.
+- **Crumple data.** `crumple.json` has 18 crumple and 7 roll entries; each strip's width is 25 times its frame width; `crumple.css` is regenerated from `crumple.json` without a diff (6.7).
 
 ## 11. Build sequence
 
@@ -1507,15 +1580,15 @@ Commits are authored as Aryan with no co-author or tool trailers, per their stan
 
 | # | Milestone | Done when | Days |
 |---|---|---|---|
-| 0 | Spec review | Aryan has read section 4.4 and the ten pending items in section 12, and their answers are folded into this file. Milestone 0 does not gate milestones 1 to 4. The Pending 10 answer is recorded in section 1 before milestone 5, and Pending 2 is answered before milestone 6. | |
+| 0 | Spec review | Aryan has read section 4.4 and the nine pending items in section 12, and their answers are folded into this file. Milestone 0 does not gate milestones 1 to 5; Pending 2 is answered before milestone 6. | |
 | 1 | Foundations | `scripts/freeze-copy.mjs` runs first, then `tests/fixtures/copy-v3.json` and the copy-freeze test. Source Serif 4 swap; the four fallback faces with measured metrics; CLS measured with the font requests blocked. The tokens of 5.1 (light, dark, slab) replace v3's, and v3's video badge, frame and file hexes are tokenised. Type scale; spacing; focus; nav restyle. `titleBlock` with its join test. Tests: 10.1 items 5 (added part) and 8; 10.2 title-block joins, copy freeze, stocks and hex, no theme toggle. The frame still runs. Visual: type and colour on the v3 layout, both themes; the `scrollWidth` probes. | 1.0 |
 | 2 | Paper pipeline | `scripts/paper.mjs` and `scripts/paper/*`; `src/data/paper.ts` (with `og.jpg` listed, still v3's file); every other asset of 6.4 generated and committed; `astro.config.mjs` with the inline-limit function and `cssTarget`; `perfect-freehand` 1.2.2. Tests: `tests/paper.test.mjs` (provenance, determinism, budgets, SVG rules, token drift); 10.1 item 7; no pencil on marigold; scripts stay inline. No page uses the assets yet. Visual: a contact sheet in the scratchpad (not the repo), built with the production CSS (the same selectors, mask properties, wrapper filters, grain tile and text tapes), shown beside the mock's inline-SVG rendering of the same seeds in Chrome, Safari and Firefox at 1x and 2x. The arena and Clean Campus duotones are checked at full size for any head or face. Aryan approves the sheet ("not mechanical") before milestone 3. | 2.0 |
 | 3 | Frame retirement and prints | `Frame.astro` and `ChapterFigure.astro` deleted; `Print.astro` and `PhotoPopover.astro`; `crop-rooms.mjs` aspects, fibre flatten, `withoutEnlargement`, no OG; `div.hero-art` holding the pillar print, with `#photo-pillar` outside it; every room rendered once in its owner (4.3), including the second Dots print and the `pillar-pair` print; `data-room` only on prints. Tests: 10.1 items 1 (M3 part), 2, 3, 10 (37 images), 11 and 12; 10.2 CSS budget and hidden subtrees. Visual: every print beside its claim; popovers open and close by keyboard; the `#photo-pillar` zoom probe. | 1.25 |
 | 4 | Hero and signature | `TitleBlock`, `Ledger` (with the three-layer "1 of 2" tape), actions, `Collage` with four pieces at the 7.1 coordinates; the arrow rule passing at three sizes; the `@starting-style` signature and its phone rules. Tests: 10.1 items 1 (M4 part), 4 (added part), 5 (changed part) and 9; 10.2 collage limits, text tapes never hidden, facts precede art (hero), inline SVG, Safari prefixes. Visual: a mid-paste screenshot at about 450ms (sky and Braille partway, plan and hand not started), the finished board, phone at the fold, and reduced motion; the finished hero and a wrapped Next tape in Safari and Firefox. | 1.5 |
-| 5 | Plates and sections | `Plate.astro` for seven plates, with the tablet rules of 7.3; Work, Projects (index, result tapes, demo mats, asides with brackets), Route, Research (split detail, cell field and note), Leadership (h3 titles, row ids, numerals), Recognition (figures and denominators, band, plain-mat video), About (ticks); the six section transitions of 8.4 in the technique Aryan chose; `src/lib/text.ts`; the `Video.astro` poster fade and poster click. Tests: 10.1 items 1 (M5 part) and 10 (39 images); 10.2 receipts, numerals and Research split, hidden subtrees (M5 part), facts precede art (cards), plates, the delete test, exceptions and stubs. Visual: each section at 1280x800, 1024x768, 768x1024, 390x844 and 320x640, both themes; plates reviewed against "more than a divider"; a frame strip of each transition at 0, 25, 50, 75 and 100% plus the mid-screen probe of 8.4; the static plates under reduced motion and in Firefox; the poster fade in Chrome, Safari and Firefox. | 2.75 |
+| 5 | Plates and sections | `Plate.astro` for seven plates, with the tablet rules of 7.3; Work, Projects (index, result tapes, demo mats, asides with brackets), Route, Research (split detail, cell field and note), Leadership (h3 titles, row ids, numerals), Recognition (figures and denominators, band, plain-mat video), About (ticks); `Sheet.astro` with the page colours of 5.2b and the whole-page crumple of 8.4, `scripts/crumple/` and its committed strips, `crumple.json` and `crumple.css`; `src/lib/text.ts`; the `Video.astro` poster fade and poster click. Tests: 10.1 items 1 (M5 part) and 10 (39 images); 10.2 receipts, numerals and Research split, hidden subtrees (M5 part), facts precede art (cards), plates, the delete test, exceptions and stubs. Visual: each section at 1280x800, 1024x768, 768x1024, 390x844 and 320x640, both themes; plates reviewed against "more than a divider"; a frame strip of every crumple at 0, 12, 30, 45, 60, 85 and 100% of its runway at 1280x800 and 390x844, matching the approved prototype; nav jumps landing on clean sheets; the static coloured page under reduced motion and in Firefox; the poster fade in Chrome, Safari and Firefox; a pacing check on Aryan's phone. | 3.5 |
 | 6 | Footer, 404, print, OG | Slab, tear, footer sheet (one column below 64rem), the colophon as Aryan answered Pending 2, `#page-end` with its own observer; 404; print stylesheet; `og.jpg` from `paper.mjs`; `theme-color`; README describes v4. Tests: 10.1 item 6. Visual: footer in both themes, a print preview PDF, the OG card in a link-preview checker run locally, `og.jpg` not blank at the face, the arrow line within 16px of the face; the Contact probe at maximum scroll. | 0.75 |
 | 7 | QA and approval | Chrome, Safari and Firefox; VoiceOver pass; keyboard pass; Lighthouse and axe; every budget in section 9 measured and recorded; the probes at all ten sizes; a check on Aryan's own phone; if row 7 was approved, `{merge month}` in `colophon.version` set to the merge month. Aryan reviews the finished branch. | 1.25 |
-| | **Total** | | **10.5** |
+| | **Total** | | **11.25** |
 
 **Main and the live site do not change until Aryan approves the finished branch.**
 
@@ -1539,9 +1612,11 @@ Commits are authored as Aryan with no co-author or tool trailers, per their stan
 | **Pillar portrait resolution.** The source is 1195x793, so the 4:5 crop is 634x793: about 1.9x at a 336px print on a retina screen. | Acceptable. A higher-resolution original from the event photographer would remove it (Pending 3). |
 | **Font cost and layout shift.** Source Serif 4 carries an optical-size axis. | The italic is fixed at optical size 20. The measured total is 171,736 B against a 180,000 B budget, with a fallback plan (section 9). Four metric-matched fallback faces cover Apple, Windows and Android, and milestone 1 measures CLS with the fonts blocked. |
 | **Copy drift during the rebuild.** | The copy-freeze test against commit `4d67042`. |
-| **Contrast under grain.** | Text appears only on marigold and sky, which hold 6.46 and 7.53 at worst. Vermilion and leaf (4.00 and 4.02 under grain) never carry text (tested). |
+| **Contrast under grain.** | On the coloured pages text is `--ink` (6.25 or more at worst grain) and `--page-ink-2` (4.85 or more); `--ink-2`, `--muted` and `--accent` are never used there (tested, 5.2b). On stocks, text appears only on the marigold and sky tapes, which hold 6.46 and 7.53 at worst. Vermilion and leaf (4.00 and 4.02 under grain) never carry text (tested). |
 | **Generator output varies between machines.** | Paths round to one decimal. Node 24 and `perfect-freehand` 1.2.2 are pinned locally and in CI. The determinism test fails loudly instead of silently shipping drift. |
-| **Section transitions get in the way of reading.** Six scroll-linked covers could feel slow or gimmicky. | The covers never touch text and are gone before each heading reaches mid-screen (probe, 8.4). One technique for all six. Reduced motion and Firefox get static plates. If it still feels like too much on Aryan's phone, the transition plays on desktop only. |
+| **The crumple slows reading.** Eight holds of one screen each add eight screens of scrolling, and a recruiter who flicks quickly sees a lot of motion. | Text never moves while being read; nav jumps land after the crumple; each boundary can be switched off in `Sheet` props, and milestone 5's phone check decides. Reduced motion and Firefox get an ordinary coloured page. |
+| **The crumple looks like a 3D render or stutters.** | The sequence is shared, small (about 160 KB) and decoded early; the prototype showed no stall at 1280x800 and 390x844. The live content is masked by the rendered outline and shaded by its creases, so text and photos visibly ball up with the paper. Tested by hand on a trackpad and an iPhone at milestone 5. |
+| **Too many colours read as childish.** Six page colours plus six stocks. | Every colour is a paper with grain, never a flat fill; type stays a quiet serif and sans in ink; neighbouring sheets never repeat a colour; the hero stays ivory. Aryan asked for bright and colourful and approved the prototype. |
 | **Page length.** Seven plates add about 1,050px on desktop. | The project index lets a recruiter skip the cards. Plates replace v3's eyebrows and rules instead of adding to them. |
 | **Accidental publish.** | The rule in section 11 and no `workflow_dispatch` from the branch. |
 
@@ -1556,4 +1631,3 @@ Commits are authored as Aryan with no co-author or tool trailers, per their stan
 7. **An observation, not changed under decision 7.** `identity.description` (the meta description) says "two-time hackathon track winner", while Projects lists three 1st-place track results (Dots, StreamFair, W.O.D.). Aryan may want to confirm the wording.
 8. **A look at the finished branch on Aryan's own phone** before approval.
 9. **Code-drawn pencil art.** The Dots floor plan, the Linde-style production log and the route are drawn in code, not by Aryan. Aryan decides whether they need a disclosure like the Research note. Any new line goes in the New copy table.
-10. **The section transition technique** (8.4): crumple, tear or fold, chosen from the prototypes. Default: tear. Needed before milestone 5.
