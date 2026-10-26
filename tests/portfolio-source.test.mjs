@@ -171,7 +171,7 @@ test("every section heading is a sentence, not a bucket label", () => {
 
 test("served source rejects theatre-era patterns, autoplay, and raw iframes", () => {
   const source = components() + read("src/data/portfolio.ts");
-  assert.doesNotMatch(source, /[—–]/, "no em or en dashes in served copy");
+  assert.doesNotMatch(source + read("src/data/rooms.ts") + css(), /[—–]/, "no em or en dashes in served copy, captions or CSS");
   for (const banned of [/lofi\.mp3/i, /curtain/i, /intermission/i, /end credits/i, /custom cursor/i, /scroll hijack/i, /<(?:video|audio)\b[^>]*\bautoplay\b/i, /<iframe/i]) {
     assert.doesNotMatch(source, banned);
   }
