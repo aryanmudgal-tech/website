@@ -199,6 +199,8 @@ test("package pins Astro 7, Node 24, and Sharp for the crop pipeline", () => {
   assert.match(packageJson.devDependencies.sharp, /^\^0\.3\d/);
   assert.equal(packageJson.engines.node, ">=24");
   assert.equal(read(".nvmrc").trim(), "24");
+  assert.equal(packageJson.devDependencies["perfect-freehand"], "1.2.2");
+  assert.equal(packageJson.dependencies, undefined);
   assert.match(read(".gitignore"), /^Pictures\/$/m);
 });
 
