@@ -1,9 +1,9 @@
 /** Provenance manifest and job list for the paper assets (spec 6.3, 6.4). scripts/paper.mjs writes exactly these files. */
 export type PaperAsset = {
-  readonly file: string;                 // path under src/assets/paper/, or "public/og.jpg"
+  readonly file: string;                 // path under src/assets/paper/, or from the repo root ("public/og.jpg", "src/data/crumple.json")
   readonly kind: "mask" | "pencil" | "line" | "colour" | "raster" | "rendered";
   readonly source: "code" | "aryan";
-  readonly generator: string;            // exported function in scripts/paper/*.mjs
+  readonly generator: string;            // exported function in scripts/paper/*.mjs, or the renderer script for "rendered"
   readonly seed?: number;                // required for code; 0 for the deterministic generators
   readonly eps?: number;                 // simplification tolerance, default 0.1
   readonly size: readonly [number, number];
@@ -58,5 +58,9 @@ export const paperAssets: readonly PaperAsset[] = [
   { file: "hand.png", kind: "raster", source: "aryan", generator: "pencilAlpha", size: [240, 234], from: { path: "Pictures/Chancellors-award/scribble.png", region: [297, 16, 187, 182] }, budget: 12000 },
   { file: "arena.jpg", kind: "raster", source: "aryan", generator: "duotone", size: [840, 82], from: { path: "Pictures/LA-hacks/IMG_9046.jpg" }, budget: 28000 },
   { file: "cleancampus.jpg", kind: "raster", source: "aryan", generator: "duotone", size: [544, 177], from: { path: "Pictures/Clean-campus/clean-campus-drive.png" }, budget: 22000 },
+  // The whole-page crumple (spec 6.7): GPU renders are not byte-identical across machines, so these are checked by shape, not bytes.
+  { file: "crumple-d.avif", kind: "rendered", source: "code", generator: "scripts/crumple/page3d.js", seed: 21, size: [16000, 400], budget: 184320 },
+  { file: "crumple-m.avif", kind: "rendered", source: "code", generator: "scripts/crumple/page3d.js", seed: 9, size: [6750, 584], budget: 184320 },
+  { file: "src/data/crumple.json", kind: "rendered", source: "code", generator: "scripts/crumple/page3d.js", seed: 21, size: [25, 2], budget: 12000 },
   { file: "public/og.jpg", kind: "raster", source: "aryan", generator: "og", size: [1200, 630], from: { path: "Pictures/Pillars-award/innovative-student-leader-award-3.png" }, budget: 122880 },
 ];

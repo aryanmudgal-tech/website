@@ -6,12 +6,15 @@ import test from "node:test";
 import { paperAssets } from "../src/data/paper.ts";
 import { codeJobs } from "../scripts/paper/jobs.mjs";
 import { readTokens } from "../scripts/paper/tokens.mjs";
+import { crumpleCss } from "../scripts/crumple/css.mjs";
+import sharp from "sharp";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIR = join(root, "src", "assets", "paper");
-const at = (asset) => (asset.file.startsWith("public/") ? join(root, asset.file) : join(DIR, asset.file));
+const fromRoot = (asset) => /^(?:public|src)\//.test(asset.file);
+const at = (asset) => (fromRoot(asset) ? join(root, asset.file) : join(DIR, asset.file));
 const tokens = readTokens(readFileSync(join(root, "src", "styles", "global.css"), "utf8"));
-const inFolder = paperAssets.filter((asset) => !asset.file.startsWith("public/"));
+const inFolder = paperAssets.filter((asset) => !fromRoot(asset));
 
 test("the manifest lists exactly the files in src/assets/paper and how each was made", () => {
   assert.deepEqual(readdirSync(DIR).sort(), inFolder.map((asset) => asset.file).sort());
@@ -38,7 +41,7 @@ test("paper stays inside its budgets", () => {
     const size = statSync(at(asset)).size;
     assert.ok(size <= asset.budget, `${asset.file} is ${size} B; budget ${asset.budget}`);
     if (asset.budget <= 1000) assert.ok(size < 1024, `${asset.file} must inline`);
-    if (asset.file.startsWith("public/")) continue;
+    if (fromRoot(asset) || asset.kind === "rendered") continue;
     all += size;
     if (asset.kind === "mask") masks += size;
     if (asset.kind === "pencil" || asset.kind === "line") lines += size;
@@ -67,4 +70,20 @@ test("paper SVGs are inert decoration, and colour comes only from tokens", () =>
       }
     }
   }
+});
+
+test("the crumple strips hold 25 frames each, and crumple.css comes from crumple.json", async () => {
+  const data = JSON.parse(readFileSync(join(root, "src", "data", "crumple.json"), "utf8"));
+  for (const [shape, file] of [["d", "crumple-d.avif"], ["m", "crumple-m.avif"]]) {
+    const set = data[shape];
+    assert.equal(set.crumple, 18);
+    assert.equal(set.roll, 7);
+    assert.equal(set.ts.length, 18);
+    assert.equal(set.boxes.length, 25);
+    const { width, height, hasAlpha } = await sharp(join(DIR, file)).metadata();
+    assert.equal(width, 25 * set.frame[0], `${file} is ${width} wide`);
+    assert.equal(height, set.frame[1]);
+    assert.ok(hasAlpha, `${file} keeps its alpha`);
+  }
+  assert.equal(readFileSync(join(root, "src", "styles", "crumple.css"), "utf8"), crumpleCss(data), "src/styles/crumple.css is stale; run npm run crumple");
 });
