@@ -11,7 +11,7 @@
     "build": "node scripts/clean-dist.mjs && astro build",
     "preview": "astro preview",
     "rooms": "node scripts/crop-rooms.mjs",
-    "test": "node --test tests/portfolio-source.test.mjs tests/github-pages-workflow.test.mjs",
+    "test": "node --test tests/portfolio-source.test.mjs tests/github-pages-workflow.test.mjs tests/paper.test.mjs",
     "test:build": "node --test tests/portfolio-build.test.mjs",
     "check": "npm run test && npm run build && npm run test:build",
     "paper": "node scripts/paper.mjs"
