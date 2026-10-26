@@ -126,3 +126,12 @@ test("built 404 page offers a route home", () => {
 test("no theme toggle ships", () => {
   assert.doesNotMatch(read(client("index.html")), /data-theme/);
 });
+
+test("both component scripts stay inline", () => {
+  const html = read(client("index.html"));
+  const inline = [...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)].map((match) => match[1]);
+  assert.ok(inline.some((body) => body.includes("site-menu")), "the nav script is inline");
+  assert.ok(inline.some((body) => body.includes("youtube-nocookie.com")), "the video script is inline");
+  const files = readdirSync(join(root, "dist", "client", "_astro"));
+  assert.ok(!files.some((name) => /^(?:SiteNav|Video)\.astro.*\.js$/.test(name)), "no component script file");
+});

@@ -41,6 +41,7 @@
   --page-ink-2: #312E29;
   --serif: "Source Serif 4", "Source Serif 4 Fallback", "Source Serif 4 Fallback Noto", Georgia, serif;
   --sans: "Instrument Sans", "Instrument Sans Fallback", "Instrument Sans Fallback Roboto", system-ui, sans-serif;
+  --grain: url(../assets/paper/grain.svg);
   /* layout; the v3 frame keeps --frame-w until Plan B retires it */
   --shell: 80rem;
   --gutter: 16px;
