@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import test from "node:test";
+import { rules, declarations } from "./lib/css.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFileSync(join(root, relativePath), "utf8");
@@ -237,4 +238,59 @@ test("the title block splits the fixation lines word for word", () => {
   assert.equal(titleBlock.flatMap((row) => row.short).join(" "), identity.fixationLineShort);
   assert.equal(titleBlock[2].long.length, 2);
   assert.equal(titleBlock[2].short.length, 2);
+});
+
+// Spec 5.2: the only selectors each stock may paint (::before and ::after are ignored when matching).
+const STOCK_SELECTORS = {
+  marigold: [".fig--tape", ".hl--marigold", ".plate--recognition"],
+  sky: [".p-sky", ".hl--sky", ".plate--work"],
+  leaf: [".p-braille", ".plate--leadership", ".plate--leadership .duo"],
+  kraft: [".p-plan", ".plate--route", ".plate--about"],
+  vermilion: [".plate--projects", ".plate--projects .duo", ".video--demo .video__mat", ".tape--vermilion"],
+  ub: [".plate--research", ".plate__band"],
+};
+
+test("stocks are declared once, paint only their selectors, and hex stays in the token blocks", () => {
+  const all = rules(css());
+  const isLightRoot = (rule) => rule.selector === ":root" && rule.context.length === 0;
+  const isDarkRoot = (rule) => rule.selector === ":root" && rule.context.some((c) => c.includes("prefers-color-scheme: dark"));
+  const isSlab = (rule) => rule.selector.split(",").some((s) => s.trim() === ".slab");
+  const isPrint = (rule) => rule.context.some((c) => c.startsWith("@media print"));
+  for (const rule of all) {
+    if (isLightRoot(rule) || isDarkRoot(rule) || isSlab(rule) || isPrint(rule)) continue;
+    assert.doesNotMatch(rule.body, /#[0-9a-fA-F]{3,8}\b|%23/, `hex literal in ${rule.selector}`);
+  }
+  const light = all.filter(isLightRoot).flatMap(declarations);
+  const stockHex = {};
+  for (const name of Object.keys(STOCK_SELECTORS)) {
+    const property = `--stock-${name}`;
+    const found = light.filter(([key]) => key === property);
+    assert.equal(found.length, 1, `${property} is declared once in :root`);
+    stockHex[name] = found[0][1].toLowerCase();
+    for (const rule of all.filter((r) => !isLightRoot(r))) {
+      assert.ok(!declarations(rule).some(([key]) => key === property), `${property} redeclared in ${rule.selector}`);
+    }
+  }
+  for (const [name, hex] of Object.entries(stockHex)) {
+    const reuse = all.flatMap((rule) => declarations(rule)
+      .filter(([, value]) => value.toLowerCase().includes(hex))
+      .map(([key]) => (isDarkRoot(rule) ? `dark ${key}` : key)))
+      .filter((key) => key !== `--stock-${name}` && !key.startsWith("--page-") && !(hex === "#005bbb" && key === "--accent"));
+    assert.deepEqual(reuse, [], `${hex} is reused outside --stock-${name}`);
+  }
+  for (const rule of all) {
+    for (const [key, value] of declarations(rule)) {
+      const uses = [...value.matchAll(/var\(--stock-([a-z]+)\)/g)].map((match) => match[1]);
+      if (!uses.length) continue;
+      assert.ok(key === "background" || key === "background-color", `var(--stock-*) in ${key} of ${rule.selector}`);
+      for (const name of uses) {
+        for (const selector of rule.selector.split(",").map((s) => s.trim().replace(/::(?:before|after)/g, ""))) {
+          assert.ok(STOCK_SELECTORS[name].some((allowed) => selector === allowed || selector.endsWith(allowed)), `${selector} may not use --stock-${name}`);
+        }
+      }
+    }
+  }
+  for (const selector of [".fig--tape", ".hl--sky", ".hl--marigold"]) {
+    for (const rule of all.filter((r) => r.selector === selector)) assert.match(rule.body, /color:\s*var\(--on-stock\)/, `${selector} sets ink on its stock`);
+  }
 });
