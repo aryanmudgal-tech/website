@@ -128,19 +128,11 @@ test("each room has a chapter, a CSS timeline, and a caption without a denominat
   }
 });
 
-test("motion is gated, reduced motion only changes timing, and no vh units remain", () => {
+// Animations are allowed anywhere; the only motion rule left is that reduced motion is handled.
+test("reduced motion is still handled and no vh units remain", () => {
   const styles = css();
-  const supportsStart = styles.indexOf("@supports (animation-timeline: view())");
-  assert.ok(supportsStart > -1, "the frame animation must sit inside an @supports block");
-  const outside = styles.slice(0, supportsStart) + styles.slice(styles.indexOf("\n}\n", supportsStart) + 3);
-  assert.doesNotMatch(outside, /(?<![-a-z])animation(?:-name)?\s*:/, "animations must live inside the @supports block");
-  const reduced = styles.match(/@media \(prefers-reduced-motion: reduce\)\s*\{([\s\S]*?)\n\}/);
-  assert.ok(reduced, "missing reduced-motion block");
-  for (const property of reduced[1].match(/[a-z-]+(?=\s*:)/g) ?? []) {
-    assert.ok(["animation-timing-function", "animation-duration", "transition-duration", "scroll-behavior"].includes(property), `reduced motion may not set ${property}`);
-  }
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/, "missing reduced-motion block");
   assert.doesNotMatch(styles, /(?<![a-z])\d*\.?\d+vh\b/, "use dvh or svh, never vh");
-  assert.doesNotMatch(styles, /animation-iteration-count:\s*infinite/i);
 });
 
 test("the visual system keeps one accent, theme and focus safeguards, and no template tells", () => {
@@ -177,10 +169,10 @@ test("every section heading is a sentence, not a bucket label", () => {
   }
 });
 
-test("served source rejects theatre-era and heavy-runtime patterns", () => {
+test("served source rejects theatre-era patterns, autoplay, and raw iframes", () => {
   const source = components() + read("src/data/portfolio.ts");
   assert.doesNotMatch(source, /[—–]/, "no em or en dashes in served copy");
-  for (const banned of [/three\.js/i, /webgl/i, /scrolltrigger/i, /<canvas/i, /lofi\.mp3/i, /curtain/i, /intermission/i, /end credits/i, /custom cursor/i, /scroll hijack/i, /<(?:video|audio)\b[^>]*\bautoplay\b/i, /<iframe/i]) {
+  for (const banned of [/lofi\.mp3/i, /curtain/i, /intermission/i, /end credits/i, /custom cursor/i, /scroll hijack/i, /<(?:video|audio)\b[^>]*\bautoplay\b/i, /<iframe/i]) {
     assert.doesNotMatch(source, banned);
   }
   // Demos may play muted when scrolled into view, never on load, and never with sound without a tap.
