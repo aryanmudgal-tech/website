@@ -296,3 +296,11 @@ test("stocks are declared once, paint only their selectors, and hex stays in the
     for (const rule of all.filter((r) => r.selector === selector)) assert.match(rule.body, /color:\s*var\(--on-stock\)/, `${selector} sets ink on its stock`);
   }
 });
+
+test("no pencil or line art sits on marigold", async () => {
+  const { paperAssets } = await import(new URL("../src/data/paper.ts", import.meta.url).href);
+  const files = paperAssets.filter((asset) => asset.kind === "pencil" || asset.kind === "line").map((asset) => asset.file);
+  for (const rule of rules(css())) {
+    if (files.some((file) => rule.body.includes(file))) assert.doesNotMatch(rule.selector, /--recognition|fig--tape|hl--marigold/, `${rule.selector} puts pencil on marigold`);
+  }
+});
