@@ -2,12 +2,9 @@
 import { route, headings } from "../data/portfolio";
 ---
 
-<section id="trajectory" class="chapter" aria-labelledby="trajectory-title">
-  <header class="chapter__head">
-    <span class="label">Route</span>
-    <h2 id="trajectory-title">{headings.trajectory}</h2>
-  </header>
-  <ol class="route">
+<section id="trajectory" class="section" aria-labelledby="trajectory-title">
+  <h2 id="trajectory-title">{headings.trajectory}</h2>
+  <ol class="route" role="list">
     {route.map((event) => (
       <li>
         <span class="route__period">{event.period}</span>

@@ -197,3 +197,66 @@ test("both component scripts stay inline", () => {
   const files = readdirSync(join(root, "dist", "client", "_astro"));
   assert.ok(!files.some((name) => /^(?:SiteNav|Video)\.astro.*\.js$/.test(name)), "no component script file");
 });
+
+test("every card states its claim before its print", () => {
+  const html = read(client("index.html"));
+  for (const article of elements(html, (tag, name) => name === "article")) {
+    const print = article.indexOf('<figure class="print');
+    if (print === -1) continue;
+    const heading = article.search(/<h3\b/);
+    assert.ok(heading !== -1 && heading < print, `an article shows a print before its h3: ${article.slice(0, 120)}`);
+  }
+});
+
+test("exceptions render nothing in place of a receipt", () => {
+  const html = read(client("index.html"));
+  const one = (id) => elements(html, withId(id))[0];
+  assert.doesNotMatch(one("leadership-men-in-green"), /class="stubs"/);
+  for (const [id, count] of [["project-armie", 2], ["project-safeline", 1]]) {
+    const stubs = elements(one(id), (tag) => tag.includes('class="stubs"'));
+    assert.equal(stubs.length, 1, `${id} has one stub row`);
+    assert.equal(elements(stubs[0], (tag, name) => name === "a" && /class="stub"/.test(tag)).length, count, `${id} stubs`);
+  }
+});
+
+test("every fact survives with the decoration, prints, popovers and videos removed", () => {
+  const html = read(client("index.html"));
+  let rest = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, "");
+  const strip = (test) => { for (const element of elements(rest, test)) rest = rest.replace(element, " "); };
+  strip((tag) => /aria-hidden="true"/.test(tag));
+  strip((tag, name) => name === "figure" && /class="(?:print|video)\b/.test(tag));
+  strip((tag) => /\spopover(?:=""|\s|>)/.test(tag));
+  const text = textOf(rest);
+  const has = (value, where) => assert.ok(text.includes(value), `${where}: "${value}" is missing once decoration is removed`);
+  const { experiences, projects, route, research, leadership, recognitions, about, ledger, titleBlock } = portfolio;
+  for (const job of experiences) for (const key of ["company", "role", "place", "period", "outcome", "detail", "myPart"]) has(job[key], `experience ${key}`);
+  for (const project of projects) {
+    for (const key of ["name", "event", "date", "result", "pool", "built", "myPart", "aside"]) if (project[key]) has(project[key], `project ${key}`);
+    for (const name of project.team) has(name, "team");
+  }
+  for (const event of route) { has(event.period, "route"); has(event.title, "route"); }
+  for (const item of research) for (const key of ["title", "role", "period", "summary", "detail"]) has(item[key], `research ${key}`);
+  for (const item of leadership) for (const key of ["title", "role", "period", "summary"]) has(item[key], `leadership ${key}`);
+  for (const award of recognitions) for (const key of ["title", "fraction", "denominator", "context", "date"]) has(award[key], `recognition ${key}`);
+  for (const line of about) has(line.text, "about");
+  for (const row of ledger) { has(row.fraction, "ledger"); has(row.text, "ledger"); }
+  for (const row of titleBlock) {
+    has(row.label, "title block");
+    for (const sentence of [...row.long, ...row.short]) has(sentence, "title block");
+  }
+  const hrefs = new Set([...rest.matchAll(/href="([^"]*)"/g)].map((match) => match[1].replace(/&amp;/g, "&")));
+  const linked = (href, where) => assert.ok(hrefs.has(href) || hrefs.has(`/website/${href}`) || hrefs.has(`/${href}`), `${where}: ${href} is not linked once decoration is removed`);
+  for (const item of [...experiences, ...projects, ...research, ...leadership, ...recognitions]) for (const receipt of item.receipts) linked(receipt.href, "receipt");
+  for (const row of ledger) linked(row.receipt.href, "ledger");
+  for (const event of route) linked(event.href, "route");
+  for (const line of about) if (line.href) linked(line.href, "about");
+});
+
+test("no hidden subtree or decorative tape carries a result or a title-block sentence", () => {
+  const html = read(client("index.html"));
+  const facts = [...portfolio.projects.map((project) => project.result), ...portfolio.titleBlock.flatMap((row) => [...row.long, ...row.short])];
+  for (const hidden of elements(html, (tag) => /aria-hidden="true"/.test(tag) || /class="(?:[^"]*\s)?tape(?:\s|")/.test(tag))) {
+    const text = textOf(hidden);
+    for (const fact of facts) assert.ok(!text.includes(fact), `hidden or taped element holds "${fact}"`);
+  }
+});

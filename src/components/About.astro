@@ -3,16 +3,15 @@ import { about, headings } from "../data/portfolio";
 import Source from "./Source.astro";
 ---
 
-<section id="about" class="chapter" aria-labelledby="about-title">
-  <header class="chapter__head">
-    <span class="label">About</span>
-    <h2 id="about-title">{headings.about}</h2>
-  </header>
-  <ul class="about-lines" role="list">
+<section id="about" class="section" aria-labelledby="about-title">
+  <h2 id="about-title">{headings.about}</h2>
+  <ul class="lines" role="list">
     {about.map((line) => (
       <li>
-        {line.text}
-        {line.href && <Source receipt={{ label: "GitHub", href: line.href }} prefix="" />}
+        <span>
+          {line.text}
+          {line.href && <> <Source receipt={{ label: "GitHub", href: line.href }} prefix="" /></>}
+        </span>
       </li>
     ))}
   </ul>

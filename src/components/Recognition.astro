@@ -5,23 +5,20 @@ import Print from "./Print.astro";
 import Video from "./Video.astro";
 ---
 
-<section id="recognition" class="chapter" aria-labelledby="recognition-title">
-  <header class="chapter__head">
-    <span class="label">Recognition</span>
-    <h2 id="recognition-title">{headings.recognition}</h2>
-  </header>
+<section id="recognition" class="section" aria-labelledby="recognition-title">
+  <h2 id="recognition-title">{headings.recognition}</h2>
   {recognitions.map((award) => (
-    <article class="card" id={`recognition-${award.id}`}>
+    <article class="card card--award" id={`recognition-${award.id}`}>
       <div class="card__meta">
-        <p>{award.date}.</p>
+        <span>{award.date}.</span>
       </div>
       <div class="card__body">
         <p class="award__line"><span class="award__fig">{award.fraction}</span> <span class="award__den">{award.denominator}</span>.</p>
         <h3>{award.title}</h3>
         <p>{award.context}</p>
-        {award.video && <Video video={award.video} />}
-        <div class="receipts">
-          {award.receipts.map((receipt) => <Source receipt={receipt} />)}
+        {award.video && <Video video={award.video} mat="plain" />}
+        <div class="stubs">
+          {award.receipts.map((receipt) => <Source receipt={receipt} variant="stub" />)}
         </div>
       </div>
       <div class="card__margin">

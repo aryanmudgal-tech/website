@@ -327,3 +327,26 @@ test("the collage is four decorative pieces after the print, and nothing in it c
   assert.doesNotMatch(inside, /<a\b|<button\b|<img\b|tabindex|popover/);
   assert.equal(inside.replace(/<[^>]+>/g, "").trim(), "", "no text in the collage");
 });
+
+test("receipts have two variants and no tiers", () => {
+  const source = read("src/components/Source.astro");
+  assert.match(source, /variant\?: "inline" \| "stub";/);
+  assert.equal((source.match(/variant\?:/g) ?? []).length, 1);
+  assert.doesNotMatch(components() + read("src/data/portfolio.ts"), /\btier(?:s|ed)?\b|self-reported|public-record|No public link/i);
+});
+
+test("leadership numerals and the research split change no words", async () => {
+  const { numeralRuns, researchParagraphs } = await import(new URL("../src/lib/text.ts", import.meta.url).href);
+  const numerals = [];
+  for (const { summary } of portfolio.leadership) {
+    const runs = numeralRuns(summary);
+    assert.equal(runs.map((run) => run.text).join(""), summary);
+    numerals.push(...runs.filter((run) => run.num).map((run) => run.text));
+  }
+  assert.deepEqual(numerals, ["30,000", "50,000", "450+", "3", "150", "500", "30,000"]);
+  const { detail } = portfolio.research[0];
+  const paragraphs = researchParagraphs(detail);
+  assert.equal(paragraphs.join(" "), detail);
+  for (const paragraph of paragraphs) assert.equal(paragraph.split(/(?<=\.) (?=[A-Z])/).length, 2, `not two sentences: ${paragraph}`);
+  for (const file of ["Leadership", "Research"]) assert.match(read(`src/components/${file}.astro`), /from "\.\.\/lib\/text"/);
+});

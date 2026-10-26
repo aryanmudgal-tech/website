@@ -122,9 +122,10 @@ export function braille(fibre, ink) {
   return out.join('');
 }
 
-/** About ticks: each one drawn separately, so no two match. viewBox 0 0 20 16. */
+/** About ticks: each one drawn separately, so no two match. viewBox 0 0 20 16, and the whole stroke stays inside it,
+ *  because a mask clips what falls outside its box. */
 export function aboutTick(seed) {
-  return P(tick(2.2, 5.2, 15, seed, { size: 1.9 }));
+  return P(tick(2, 3.4, 11.4, seed, { size: 1.7 }));
 }
 
 /** Pune to Buffalo to New York City: a solid pencil arc between two pressed stops, then a dashed leg to an open stop,

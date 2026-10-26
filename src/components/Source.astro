@@ -6,21 +6,20 @@ interface Props {
   receipt: Receipt;
   /** Text before the colon. Pass an empty string to print the label alone. */
   prefix?: string;
+  /** Inline sits inside a sentence; a stub ends a row (spec 7.4). Both read "Source: {label}". */
+  variant?: "inline" | "stub";
   class?: string;
 }
 
-const { receipt, prefix = "Source", class: className } = Astro.props;
+const { receipt, prefix = "Source", variant = "inline", class: className } = Astro.props;
 const external = receipt.href.startsWith("http");
 const href = external || receipt.href.startsWith("#") ? receipt.href : publicAssetUrl(receipt.href);
 const text = prefix ? `${prefix}: ${receipt.label}` : receipt.label;
+const classes = variant === "stub" ? ["stub", className] : ["source", className];
+const target = external ? { target: "_blank", rel: "noopener noreferrer" } : {};
 ---
 
-{
-  external ? (
-    <a class:list={["source", className]} href={href} target="_blank" rel="noopener noreferrer">
-      {text}<span class="sr-only"> opens in a new tab</span>
-    </a>
-  ) : (
-    <a class:list={["source", className]} href={href}>{text}</a>
-  )
-}
+<a class:list={classes} href={href} {...target}>
+  {variant === "stub" ? <>{prefix && `${prefix}: `}<span class="stub__pub">{receipt.label}</span></> : text}
+  {external && <span class="sr-only"> opens in a new tab</span>}
+</a>

@@ -1,26 +1,24 @@
 ---
 import { research, headings } from "../data/portfolio";
+import { researchParagraphs } from "../lib/text";
 import Source from "./Source.astro";
 import Print from "./Print.astro";
 ---
 
-<section id="research" class="chapter" aria-labelledby="research-title">
-  <header class="chapter__head">
-    <span class="label">Research</span>
-    <h2 id="research-title">{headings.research}</h2>
-  </header>
+<section id="research" class="section" aria-labelledby="research-title">
+  <h2 id="research-title">{headings.research}</h2>
   {research.map((item) => (
-    <article class="card">
+    <article class="card card--research">
       <div class="card__meta">
-        <strong class="meta-lead">{item.role}</strong>
+        <span class="meta-lead">{item.role}</span>
         <span>{item.period}</span>
       </div>
       <div class="card__body">
         <h3>{item.title}</h3>
         <p class="card__lede">{item.summary}</p>
-        <p>{item.detail}</p>
-        <div class="receipts">
-          {item.receipts.map((receipt) => <Source receipt={receipt} />)}
+        {researchParagraphs(item.detail).map((paragraph) => <p>{paragraph}</p>)}
+        <div class="stubs">
+          {item.receipts.map((receipt) => <Source receipt={receipt} variant="stub" />)}
         </div>
       </div>
       <div class="card__margin">

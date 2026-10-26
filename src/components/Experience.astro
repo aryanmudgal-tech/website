@@ -3,25 +3,22 @@ import { experiences, headings } from "../data/portfolio";
 import Source from "./Source.astro";
 ---
 
-<section id="work" class="chapter" aria-labelledby="work-title">
-  <header class="chapter__head">
-    <span class="label">Work</span>
-    <h2 id="work-title">{headings.work}</h2>
-  </header>
+<section id="work" class="section" aria-labelledby="work-title">
+  <h2 id="work-title">{headings.work}</h2>
   {experiences.map((job) => (
     <article class="row">
       <div class="row__meta">
-        <strong>{job.company}</strong>
-        <span>{job.role}</span>
-        <span>{job.period}</span>
+        <span class="meta-lead">{job.company}</span>
+        <span class="meta__role">{job.role}</span>
         <span>{job.place}</span>
+        <span>{job.period}</span>
       </div>
       <div class="row__body">
         <h3>{job.outcome}</h3>
         <p>{job.detail}</p>
-        <p class="my-part"><strong>My part:</strong> {job.myPart}</p>
-        <div class="receipts">
-          {job.receipts.map((receipt) => <Source receipt={receipt} />)}
+        <p class="my-part"><strong>My part.</strong> {job.myPart}</p>
+        <div class="stubs">
+          {job.receipts.map((receipt) => <Source receipt={receipt} variant="stub" />)}
         </div>
       </div>
     </article>

@@ -5,31 +5,34 @@ import Print from "./Print.astro";
 import Video from "./Video.astro";
 ---
 
-<section id="projects" class="chapter" aria-labelledby="projects-title">
-  <header class="chapter__head">
-    <span class="label">Projects</span>
-    <h2 id="projects-title">{headings.projects}</h2>
-    <p class="chapter__lede">Hackathon builds, each finished in a day or two and shown to judges. Team size and my part are stated on every card.</p>
-  </header>
+<section id="projects" class="section" aria-labelledby="projects-title">
+  <h2 id="projects-title">{headings.projects}</h2>
+  <p class="lede">Hackathon builds, each finished in a day or two and shown to judges. Team size and my part are stated on every card.</p>
+  <ol class="index" role="list">
+    {projects.map((project) => (
+      <li>
+        <a class="index__name" href={`#project-${project.id}`}>{project.name}</a>
+        <span class="index__result">{project.result}</span>
+      </li>
+    ))}
+  </ol>
   {projects.map((project) => (
     <article class="card" id={`project-${project.id}`}>
       <div class="card__meta">
-        <p class="card__event">
-          <span>{project.event}</span>
-          <span>{project.date}</span>
-          {project.pool && <span>{project.pool}</span>}
-        </p>
-        <p class="card__team">Team: {project.team.join(", ")}.</p>
+        <span>{project.event}</span>
+        <span>{project.date}</span>
+        {project.pool && <span>{project.pool}</span>}
+        <span>Team: {project.team.join(", ")}.</span>
       </div>
       <div class="card__body">
         <h3>{project.name}</h3>
-        <p class="card__result">{project.result}</p>
+        <p class="result"><span class="hl--marigold">{project.result}</span></p>
         <p>{project.built}</p>
-        {project.demo && <Video video={project.demo} />}
-        <p class="my-part"><strong>My part:</strong> {project.myPart}</p>
-        {project.aside && <p class="card__aside">{project.aside}</p>}
-        <div class="receipts">
-          {project.receipts.map((receipt) => <Source receipt={receipt} />)}
+        {project.demo && <Video video={project.demo} mat="demo" />}
+        <p class="my-part"><strong>My part.</strong> {project.myPart}</p>
+        {project.aside && <p class="aside">{project.aside}</p>}
+        <div class="stubs">
+          {project.receipts.map((receipt) => <Source receipt={receipt} variant="stub" />)}
         </div>
       </div>
       <div class="card__margin">
