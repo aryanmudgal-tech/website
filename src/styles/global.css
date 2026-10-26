@@ -1,39 +1,76 @@
+/* Fallback faces, measured 26 October 2026 against the real fixation line, so the font swap does not move the first screen. */
+@font-face { font-family: "Source Serif 4 Fallback"; src: local("Georgia"); size-adjust: 99.75%; ascent-override: 103.86%; descent-override: 33.58%; line-gap-override: 0%; }
+@font-face { font-family: "Source Serif 4 Fallback Noto"; src: local("Noto Serif"); size-adjust: 93.71%; ascent-override: 110.55%; descent-override: 35.75%; line-gap-override: 0%; }
+@font-face { font-family: "Instrument Sans Fallback"; src: local("Arial"), local("Helvetica"); size-adjust: 102.83%; ascent-override: 94.33%; descent-override: 24.31%; line-gap-override: 0%; }
+@font-face { font-family: "Instrument Sans Fallback Roboto"; src: local("Roboto"); size-adjust: 104.01%; ascent-override: 93.26%; descent-override: 24.04%; line-gap-override: 0%; }
+
 :root {
   color-scheme: light dark;
-  --paper: #f3f2ee;
-  --paper-2: #e9e7e1;
-  --paper-3: #dcd9d1;
-  --ink: #1c1b19;
-  --ink-2: #44423d;
-  --muted: #6b6861;
-  --line: #d3cfc6;
-  --line-2: #b8b3a8;
-  --accent: #0b4fb3;
-  --accent-text: #0a45a0;
-  --accent-ink: #ffffff;
-  --font-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --font-text: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  /* theme tokens (spec 5.1) */
+  --paper: #FBF8F2;
+  --paper-2: #F3EDE1;
+  --ink: #1B1A17;
+  --ink-2: #45413A;
+  --muted: #635E55;
+  --line: #DDD5C6;
+  --accent: #005BBB;
+  --on-accent: #FFFFFF;
+  --slab: #1B1A17;
+  --lift: rgba(27, 26, 23, .26);
+  --lift-far: rgba(27, 26, 23, .12);
+  /* fixed tokens: paper, the same in both themes */
+  --on-stock: #1B1A17;
+  --fibre: #FFFDF6;
+  --pencil: #2B2925;
+  --tape: #E9DDC2;
+  --graph-line: #A9C7E0;
+  --on-slab: var(--fibre);
+  --on-slab-muted: #CFC8BA;
+  --stock-marigold: #F2A516;
+  --stock-vermilion: #EC5B3B;
+  --stock-sky: #9CC8EE;
+  --stock-leaf: #2F9E5B;
+  --stock-kraft: #D6BC92;
+  --stock-ub: #005BBB;
+  --page-marigold: #F2A516;
+  --page-sky: #9CC8EE;
+  --page-mint: #8FD3A8;
+  --page-coral: #F59A80;
+  --page-rose: #F2A9BF;
+  --page-lilac: #CDB8F0;
+  --page-ink-2: #312E29;
+  --serif: "Source Serif 4", "Source Serif 4 Fallback", "Source Serif 4 Fallback Noto", Georgia, serif;
+  --sans: "Instrument Sans", "Instrument Sans Fallback", "Instrument Sans Fallback Roboto", system-ui, sans-serif;
+  /* layout; the v3 frame keeps --frame-w until Plan B retires it */
   --shell: 80rem;
-  --gutter: clamp(1rem, 4vw, 3rem);
+  --gutter: 16px;
   --measure: 46rem;
   --header-height: 3.75rem;
   --frame-w: clamp(18rem, 30vw, 30rem);
   --radius: 3px;
 }
 
+@media (min-width: 48rem) {
+  :root { --gutter: 32px; }
+}
+
+@media (min-width: 68.75rem) {
+  :root { --gutter: 48px; }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #15171a;
-    --paper-2: #1d2024;
-    --paper-3: #262a2f;
-    --ink: #eceae4;
-    --ink-2: #c9c6bf;
-    --muted: #918d85;
-    --line: #2e3237;
-    --line-2: #454a51;
-    --accent: #8eb4f5;
-    --accent-text: #9dbdf6;
-    --accent-ink: #0b1220;
+    --paper: #161512;
+    --paper-2: #201E1A;
+    --ink: #F2EDE3;
+    --ink-2: #CFC8BA;
+    --muted: #A39C8E;
+    --line: #3A362F;
+    --accent: #7DB0FF;
+    --on-accent: #0B1220;
+    --slab: #25231F;
+    --lift: rgba(0, 0, 0, .6);
+    --lift-far: rgba(0, 0, 0, .35);
   }
 }
 
@@ -53,7 +90,7 @@ body {
   min-width: 20rem;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-text);
+  font-family: var(--sans);
   font-size: 1.0625rem;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -62,7 +99,7 @@ body {
 
 ::selection {
   background: var(--accent);
-  color: var(--accent-ink);
+  color: var(--on-accent);
 }
 
 img {
@@ -105,14 +142,14 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
 
 h1,
 h2,
 h3 {
-  font-family: var(--font-display);
+  font-family: var(--serif);
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -152,7 +189,7 @@ h3 {
   z-index: 100;
   padding: 0.6rem 0.9rem;
   background: var(--accent);
-  color: var(--accent-ink);
+  color: var(--on-accent);
   border-radius: var(--radius);
   transform: translateY(-200%);
 }
@@ -182,15 +219,15 @@ h3 {
 }
 
 .num {
-  font-family: var(--font-display);
+  font-family: var(--serif);
   font-variant-numeric: tabular-nums;
 }
 
 .source {
   display: inline-block;
   font-size: 0.86rem;
-  color: var(--accent-text);
-  text-decoration-color: var(--line-2);
+  color: var(--accent);
+  text-decoration-color: currentColor;
   padding-block: 0.35rem;
 }
 
@@ -218,7 +255,7 @@ h3 {
 
 .action--primary {
   background: var(--accent);
-  color: var(--accent-ink);
+  color: var(--on-accent);
 }
 
 .action--primary:hover {
@@ -226,7 +263,7 @@ h3 {
 }
 
 .action--text {
-  color: var(--accent-text);
+  color: var(--accent);
   text-decoration: underline;
   text-decoration-thickness: 0.06em;
   text-underline-offset: 0.2em;
@@ -251,7 +288,7 @@ h3 {
 }
 
 .wordmark {
-  font-family: var(--font-display);
+  font-family: var(--serif);
   font-size: 1.2rem;
   font-weight: 500;
   text-decoration: none;
@@ -292,7 +329,7 @@ h3 {
   min-height: 2.75rem;
   min-width: 2.75rem;
   padding: 0.4rem 0.8rem;
-  border: 1px solid var(--line-2);
+  border: 1px solid var(--ink);
   border-radius: var(--radius);
   background: var(--paper);
   font-weight: 600;
@@ -342,7 +379,7 @@ main {
   width: 100%;
   padding: 0;
   border: 0;
-  background: var(--paper-3);
+  background: var(--paper-2);
   border-radius: var(--radius);
   overflow: hidden;
   cursor: zoom-in;
@@ -415,7 +452,7 @@ main {
   justify-self: end;
   min-height: 2.75rem;
   padding: 0.4rem 1rem;
-  border: 1px solid var(--line-2);
+  border: 1px solid var(--ink);
   border-radius: var(--radius);
   background: var(--paper);
   font-weight: 600;
@@ -447,7 +484,7 @@ main {
 }
 
 .ledger {
-  border-top: 1px solid var(--line-2);
+  border-top: 1px solid var(--ink);
 }
 
 .ledger__row {
@@ -460,7 +497,7 @@ main {
 }
 
 .ledger__fraction {
-  font-family: var(--font-display);
+  font-family: var(--serif);
   font-size: 1.7rem;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
@@ -472,7 +509,7 @@ main {
 }
 
 .ledger__row--bold .ledger__fraction {
-  color: var(--accent-text);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -588,9 +625,9 @@ main {
 }
 
 .card__result {
-  font-family: var(--font-display);
+  font-family: var(--serif);
   font-size: 1.25rem;
-  color: var(--accent-text);
+  color: var(--accent);
 }
 
 .card__team {
@@ -617,7 +654,7 @@ main {
   display: block;
   overflow: hidden;
   border-radius: var(--radius);
-  background: var(--paper-3);
+  background: var(--paper-2);
 }
 
 .video__poster[hidden] {
@@ -636,8 +673,8 @@ main {
   bottom: 0.75rem;
   padding: 0.3rem 0.65rem;
   border-radius: 999px;
-  background: rgb(20 20 20 / 0.72);
-  color: #fff;
+  background: var(--fibre);
+  color: var(--on-stock);
   font-size: 0.78rem;
   font-weight: 600;
 }
@@ -648,7 +685,7 @@ main {
   aspect-ratio: 16 / 9;
   border: 0;
   border-radius: var(--radius);
-  background: #000;
+  background: var(--on-stock);
 }
 
 .video__file {
@@ -658,7 +695,7 @@ main {
   max-height: 34rem;
   margin-inline: auto;
   border-radius: var(--radius);
-  background: #000;
+  background: var(--on-stock);
 }
 
 .video__caption {
@@ -688,7 +725,7 @@ main {
 }
 
 .route a {
-  text-decoration-color: var(--line-2);
+  text-decoration-color: currentColor;
 }
 
 /* Recognition */
@@ -704,11 +741,11 @@ main {
 }
 
 .award__fraction {
-  font-family: var(--font-display);
+  font-family: var(--serif);
   font-size: 2.4rem;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  color: var(--accent-text);
+  color: var(--accent);
 }
 
 .award__body {
@@ -727,7 +764,7 @@ main {
   row-gap: 0.8rem;
   max-width: var(--measure);
   font-size: 1.15rem;
-  font-family: var(--font-display);
+  font-family: var(--serif);
 }
 
 /* Footer */
@@ -744,9 +781,9 @@ main {
 }
 
 .contact-link {
-  font-family: var(--font-display);
+  font-family: var(--serif);
   font-size: clamp(1.4rem, 2.4vw, 1.9rem);
-  color: var(--accent-text);
+  color: var(--accent);
   text-decoration-thickness: 0.05em;
 }
 
@@ -827,7 +864,7 @@ main {
     margin: 0;
     padding: 0.5rem;
     min-width: 12rem;
-    border: 1px solid var(--line-2);
+    border: 1px solid var(--ink);
     border-radius: var(--radius);
     background: var(--paper);
     color: var(--ink);

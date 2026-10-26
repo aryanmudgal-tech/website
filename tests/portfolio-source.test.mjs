@@ -151,6 +151,14 @@ test("the visual system keeps one accent, theme and focus safeguards, and no tem
     assert.doesNotMatch(styles, font);
   }
   assert.doesNotMatch(styles, /\.hero\b[^{]*\{[^}]*(?<![a-z-])gap:/s, "the hero grid must use row-gap, never the gap shorthand");
+  const layout = read("src/layouts/BaseLayout.astro");
+  assert.match(styles, /"Source Serif 4"/);
+  assert.match(styles, /"Instrument Sans"/);
+  assert.doesNotMatch(styles + layout, /Newsreader/);
+  assert.doesNotMatch(styles, /\bcursive\b|Kalam/i);
+  const accents = [...styles.matchAll(/--accent:\s*([^;]+);/g)].map((match) => match[1].trim().toUpperCase());
+  assert.ok(accents.length >= 2, "light and dark accents");
+  for (const accent of accents) assert.ok(["#005BBB", "#7DB0FF"].includes(accent), `--accent is ${accent}`);
 });
 
 test("navigation exposes the current section without scroll listeners or swap hooks", () => {
