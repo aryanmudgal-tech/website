@@ -1,6 +1,6 @@
 # Whole-page crumple prototype (26 October 2026)
 
-Aryan asked for the whole page, not just the section strips, to crumple as you scroll, with the next page coming up from behind. Open `index.html` in Chrome, Edge or Safari 26 and scroll slowly to the end of each section.
+Aryan asked for the whole page, not just the section strips, to crumple as you scroll, with the next page coming up from behind, and for it to be bright, colourful and artistic: every section is its own sheet of coloured paper. Open `index.html` in Chrome, Edge or Safari 26 and scroll slowly to the end of each section.
 
 How it works:
 
