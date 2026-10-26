@@ -1,0 +1,17 @@
+{
+  "name": "whole-page-crumple-tools",
+  "private": true,
+  "type": "module",
+  "description": "Offline build for the whole-page crumple prototype: three.js renders one crumple sequence per screen shape, sharp packs it into AVIF strips, and the page CSS is generated from the frame outlines.",
+  "scripts": {
+    "render": "node page-crumple.mjs d m",
+    "pack": "node pack-page.mjs",
+    "page": "node build-whole-page.mjs"
+  },
+  "dependencies": {
+    "perfect-freehand": "1.2.2",
+    "sharp": "0.34.4",
+    "simplex-noise": "4.0.3",
+    "three": "0.169.0"
+  }
+}

@@ -1,0 +1,417 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style></head><body><title>Whole-Page Crumple Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&display=swap">
+<!--
+  WHOLE-PAGE CRUMPLE, a scroll prototype for the Paste-Up portfolio.
+  Each section is a sheet. When you reach the end of one, its last screen holds still for one screen of scrolling while
+  it wrinkles, balls up and rolls away; the next sheet waits underneath and is revealed. The real page (text, links,
+  photos) is what crumples: a pre-rendered crumple sequence (one strip of frames, shared by every sheet) supplies the
+  outline as a mask and the creases as a multiply layer, and the live content shrinks with the outline.
+  Motion is CSS scroll-driven only. Without support, or with reduced motion, it is an ordinary scrolling page.
+-->
+<style>
+:root {
+  --paper: #FBF8F2; --ink: #1B1A17; --ink-2: #45413A; --muted: #635E55; --line: #DDD5C6; --accent: #005BBB;
+  --serif: "Source Serif 4", Georgia, serif; --sans: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .08 0 0 0 0 .06 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+* { box-sizing: border-box; }
+html { overflow-x: clip; background: var(--paper); }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-underline-offset: .16em; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+h2 { font: 500 clamp(30px, 4vw, 44px)/1.1 var(--serif); letter-spacing: -.01em; margin: 0 0 32px; text-wrap: balance; }
+p { margin: 0; }
+
+.sheet { position: relative; overflow-x: clip; }
+.sheet:nth-of-type(1) { z-index: 4; } .sheet:nth-of-type(2) { z-index: 3; } .sheet:nth-of-type(3) { z-index: 2; } .sheet:nth-of-type(4) { z-index: 1; }
+.crumple { position: relative; isolation: isolate; }
+.content {
+  min-height: 100svh; background: var(--paper) var(--grain);
+  padding: 40px max(16px, env(safe-area-inset-right, 0px)) 120px max(16px, env(safe-area-inset-left, 0px));
+}
+.wrap { max-width: 1184px; margin: 0 auto; }
+.fx { display: none; }
+
+.intro { font: 500 15px/22px var(--sans); color: var(--muted); padding-bottom: 12px; border-bottom: 1px solid var(--ink); margin-bottom: 40px; }
+.band { display: block; width: 100%; height: auto; margin: 0 0 40px; }
+.band--sm { display: none; }
+
+.row { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; padding: 32px 0; border-top: 1px solid var(--line); }
+.row:last-child { border-bottom: 1px solid var(--line); }
+.meta { color: var(--muted); font-size: 15px; line-height: 1.5; }
+.meta b { display: block; font: 600 22px/28px var(--serif); color: var(--ink); margin-bottom: 2px; }
+.out { font: 600 21px/1.35 var(--serif); margin-bottom: 12px; max-width: 640px; }
+.body { color: var(--ink-2); max-width: 640px; margin-bottom: 12px; }
+.mine b { font-weight: 600; }
+.src { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; font-size: 14px; }
+
+.lede { font: 400 20px/30px var(--serif); color: var(--ink-2); max-width: 640px; margin: -16px 0 32px; }
+.index { list-style: none; margin: 0 0 48px; padding: 0; max-width: 784px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.index li { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 16px; padding: 10px 0; border-top: 1px solid var(--line); }
+.index li:first-child { border-top: 0; }
+.index b { font: 600 17px/26px var(--serif); }
+.index span { font: 400 17px/26px var(--serif); color: var(--ink-2); }
+.card { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; }
+.result { display: inline-block; background: #F2A516; color: var(--ink); font: 600 17px/26px var(--serif); padding: 2px 8px; margin: 4px 0 14px; }
+.card h3 { font: 600 26px/1.2 var(--serif); margin: 0; }
+.mat { background: #EC5B3B; padding: 12px; margin: 18px 0 8px; max-width: 600px; }
+.mat img { display: block; width: 100%; height: auto; }
+.cap { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.aside { font-style: italic; color: var(--ink-2); font-family: var(--serif); }
+
+.award { display: grid; grid-template-columns: 220px minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
+.fig { font: 600 64px/1 var(--serif); letter-spacing: -.02em; }
+.den { font: italic 400 20px/1.4 var(--serif); color: var(--ink-2); margin: 6px 0 16px; }
+.award h3 { font: 600 24px/1.25 var(--serif); margin: 0 0 4px; }
+.print { background: #fff; padding: 8px 8px 10px; box-shadow: 0 2px 8px rgba(27,26,23,.18); rotate: 1deg; }
+.print img { display: block; width: 100%; height: auto; }
+.print figcaption { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.ticks { list-style: none; margin: 0; padding: 0; max-width: 760px; }
+.ticks li { padding: 14px 0 14px 30px; border-top: 1px solid var(--line); font: 400 20px/1.45 var(--serif); position: relative; }
+.ticks li::before { content: ""; position: absolute; left: 2px; top: 22px; width: 14px; height: 8px; border-left: 2px solid var(--ink-2); border-bottom: 2px solid var(--ink-2); rotate: -45deg; }
+.end { margin-top: 64px; color: var(--muted); font-size: 15px; }
+
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .row, .card, .award, .index li { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .band--lg { display: none; } .band--sm { display: block; }
+  .content { padding-top: 24px; }
+  .fig { font-size: 52px; }
+  .print { max-width: 320px; }
+}
+
+/* ---------- the crumple ---------- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    main { timeline-scope: --r1, --r2, --r3; }
+    .runway { height: 100svh; }
+    .runway + .sheet { margin-top: -100svh; }
+    #r1 { view-timeline: --r1 block; } #r2 { view-timeline: --r2 block; } #r3 { view-timeline: --r3 block; }
+
+    .fx {
+      display: block; position: absolute; left: 0; right: 0; bottom: 0; height: 100svh; pointer-events: none;
+      background: url(crumple-d.avif) no-repeat; background-size: 2500% 100%; mix-blend-mode: multiply; opacity: 0; z-index: 2;
+    }
+    .crumple { -webkit-mask-size: 2500% 100svh; mask-size: 2500% 100svh; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+    .content { transform-origin: 50% calc(100% - 50svh); }
+
+    /* leaving: the last screen holds still while it crumples and rolls away */
+    [data-out] .pin, [data-out] .crumple, [data-out] .content, [data-out] .fx { animation-range: entry 0% entry 100%; animation-fill-mode: both; }
+    [data-out] .pin { animation-name: hold; animation-timing-function: linear; }
+    [data-out] .crumple { animation-name: mask-d, roll; animation-timing-function: step-end, linear; }
+    [data-out] .content { animation-name: content-d; animation-timing-function: linear; }
+    [data-out] .fx { animation-name: fx-d; animation-timing-function: step-end; }
+    [data-out="r1"] :is(.pin, .crumple, .content, .fx) { animation-timeline: --r1; }
+    [data-out="r2"] :is(.pin, .crumple, .content, .fx) { animation-timeline: --r2; }
+    [data-out="r3"] :is(.pin, .crumple, .content, .fx) { animation-timeline: --r3; }
+    [data-out="r1"] .crumple { animation-timeline: --r1, --r1; }
+    [data-out="r2"] .crumple { animation-timeline: --r2, --r2; }
+    [data-out="r3"] .crumple { animation-timeline: --r3, --r3; }
+
+    /* arriving: the next sheet waits at the top of the screen, underneath */
+    [data-in] { animation: arrive linear both; animation-range: entry 0% entry 100%; }
+    [data-in="r1"] { animation-timeline: --r1; } [data-in="r2"] { animation-timeline: --r2; } [data-in="r3"] { animation-timeline: --r3; }
+
+    @keyframes hold {
+      0% { translate: 0 0; filter: none; visibility: visible; }
+      3% { filter: drop-shadow(0 10px 14px rgba(27, 26, 23, .22)); }
+      99.9% { visibility: visible; }
+      100% { translate: 0 100svh; filter: drop-shadow(0 10px 14px rgba(27, 26, 23, .22)); visibility: hidden; }
+    }
+    @keyframes arrive { from { translate: 0 -100svh; } to { translate: 0 0; } }
+    @keyframes roll { 0%, 74% { translate: 0 0; } 100% { translate: 78vw 4svh; } }
+
+    /* generated by build-whole-page.mjs: 25 desktop frames, 25 phone frames; crumple ends at 72% of each runway, the roll fills the rest */
+@keyframes mask-d {
+  0% { -webkit-mask-image: none; mask-image: none; }
+  5.92% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 0% 100%; mask-position: 0% 100%; }
+  10.4% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 4.1667% 100%; mask-position: 4.1667% 100%; }
+  12.15% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 8.3333% 100%; mask-position: 8.3333% 100%; }
+  13.9% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 12.5% 100%; mask-position: 12.5% 100%; }
+  16% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 16.6667% 100%; mask-position: 16.6667% 100%; }
+  20.305% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 20.8333% 100%; mask-position: 20.8333% 100%; }
+  24.617% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 25% 100%; mask-position: 25% 100%; }
+  28.922% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 29.1667% 100%; mask-position: 29.1667% 100%; }
+  33.234% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 33.3333% 100%; mask-position: 33.3333% 100%; }
+  37.539% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 37.5% 100%; mask-position: 37.5% 100%; }
+  41.844% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 41.6667% 100%; mask-position: 41.6667% 100%; }
+  46.156% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 45.8333% 100%; mask-position: 45.8333% 100%; }
+  50.461% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 50% 100%; mask-position: 50% 100%; }
+  54.766% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 54.1667% 100%; mask-position: 54.1667% 100%; }
+  59.078% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 58.3333% 100%; mask-position: 58.3333% 100%; }
+  63.383% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 62.5% 100%; mask-position: 62.5% 100%; }
+  67.695% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 66.6667% 100%; mask-position: 66.6667% 100%; }
+  72% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 70.8333% 100%; mask-position: 70.8333% 100%; }
+  77.714% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 75% 100%; mask-position: 75% 100%; }
+  81.429% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 79.1667% 100%; mask-position: 79.1667% 100%; }
+  85.143% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 83.3333% 100%; mask-position: 83.3333% 100%; }
+  88.857% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 87.5% 100%; mask-position: 87.5% 100%; }
+  92.571% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 91.6667% 100%; mask-position: 91.6667% 100%; }
+  96.286% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 95.8333% 100%; mask-position: 95.8333% 100%; }
+  100% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 100% 100%; mask-position: 100% 100%; }
+  100% { -webkit-mask-image: url(crumple-d.avif); mask-image: url(crumple-d.avif); -webkit-mask-position: 100% 100%; mask-position: 100% 100%; }
+}
+@keyframes fx-d {
+  0% { opacity: 0; background-position: 0% 100%; }
+  5.92% { opacity: .82; background-position: 0% 100%; }
+  10.4% { opacity: .82; background-position: 4.1667% 100%; }
+  12.15% { opacity: .82; background-position: 8.3333% 100%; }
+  13.9% { opacity: .82; background-position: 12.5% 100%; }
+  16% { opacity: .82; background-position: 16.6667% 100%; }
+  20.305% { opacity: .82; background-position: 20.8333% 100%; }
+  24.617% { opacity: .82; background-position: 25% 100%; }
+  28.922% { opacity: .82; background-position: 29.1667% 100%; }
+  33.234% { opacity: .82; background-position: 33.3333% 100%; }
+  37.539% { opacity: .82; background-position: 37.5% 100%; }
+  41.844% { opacity: .82; background-position: 41.6667% 100%; }
+  46.156% { opacity: .82; background-position: 45.8333% 100%; }
+  50.461% { opacity: .82; background-position: 50% 100%; }
+  54.766% { opacity: .82; background-position: 54.1667% 100%; }
+  59.078% { opacity: .82; background-position: 58.3333% 100%; }
+  63.383% { opacity: .82; background-position: 62.5% 100%; }
+  67.695% { opacity: .82; background-position: 66.6667% 100%; }
+  72% { opacity: .82; background-position: 70.8333% 100%; }
+  77.714% { opacity: .82; background-position: 75% 100%; }
+  81.429% { opacity: .82; background-position: 79.1667% 100%; }
+  85.143% { opacity: .82; background-position: 83.3333% 100%; }
+  88.857% { opacity: .82; background-position: 87.5% 100%; }
+  92.571% { opacity: .82; background-position: 91.6667% 100%; }
+  96.286% { opacity: .82; background-position: 95.8333% 100%; }
+  100% { opacity: .82; background-position: 100% 100%; }
+  100% { opacity: .82; background-position: 100% 100%; }
+}
+@keyframes content-d {
+  0% { transform: none; }
+  5.92% { transform: translate(0.00vw, 0.00svh) scale(1.0000, 1.0000); }
+  10.4% { transform: translate(0.00vw, 0.00svh) scale(1.0000, 1.0000); }
+  12.15% { transform: translate(0.00vw, 0.00svh) scale(1.0000, 1.0000); }
+  13.9% { transform: translate(0.00vw, 0.00svh) scale(1.0000, 1.0000); }
+  16% { transform: translate(0.04vw, 0.06svh) scale(0.9914, 0.9988); }
+  20.305% { transform: translate(0.00vw, -0.56svh) scale(0.9234, 0.9263); }
+  24.617% { transform: translate(-0.20vw, -1.12svh) scale(0.8492, 0.8450); }
+  28.922% { transform: translate(-0.27vw, -1.44svh) scale(0.7695, 0.7638); }
+  33.234% { transform: translate(-0.27vw, -1.81svh) scale(0.6867, 0.6763); }
+  37.539% { transform: translate(-0.27vw, -2.12svh) scale(0.6023, 0.5850); }
+  41.844% { transform: translate(-0.23vw, -2.50svh) scale(0.5125, 0.4875); }
+  46.156% { transform: translate(-0.23vw, -2.88svh) scale(0.4203, 0.3900); }
+  50.461% { transform: translate(-0.27vw, -3.31svh) scale(0.3258, 0.2887); }
+  54.766% { transform: translate(-0.16vw, -1.88svh) scale(0.2328, 0.2500); }
+  59.078% { transform: translate(0.04vw, -3.06svh) scale(0.1961, 0.2813); }
+  63.383% { transform: translate(0.04vw, -3.37svh) scale(0.2008, 0.2925); }
+  67.695% { transform: translate(0.04vw, -3.19svh) scale(0.2055, 0.3038); }
+  72% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
+  77.714% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
+  81.429% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
+  85.143% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
+  88.857% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
+  92.571% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
+  96.286% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
+  100% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
+}
+@keyframes mask-m {
+  0% { -webkit-mask-image: none; mask-image: none; }
+  5.92% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 0% 100%; mask-position: 0% 100%; }
+  10.4% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 4.1667% 100%; mask-position: 4.1667% 100%; }
+  12.15% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 8.3333% 100%; mask-position: 8.3333% 100%; }
+  13.9% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 12.5% 100%; mask-position: 12.5% 100%; }
+  16% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 16.6667% 100%; mask-position: 16.6667% 100%; }
+  20.305% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 20.8333% 100%; mask-position: 20.8333% 100%; }
+  24.617% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 25% 100%; mask-position: 25% 100%; }
+  28.922% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 29.1667% 100%; mask-position: 29.1667% 100%; }
+  33.234% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 33.3333% 100%; mask-position: 33.3333% 100%; }
+  37.539% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 37.5% 100%; mask-position: 37.5% 100%; }
+  41.844% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 41.6667% 100%; mask-position: 41.6667% 100%; }
+  46.156% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 45.8333% 100%; mask-position: 45.8333% 100%; }
+  50.461% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 50% 100%; mask-position: 50% 100%; }
+  54.766% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 54.1667% 100%; mask-position: 54.1667% 100%; }
+  59.078% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 58.3333% 100%; mask-position: 58.3333% 100%; }
+  63.383% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 62.5% 100%; mask-position: 62.5% 100%; }
+  67.695% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 66.6667% 100%; mask-position: 66.6667% 100%; }
+  72% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 70.8333% 100%; mask-position: 70.8333% 100%; }
+  77.714% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 75% 100%; mask-position: 75% 100%; }
+  81.429% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 79.1667% 100%; mask-position: 79.1667% 100%; }
+  85.143% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 83.3333% 100%; mask-position: 83.3333% 100%; }
+  88.857% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 87.5% 100%; mask-position: 87.5% 100%; }
+  92.571% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 91.6667% 100%; mask-position: 91.6667% 100%; }
+  96.286% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 95.8333% 100%; mask-position: 95.8333% 100%; }
+  100% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 100% 100%; mask-position: 100% 100%; }
+  100% { -webkit-mask-image: url(crumple-m.avif); mask-image: url(crumple-m.avif); -webkit-mask-position: 100% 100%; mask-position: 100% 100%; }
+}
+@keyframes fx-m {
+  0% { opacity: 0; background-position: 0% 100%; }
+  5.92% { opacity: .82; background-position: 0% 100%; }
+  10.4% { opacity: .82; background-position: 4.1667% 100%; }
+  12.15% { opacity: .82; background-position: 8.3333% 100%; }
+  13.9% { opacity: .82; background-position: 12.5% 100%; }
+  16% { opacity: .82; background-position: 16.6667% 100%; }
+  20.305% { opacity: .82; background-position: 20.8333% 100%; }
+  24.617% { opacity: .82; background-position: 25% 100%; }
+  28.922% { opacity: .82; background-position: 29.1667% 100%; }
+  33.234% { opacity: .82; background-position: 33.3333% 100%; }
+  37.539% { opacity: .82; background-position: 37.5% 100%; }
+  41.844% { opacity: .82; background-position: 41.6667% 100%; }
+  46.156% { opacity: .82; background-position: 45.8333% 100%; }
+  50.461% { opacity: .82; background-position: 50% 100%; }
+  54.766% { opacity: .82; background-position: 54.1667% 100%; }
+  59.078% { opacity: .82; background-position: 58.3333% 100%; }
+  63.383% { opacity: .82; background-position: 62.5% 100%; }
+  67.695% { opacity: .82; background-position: 66.6667% 100%; }
+  72% { opacity: .82; background-position: 70.8333% 100%; }
+  77.714% { opacity: .82; background-position: 75% 100%; }
+  81.429% { opacity: .82; background-position: 79.1667% 100%; }
+  85.143% { opacity: .82; background-position: 83.3333% 100%; }
+  88.857% { opacity: .82; background-position: 87.5% 100%; }
+  92.571% { opacity: .82; background-position: 91.6667% 100%; }
+  96.286% { opacity: .82; background-position: 95.8333% 100%; }
+  100% { opacity: .82; background-position: 100% 100%; }
+  100% { opacity: .82; background-position: 100% 100%; }
+}
+@keyframes content-m {
+  0% { transform: none; }
+  5.92% { transform: translate(0.00vw, 0.00svh) scale(1.0000, 1.0000); }
+  10.4% { transform: translate(0.00vw, 0.00svh) scale(1.0000, 1.0000); }
+  12.15% { transform: translate(0.00vw, 0.00svh) scale(1.0000, 1.0000); }
+  13.9% { transform: translate(0.00vw, -0.12svh) scale(1.0000, 0.9976); }
+  16% { transform: translate(0.00vw, -0.30svh) scale(1.0000, 0.9870); }
+  20.305% { transform: translate(1.15vw, -0.65svh) scale(0.9564, 0.9206); }
+  24.617% { transform: translate(0.90vw, -1.07svh) scale(0.8641, 0.8460); }
+  28.922% { transform: translate(1.28vw, -1.48svh) scale(0.7795, 0.7666); }
+  33.234% { transform: translate(1.41vw, -1.84svh) scale(0.6949, 0.6813); }
+  37.539% { transform: translate(1.41vw, -2.31svh) scale(0.6077, 0.5912); }
+  41.844% { transform: translate(1.67vw, -2.78svh) scale(0.5154, 0.4964); }
+  46.156% { transform: translate(1.79vw, -3.26svh) scale(0.4205, 0.3993); }
+  50.461% { transform: translate(0.26vw, -3.67svh) scale(0.3949, 0.2962); }
+  54.766% { transform: translate(0.26vw, -4.09svh) scale(0.4051, 0.1931); }
+  59.078% { transform: translate(0.26vw, -2.55svh) scale(0.4154, 0.1694); }
+  63.383% { transform: translate(0.26vw, -2.55svh) scale(0.4256, 0.1742); }
+  67.695% { transform: translate(0.38vw, -2.61svh) scale(0.4333, 0.1777); }
+  72% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
+  77.714% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
+  81.429% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
+  85.143% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
+  88.857% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
+  92.571% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
+  96.286% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
+  100% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
+}
+
+
+    @media (max-aspect-ratio: 3/4) {
+      .fx { background-image: url(crumple-m.avif); background-size: 2500% 100%; }
+      .crumple { -webkit-mask-size: 2500% 100svh; mask-size: 2500% 100svh; }
+      [data-out] .crumple { animation-name: mask-m, roll; }
+      [data-out] .content { animation-name: content-m; }
+      [data-out] .fx { animation-name: fx-m; }
+    }
+    /* decode both strips while the first sheet is being read, so the first crumple does not stall */
+    .preload { position: fixed; left: 0; top: 0; width: 1px; height: 1px; opacity: .01; pointer-events: none; background: url(crumple-d.avif) 0 0 / 1px 1px, url(crumple-m.avif) 0 0 / 1px 1px; }
+  }
+}
+</style>
+
+<div class="preload" aria-hidden="true"></div>
+<main>
+  <section class="sheet" id="work" data-out="r1">
+    <div class="pin"><div class="crumple"><div class="content"><div class="wrap">
+      <p class="intro">Prototype: whole-page crumple. Scroll slowly to the end of each section.</p>
+      <picture aria-hidden="true"><img class="band band--lg" src="bands/sky.svg" alt="" width="1184" height="156"><img class="band band--sm" src="bands/sky-sm.svg" alt="" width="358" height="96"></picture>
+      <h2>Three summers, one app that replaced paper on a plant floor</h2>
+      <div class="row">
+        <div class="meta"><b>Linde</b>Software Engineer Intern<br>Buffalo, NY<br>Summer 2026</div>
+        <div>
+          <p class="out">Replaced paper production logging across a plant with an app that saves operators about three hours a day.</p>
+          <p class="body">Built and shipped an ASP.NET Core MVC application from scratch. Designed the SQL Server schema, integrated Active Directory sign-in so floor laptops log in automatically, deployed on-prem via IIS, and built an Azure CI/CD pipeline for a second internal tool. In beta at the Palmer, Massachusetts site, slated to scale nationwide.</p>
+          <p class="mine"><b>My part.</b> The whole application, from schema to deployment.</p>
+          <p class="src"><span>Source: <a href="https://www.linkedin.com/in/aryan-mudgal" target="_blank" rel="noopener">LinkedIn</a></span><span>Source: <a href="https://aryanmudgal-tech.github.io/website/resume.pdf" target="_blank" rel="noopener">Resume</a></span></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="meta"><b>Meta Layer Initiative</b>Software Engineer Intern<br>Remote<br>Summer 2025</div>
+        <div>
+          <p class="out">Built the core browser extension: a persistent layer over any webpage where people and AI agents work side by side.</p>
+          <p class="body">Shipped the extension that the initiative's human-AI collaboration work runs on. Code is private to the initiative.</p>
+          <p class="mine"><b>My part.</b> The extension itself.</p>
+          <p class="src"><span>Source: <a href="https://www.linkedin.com/in/aryan-mudgal" target="_blank" rel="noopener">LinkedIn</a></span></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="meta"><b>HCLTech</b>Technical Analyst Intern<br>Dubai, UAE<br>May to August 2024</div>
+        <div>
+          <p class="out">Turned 50+ industry reports on AI in the MENA region into a strategy a Fortune 500 client acted on.</p>
+          <p class="body">Analyzed 35+ customer journeys to align product localization with regional infrastructure standards, then delivered a 45-minute strategy presentation to C-suite stakeholders that shaped technology investment priorities across MENA markets.</p>
+          <p class="mine"><b>My part.</b> The research, the analysis, and the presentation.</p>
+          <p class="src"><span>Source: <a href="https://www.linkedin.com/in/aryan-mudgal" target="_blank" rel="noopener">LinkedIn</a></span><span>Source: <a href="https://aryanmudgal-tech.github.io/website/resume.pdf" target="_blank" rel="noopener">Resume</a></span></p>
+        </div>
+      </div>
+    </div></div><div class="fx" aria-hidden="true"></div></div></div>
+  </section>
+  <div class="runway" id="r1" aria-hidden="true"></div>
+
+  <section class="sheet" id="projects" data-in="r1" data-out="r2">
+    <div class="pin"><div class="crumple"><div class="content"><div class="wrap">
+      <picture aria-hidden="true"><img class="band band--lg" src="bands/vermilion.svg" alt="" width="1184" height="162"><img class="band band--sm" src="bands/vermilion-sm.svg" alt="" width="358" height="102"></picture>
+      <h2>What I built in a day at UCLA, MIT, CMU and Stanford</h2>
+      <p class="lede">Hackathon builds, each finished in a day or two and shown to judges. Team size and my part are stated on every card.</p>
+      <ul class="index">
+        <li><b>Dots</b><span>1st, Catalyst for Care track. 3rd, Agentverse track.</span></li>
+        <li><b>ARMIE</b><span>Honorable mention.</span></li>
+        <li><b>StreamFair</b><span>1st, Ripple track.</span></li>
+        <li><b>W.O.D.</b><span>1st, Best Creation on Moonlake.</span></li>
+        <li><b>Safeline</b><span>Did not place. The demo ran.</span></li>
+      </ul>
+      <div class="card">
+        <div class="meta">LA Hacks, UCLA<br>April 2026<br>307 projects<br><br>Team: Ayush Srivastava, Manav Sharma, Abhi Ramtel.</div>
+        <div>
+          <h3>Dots</h3>
+          <p class="result">1st, Catalyst for Care track. 3rd, Agentverse track.</p>
+          <p class="body">An iOS app built in 20 hours that turns floor plans or LiDAR room scans into Braille tactile maps and lets a blind user ask an AI voice agent about the space. On-device LiDAR scanning in Swift; a printable map for under 50 dollars instead of a compliance bill in the thousands.</p>
+          <div class="mat"><img src="img/dots-poster.jpg" alt="Still from the Dots demo video" width="1280" height="720" loading="lazy"></div>
+          <p class="cap">Dots demo: a LiDAR scan becomes a Braille map and answers questions by voice.</p>
+          <p class="mine"><b>My part.</b> The iOS app and its full pipeline, the voice agent, and the backend that generates the Braille-map STL.</p>
+          <p class="aside" style="margin-top:10px">One blind user tested it before the demo: my cousin.</p>
+          <p class="src"><span>Source: <a href="https://devpost.com/software/dots-y5r21j" target="_blank" rel="noopener">Devpost</a></span><span>Source: <a href="https://github.com/aryanmudgal-tech/dots" target="_blank" rel="noopener">GitHub</a></span></p>
+        </div>
+      </div>
+    </div></div><div class="fx" aria-hidden="true"></div></div></div>
+  </section>
+  <div class="runway" id="r2" aria-hidden="true"></div>
+
+  <section class="sheet" id="recognition" data-in="r2" data-out="r3">
+    <div class="pin"><div class="crumple"><div class="content"><div class="wrap">
+      <picture aria-hidden="true"><img class="band band--lg" src="bands/marigold.svg" alt="" width="1184" height="168"><img class="band band--sm" src="bands/marigold-sm.svg" alt="" width="358" height="108"></picture>
+      <h2>Two awards in one April, and a key</h2>
+      <div class="award">
+        <div class="meta">University at Buffalo,<br>April 2026</div>
+        <div>
+          <p class="fig">1 of 2</p>
+          <p class="den">from 130+ nominations across UB's 20,000+ undergraduates</p>
+          <h3>Award for Innovative Student Leadership</h3>
+          <p class="body">The Pillar of Leadership award for the student whose initiative changed something at the university.</p>
+          <p class="src"><span>Source: <a href="https://www.buffalo.edu/studentlife/life-on-campus/clubs-and-activities/event-calendars/ceremonies-and-celebrations/leadership-awards.html" target="_blank" rel="noopener">UB Student Life</a></span></p>
+        </div>
+        <figure class="print"><img src="img/full-pillar-pair.jpg" alt="Aryan holding the Pillar of Leadership award beside Shaurya Jain in front of a University at Buffalo backdrop" width="991" height="661" loading="lazy"><figcaption>With Shaurya Jain, who received the Exemplary Student Leader Award the same evening.</figcaption></figure>
+      </div>
+    </div></div><div class="fx" aria-hidden="true"></div></div></div>
+  </section>
+  <div class="runway" id="r3" aria-hidden="true"></div>
+
+  <section class="sheet" id="about" data-in="r3">
+    <div class="pin"><div class="crumple"><div class="content"><div class="wrap">
+      <picture aria-hidden="true"><img class="band band--lg" src="bands/kraft.svg" alt="" width="1184" height="168"><img class="band band--sm" src="bands/kraft-sm.svg" alt="" width="358" height="108"></picture>
+      <h2>Outside the work</h2>
+      <ul class="ticks">
+        <li>I do impressions, mostly Bollywood, on request.</li>
+        <li>Army kid: ten schools before university. Pune from 2020 to 2023, Buffalo since 2023.</li>
+        <li>Golf handicap 20. Badminton most weeks.</li>
+        <li>Geopolitics and public speaking, when nobody stops me.</li>
+        <li>Building Litos, a Chrome extension on the Chrome Web Store that shows what each Claude message costs you. <a href="https://github.com/aryanmudgal-tech/Litos" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+      <p class="end">End of the prototype. Scroll back up to watch each page uncrumple.</p>
+    </div></div></div></div>
+  </section>
+</main>
+</body></html>
