@@ -31,7 +31,7 @@
 }
 @keyframes fx-d {
   0% { opacity: 0; background-position: 0% 100%; }
-  5.92% { opacity: 0.82; background-position: 0% 100%; }
+  5.92% { opacity: 0.82; background-image: url(../assets/paper/crumple-d.avif); background-position: 0% 100%; }
   10.4% { background-position: 4.1667% 100%; }
   12.15% { background-position: 8.3333% 100%; }
   13.9% { background-position: 12.5% 100%; }
@@ -56,7 +56,7 @@
   92.571% { background-position: 91.6667% 100%; }
   96.286% { background-position: 95.8333% 100%; }
   100% { background-position: 100% 100%; }
-  100% { opacity: 0.82; background-position: 100% 100%; }
+  100% { opacity: 0.82; background-image: url(../assets/paper/crumple-d.avif); background-position: 100% 100%; }
 }
 @keyframes content-d {
   0% { transform: none; }
@@ -117,7 +117,7 @@
 }
 @keyframes fx-m {
   0% { opacity: 0; background-position: 0% 100%; }
-  5.92% { opacity: 0.82; background-position: 0% 100%; }
+  5.92% { opacity: 0.82; background-image: url(../assets/paper/crumple-m.avif); background-position: 0% 100%; }
   10.4% { background-position: 4.1667% 100%; }
   12.15% { background-position: 8.3333% 100%; }
   13.9% { background-position: 12.5% 100%; }
@@ -142,7 +142,7 @@
   92.571% { background-position: 91.6667% 100%; }
   96.286% { background-position: 95.8333% 100%; }
   100% { background-position: 100% 100%; }
-  100% { opacity: 0.82; background-position: 100% 100%; }
+  100% { opacity: 0.82; background-image: url(../assets/paper/crumple-m.avif); background-position: 100% 100%; }
 }
 @keyframes content-m {
   0% { transform: none; }

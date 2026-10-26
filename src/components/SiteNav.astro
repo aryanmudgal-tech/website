@@ -67,6 +67,32 @@ import { navItems } from "../data/portfolio";
     }, { threshold: 0 }).observe(pageEnd);
   }
 
+  // Keyboard focus can land in a sheet still waiting under the one being read, or stop the scroll mid-crumple, because
+  // the browser measures the moved box. Where the crumple runs, show the focused element where it lies at rest instead.
+  if (CSS.supports("animation-timeline: view()") && matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+    const laidOut = (element: HTMLElement) => {
+      let y = 0;
+      for (let node: HTMLElement | null = element; node; node = node.offsetParent as HTMLElement | null) y += node.offsetTop;
+      return y;
+    };
+    const header = document.querySelector<HTMLElement>(".site-header");
+    document.addEventListener("focusin", (event) => {
+      const target = event.target as HTMLElement;
+      const sheet = target.closest<HTMLElement>(".sheet");
+      if (!sheet || target.closest("[popover]")) return;
+      requestAnimationFrame(() => {
+        const top = laidOut(target), pad = 24, head = header?.offsetHeight ?? 0;
+        const arrived = sheet.dataset.in ? laidOut(document.getElementById(sheet.dataset.in)!) : 0;
+        const leaves = sheet.dataset.out ? laidOut(document.getElementById(sheet.dataset.out)!) - innerHeight : document.documentElement.scrollHeight - innerHeight;
+        let want = scrollY;
+        if (top - head - pad < want) want = top - head - pad;
+        else if (top + target.offsetHeight + pad > want + innerHeight) want = top + target.offsetHeight + pad - innerHeight;
+        want = Math.min(Math.max(want, arrived), Math.max(arrived, leaves));
+        if (Math.abs(want - scrollY) > 1) scrollTo({ top: want, behavior: "instant" });
+      });
+    });
+  }
+
   const menu = document.getElementById("site-menu");
   if (menu && "hidePopover" in menu) {
     menu.querySelectorAll("a").forEach((link) => {

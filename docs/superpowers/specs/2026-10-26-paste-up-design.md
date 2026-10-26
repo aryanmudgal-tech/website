@@ -1384,11 +1384,28 @@ Screen readers hear the title block as three term and definition pairs ("Study, 
 | Crumple strip (8.4), one per visit, chosen by screen shape | 180 KB or less each (`crumple-d.avif` about 160 KB, `crumple-m.avif` about 130 KB); not counted in the first-load figure because it is only needed at the end of the hero, and it is not downloaded under reduced motion or without scroll-driven animation support |
 | `crumple.css` (generated keyframes) | 6 KB gzipped or less, counted inside the built CSS budget (1.4 KB measured at milestone 5; a value that holds between frames is stated only at its first frame and at 100%) |
 
+**Measured at milestone 7** (26 October 2026, Chromium 153, built site served gzipped as Pages serves it):
+
+| Item | Budget | Measured |
+|---|---|---|
+| `index.html` | 20 KB gz | 16.0 KB |
+| Built CSS | 20 KB gz | 18.4 KB (`crumple.css` 1.25 KB of it) |
+| Inline `<svg>` | 1,024 B | 0 B |
+| Inline scripts | 3 KB gz | 1.47 KB |
+| Fonts | 180,000 B | 167.8 KB |
+| Hero print | 60 KB | 12.0 KB (desktop), 16.7 KB (phone) |
+| Paper fetched at load | 110 KB | 32.1 KB, 17 files (desktop); 27.8 KB (phone) |
+| First load | 600 KB | 358 KB (desktop), 313 KB (phone) |
+| Crumple strip | 180 KB each | 157.1 KB landscape, 131.7 KB portrait; one per visit, fetched on the first scroll (not at load), never under reduced motion |
+
+Three things measured here changed the build: a waiting sheet is transparent until its crumple starts (Chrome counted the hidden Work plate as the phone's LCP); the strip is fetched by a 1px element whose image switches on after the first 2px of scroll, and the crease layer takes it at the crumple's first frame (the prototype preloaded both strips at load, about 290 KB); and keyboard focus is brought to where the focused element lies at rest (37 of 95 Tab stops had landed under the sheet above or mid-crumple; now none do, forwards or backwards, at 1280x800 and 390x844).
+
 ### Speed targets
 
 - Lighthouse mobile (simulated Moto G Power, slow 4G): LCP 2.5s or less, CLS 0.05 or less, TBT 50ms or less.
 - Desktop: LCP 1.2s or less.
 - Lighthouse accessibility 100, and no axe violations.
+- **Measured at milestone 7** (Lighthouse 12.6.1, local, gzipped): desktop performance 99, LCP 0.9s, CLS 0, TBT 0; mobile performance 87 to 88, FCP 2.5s, LCP 3.5s, CLS 0, TBT 0; accessibility, best practices and SEO 100 on both. axe 4.10.3 finds no violations in light, dark, reduced motion on a phone, or on the 404. The mobile LCP misses its 2.5s target: the floor is FCP, set by the render-blocking Google Fonts stylesheet on a third-party connection, and the LCP element is the hero's sky block, which paints once its masks arrive behind 168 KB of fonts. The live v3 site measures mobile performance 80, FCP 3.5s, LCP 3.9s under the same Lighthouse. The levers are self-hosting the two woff2 files with a preload, or dropping the roman's opsz axis (about 50 KB); both are Aryan's call (Pending 10).
 - **Image loading:** only the hero print loads eagerly, with `fetchpriority="high"`. Every other image is `loading="lazy"`.
 
 ### JavaScript
@@ -1632,3 +1649,6 @@ Commits are authored as Aryan with no co-author or tool trailers, per their stan
 7. **An observation, not changed under decision 7.** `identity.description` (the meta description) says "two-time hackathon track winner", while Projects lists three 1st-place track results (Dots, StreamFair, W.O.D.). Aryan may want to confirm the wording.
 8. **A look at the finished branch on Aryan's own phone** before approval.
 9. **Code-drawn pencil art.** The Dots floor plan, the Linde-style production log and the route are drawn in code, not by Aryan. Aryan decides whether they need a disclosure like the Research note. Any new line goes in the New copy table.
+10. **Mobile speed (milestone 7).** Mobile LCP measures 3.5s against the 2.5s target (section 9). Self-host the two woff2 files with a preload, drop the roman's opsz axis, or accept the figure.
+11. **The CSS budget (milestone 6).** Raised from 18 to 20 KB gzipped for the crumple, the sheets and the slab; 18.4 KB measured.
+12. **Safari and Firefox.** Milestone 7 ran in Chromium only. Firefox has no scroll-driven animation and shows the still coloured page; Safari's crumple, masks and text tapes need a look on Aryan's devices.

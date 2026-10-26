@@ -25,13 +25,13 @@ function keyframes(name, set, file) {
   // name it, it does not change.
   for (const [i, { k, p }] of stops(set).entries()) {
     mask += `  ${pct(p)}% { ${i === 0 ? `mask-image: url(${file}); ` : ''}mask-position: ${at(k)}% 100%; }\n`;
-    fx += `  ${pct(p)}% { ${i === 0 ? 'opacity: 0.82; ' : ''}background-position: ${at(k)}% 100%; }\n`;
+    fx += `  ${pct(p)}% { ${i === 0 ? `opacity: 0.82; background-image: url(${file}); ` : ''}background-position: ${at(k)}% 100%; }\n`;
     const [x0, y0, x1, y1] = set.boxes[Math.min(k, set.crumple - 1)];
     const cx = (x0 + x1) / 2 - 0.5, cy = (y0 + y1) / 2 - 0.5;
     content += `  ${pct(p)}% { transform: translate(${(cx * 100).toFixed(2)}vw, ${(cy * 100).toFixed(2)}svh) scale(${(x1 - x0).toFixed(4)}, ${(y1 - y0).toFixed(4)}); }\n`;
   }
   mask += `  100% { mask-image: url(${file}); mask-position: 100% 100%; }\n}\n`;
-  fx += '  100% { opacity: 0.82; background-position: 100% 100%; }\n}\n';
+  fx += `  100% { opacity: 0.82; background-image: url(${file}); background-position: 100% 100%; }\n}\n`;
   content += '}\n';
   return mask + fx + content;
 }

@@ -48,7 +48,7 @@
   --shell: 80rem;
   --gutter: 16px;
   --measure: 46rem;
-  --header-height: 3.75rem;
+  --header-height: 55px;
   --radius: 3px;
 }
 
@@ -882,7 +882,7 @@ h3 {
       z-index: 2;
       height: 100svh;
       pointer-events: none;
-      background: url(../assets/paper/crumple-d.avif) 0 100% / 2500% 100% no-repeat;
+      background: 0 100% / 2500% 100% no-repeat;
       mix-blend-mode: multiply;
       opacity: 0;
     }
@@ -930,9 +930,11 @@ h3 {
       100% { translate: 0 100svh; --hold: 100svh; filter: drop-shadow(0 10px 14px rgba(27, 26, 23, 0.22)); visibility: hidden; }
     }
 
+    /* A waiting sheet is clear until its crumple starts, so nothing hidden beneath the page is painted or measured. */
     @keyframes arrive {
-      from { translate: 0 -100svh; --arrive: -100svh; }
-      to { translate: 0 0; --arrive: 0px; }
+      from { translate: 0 -100svh; --arrive: -100svh; opacity: 0; }
+      0.1% { opacity: 1; }
+      to { translate: 0 0; --arrive: 0px; opacity: 1; }
     }
 
     @keyframes roll {
@@ -940,15 +942,8 @@ h3 {
       100% { translate: 78vw 4svh; }
     }
 
-    /* Portrait screens use the tall strip. */
-    @media (max-aspect-ratio: 3/4) {
-      .fx { background-image: url(../assets/paper/crumple-m.avif); }
-      [data-out] .crumple { animation-name: mask-m, roll; }
-      [data-out] .content { animation-name: content-m; }
-      [data-out] .fx { animation-name: fx-m; }
-    }
-
-    /* Paints a pixel of each strip early, so the first crumple never waits on decoding. */
+    /* Paints a pixel of this screen's strip as soon as the reader scrolls, so the first crumple never waits on the
+       network or on decoding, and a visit that never scrolls never downloads it. */
     .preload {
       position: fixed;
       left: 0;
@@ -957,8 +952,30 @@ h3 {
       height: 1px;
       opacity: 0.01;
       pointer-events: none;
-      background: url(../assets/paper/crumple-d.avif) 0 0 / 1px 1px, url(../assets/paper/crumple-m.avif) 0 0 / 1px 1px;
+      background: 0 0 / 1px 1px no-repeat;
+      animation: strip-d linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 2px;
     }
+
+    @keyframes strip-d {
+      from { background-image: none; }
+      to { background-image: url(../assets/paper/crumple-d.avif); }
+    }
+
+    @keyframes strip-m {
+      from { background-image: none; }
+      to { background-image: url(../assets/paper/crumple-m.avif); }
+    }
+
+    /* Portrait screens use the tall strip. */
+    @media (max-aspect-ratio: 3/4) {
+      .preload { animation-name: strip-m; }
+      [data-out] .crumple { animation-name: mask-m, roll; }
+      [data-out] .content { animation-name: content-m; }
+      [data-out] .fx { animation-name: fx-m; }
+    }
+
   }
 }
 
@@ -1872,6 +1889,10 @@ h2 + .card {
 /* Phone and tablet: the nav collapses to Menu */
 
 @media (max-width: 63.99rem) {
+  :root {
+    --header-height: 51px;
+  }
+
   .site-nav--inline {
     display: none;
   }
