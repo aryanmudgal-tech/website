@@ -3,59 +3,59 @@
 @keyframes mask-d {
   0% { mask-image: none; }
   5.92% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 0% 100%; }
-  10.4% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 4.1667% 100%; }
-  12.15% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 8.3333% 100%; }
-  13.9% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 12.5% 100%; }
-  16% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 16.6667% 100%; }
-  20.305% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 20.8333% 100%; }
-  24.617% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 25% 100%; }
-  28.922% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 29.1667% 100%; }
-  33.234% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 33.3333% 100%; }
-  37.539% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 37.5% 100%; }
-  41.844% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 41.6667% 100%; }
-  46.156% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 45.8333% 100%; }
-  50.461% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 50% 100%; }
-  54.766% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 54.1667% 100%; }
-  59.078% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 58.3333% 100%; }
-  63.383% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 62.5% 100%; }
-  67.695% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 66.6667% 100%; }
-  72% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 70.8333% 100%; }
-  77.714% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 75% 100%; }
-  81.429% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 79.1667% 100%; }
-  85.143% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 83.3333% 100%; }
-  88.857% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 87.5% 100%; }
-  92.571% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 91.6667% 100%; }
-  96.286% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 95.8333% 100%; }
-  100% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 100% 100%; }
+  10.4% { mask-position: 4.1667% 100%; }
+  12.15% { mask-position: 8.3333% 100%; }
+  13.9% { mask-position: 12.5% 100%; }
+  16% { mask-position: 16.6667% 100%; }
+  20.305% { mask-position: 20.8333% 100%; }
+  24.617% { mask-position: 25% 100%; }
+  28.922% { mask-position: 29.1667% 100%; }
+  33.234% { mask-position: 33.3333% 100%; }
+  37.539% { mask-position: 37.5% 100%; }
+  41.844% { mask-position: 41.6667% 100%; }
+  46.156% { mask-position: 45.8333% 100%; }
+  50.461% { mask-position: 50% 100%; }
+  54.766% { mask-position: 54.1667% 100%; }
+  59.078% { mask-position: 58.3333% 100%; }
+  63.383% { mask-position: 62.5% 100%; }
+  67.695% { mask-position: 66.6667% 100%; }
+  72% { mask-position: 70.8333% 100%; }
+  77.714% { mask-position: 75% 100%; }
+  81.429% { mask-position: 79.1667% 100%; }
+  85.143% { mask-position: 83.3333% 100%; }
+  88.857% { mask-position: 87.5% 100%; }
+  92.571% { mask-position: 91.6667% 100%; }
+  96.286% { mask-position: 95.8333% 100%; }
+  100% { mask-position: 100% 100%; }
   100% { mask-image: url(../assets/paper/crumple-d.avif); mask-position: 100% 100%; }
 }
 @keyframes fx-d {
   0% { opacity: 0; background-position: 0% 100%; }
   5.92% { opacity: 0.82; background-position: 0% 100%; }
-  10.4% { opacity: 0.82; background-position: 4.1667% 100%; }
-  12.15% { opacity: 0.82; background-position: 8.3333% 100%; }
-  13.9% { opacity: 0.82; background-position: 12.5% 100%; }
-  16% { opacity: 0.82; background-position: 16.6667% 100%; }
-  20.305% { opacity: 0.82; background-position: 20.8333% 100%; }
-  24.617% { opacity: 0.82; background-position: 25% 100%; }
-  28.922% { opacity: 0.82; background-position: 29.1667% 100%; }
-  33.234% { opacity: 0.82; background-position: 33.3333% 100%; }
-  37.539% { opacity: 0.82; background-position: 37.5% 100%; }
-  41.844% { opacity: 0.82; background-position: 41.6667% 100%; }
-  46.156% { opacity: 0.82; background-position: 45.8333% 100%; }
-  50.461% { opacity: 0.82; background-position: 50% 100%; }
-  54.766% { opacity: 0.82; background-position: 54.1667% 100%; }
-  59.078% { opacity: 0.82; background-position: 58.3333% 100%; }
-  63.383% { opacity: 0.82; background-position: 62.5% 100%; }
-  67.695% { opacity: 0.82; background-position: 66.6667% 100%; }
-  72% { opacity: 0.82; background-position: 70.8333% 100%; }
-  77.714% { opacity: 0.82; background-position: 75% 100%; }
-  81.429% { opacity: 0.82; background-position: 79.1667% 100%; }
-  85.143% { opacity: 0.82; background-position: 83.3333% 100%; }
-  88.857% { opacity: 0.82; background-position: 87.5% 100%; }
-  92.571% { opacity: 0.82; background-position: 91.6667% 100%; }
-  96.286% { opacity: 0.82; background-position: 95.8333% 100%; }
-  100% { opacity: 0.82; background-position: 100% 100%; }
+  10.4% { background-position: 4.1667% 100%; }
+  12.15% { background-position: 8.3333% 100%; }
+  13.9% { background-position: 12.5% 100%; }
+  16% { background-position: 16.6667% 100%; }
+  20.305% { background-position: 20.8333% 100%; }
+  24.617% { background-position: 25% 100%; }
+  28.922% { background-position: 29.1667% 100%; }
+  33.234% { background-position: 33.3333% 100%; }
+  37.539% { background-position: 37.5% 100%; }
+  41.844% { background-position: 41.6667% 100%; }
+  46.156% { background-position: 45.8333% 100%; }
+  50.461% { background-position: 50% 100%; }
+  54.766% { background-position: 54.1667% 100%; }
+  59.078% { background-position: 58.3333% 100%; }
+  63.383% { background-position: 62.5% 100%; }
+  67.695% { background-position: 66.6667% 100%; }
+  72% { background-position: 70.8333% 100%; }
+  77.714% { background-position: 75% 100%; }
+  81.429% { background-position: 79.1667% 100%; }
+  85.143% { background-position: 83.3333% 100%; }
+  88.857% { background-position: 87.5% 100%; }
+  92.571% { background-position: 91.6667% 100%; }
+  96.286% { background-position: 95.8333% 100%; }
+  100% { background-position: 100% 100%; }
   100% { opacity: 0.82; background-position: 100% 100%; }
 }
 @keyframes content-d {
@@ -89,59 +89,59 @@
 @keyframes mask-m {
   0% { mask-image: none; }
   5.92% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 0% 100%; }
-  10.4% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 4.1667% 100%; }
-  12.15% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 8.3333% 100%; }
-  13.9% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 12.5% 100%; }
-  16% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 16.6667% 100%; }
-  20.305% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 20.8333% 100%; }
-  24.617% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 25% 100%; }
-  28.922% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 29.1667% 100%; }
-  33.234% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 33.3333% 100%; }
-  37.539% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 37.5% 100%; }
-  41.844% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 41.6667% 100%; }
-  46.156% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 45.8333% 100%; }
-  50.461% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 50% 100%; }
-  54.766% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 54.1667% 100%; }
-  59.078% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 58.3333% 100%; }
-  63.383% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 62.5% 100%; }
-  67.695% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 66.6667% 100%; }
-  72% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 70.8333% 100%; }
-  77.714% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 75% 100%; }
-  81.429% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 79.1667% 100%; }
-  85.143% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 83.3333% 100%; }
-  88.857% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 87.5% 100%; }
-  92.571% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 91.6667% 100%; }
-  96.286% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 95.8333% 100%; }
-  100% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 100% 100%; }
+  10.4% { mask-position: 4.1667% 100%; }
+  12.15% { mask-position: 8.3333% 100%; }
+  13.9% { mask-position: 12.5% 100%; }
+  16% { mask-position: 16.6667% 100%; }
+  20.305% { mask-position: 20.8333% 100%; }
+  24.617% { mask-position: 25% 100%; }
+  28.922% { mask-position: 29.1667% 100%; }
+  33.234% { mask-position: 33.3333% 100%; }
+  37.539% { mask-position: 37.5% 100%; }
+  41.844% { mask-position: 41.6667% 100%; }
+  46.156% { mask-position: 45.8333% 100%; }
+  50.461% { mask-position: 50% 100%; }
+  54.766% { mask-position: 54.1667% 100%; }
+  59.078% { mask-position: 58.3333% 100%; }
+  63.383% { mask-position: 62.5% 100%; }
+  67.695% { mask-position: 66.6667% 100%; }
+  72% { mask-position: 70.8333% 100%; }
+  77.714% { mask-position: 75% 100%; }
+  81.429% { mask-position: 79.1667% 100%; }
+  85.143% { mask-position: 83.3333% 100%; }
+  88.857% { mask-position: 87.5% 100%; }
+  92.571% { mask-position: 91.6667% 100%; }
+  96.286% { mask-position: 95.8333% 100%; }
+  100% { mask-position: 100% 100%; }
   100% { mask-image: url(../assets/paper/crumple-m.avif); mask-position: 100% 100%; }
 }
 @keyframes fx-m {
   0% { opacity: 0; background-position: 0% 100%; }
   5.92% { opacity: 0.82; background-position: 0% 100%; }
-  10.4% { opacity: 0.82; background-position: 4.1667% 100%; }
-  12.15% { opacity: 0.82; background-position: 8.3333% 100%; }
-  13.9% { opacity: 0.82; background-position: 12.5% 100%; }
-  16% { opacity: 0.82; background-position: 16.6667% 100%; }
-  20.305% { opacity: 0.82; background-position: 20.8333% 100%; }
-  24.617% { opacity: 0.82; background-position: 25% 100%; }
-  28.922% { opacity: 0.82; background-position: 29.1667% 100%; }
-  33.234% { opacity: 0.82; background-position: 33.3333% 100%; }
-  37.539% { opacity: 0.82; background-position: 37.5% 100%; }
-  41.844% { opacity: 0.82; background-position: 41.6667% 100%; }
-  46.156% { opacity: 0.82; background-position: 45.8333% 100%; }
-  50.461% { opacity: 0.82; background-position: 50% 100%; }
-  54.766% { opacity: 0.82; background-position: 54.1667% 100%; }
-  59.078% { opacity: 0.82; background-position: 58.3333% 100%; }
-  63.383% { opacity: 0.82; background-position: 62.5% 100%; }
-  67.695% { opacity: 0.82; background-position: 66.6667% 100%; }
-  72% { opacity: 0.82; background-position: 70.8333% 100%; }
-  77.714% { opacity: 0.82; background-position: 75% 100%; }
-  81.429% { opacity: 0.82; background-position: 79.1667% 100%; }
-  85.143% { opacity: 0.82; background-position: 83.3333% 100%; }
-  88.857% { opacity: 0.82; background-position: 87.5% 100%; }
-  92.571% { opacity: 0.82; background-position: 91.6667% 100%; }
-  96.286% { opacity: 0.82; background-position: 95.8333% 100%; }
-  100% { opacity: 0.82; background-position: 100% 100%; }
+  10.4% { background-position: 4.1667% 100%; }
+  12.15% { background-position: 8.3333% 100%; }
+  13.9% { background-position: 12.5% 100%; }
+  16% { background-position: 16.6667% 100%; }
+  20.305% { background-position: 20.8333% 100%; }
+  24.617% { background-position: 25% 100%; }
+  28.922% { background-position: 29.1667% 100%; }
+  33.234% { background-position: 33.3333% 100%; }
+  37.539% { background-position: 37.5% 100%; }
+  41.844% { background-position: 41.6667% 100%; }
+  46.156% { background-position: 45.8333% 100%; }
+  50.461% { background-position: 50% 100%; }
+  54.766% { background-position: 54.1667% 100%; }
+  59.078% { background-position: 58.3333% 100%; }
+  63.383% { background-position: 62.5% 100%; }
+  67.695% { background-position: 66.6667% 100%; }
+  72% { background-position: 70.8333% 100%; }
+  77.714% { background-position: 75% 100%; }
+  81.429% { background-position: 79.1667% 100%; }
+  85.143% { background-position: 83.3333% 100%; }
+  88.857% { background-position: 87.5% 100%; }
+  92.571% { background-position: 91.6667% 100%; }
+  96.286% { background-position: 95.8333% 100%; }
+  100% { background-position: 100% 100%; }
   100% { opacity: 0.82; background-position: 100% 100%; }
 }
 @keyframes content-m {

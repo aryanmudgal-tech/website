@@ -21,9 +21,11 @@ function keyframes(name, set, file) {
   let mask = `@keyframes mask-${name} {\n  0% { mask-image: none; }\n`;
   let fx = `@keyframes fx-${name} {\n  0% { opacity: 0; background-position: 0% 100%; }\n`;
   let content = `@keyframes content-${name} {\n  0% { transform: none; }\n`;
-  for (const { k, p } of stops(set)) {
-    mask += `  ${pct(p)}% { mask-image: url(${file}); mask-position: ${at(k)}% 100%; }\n`;
-    fx += `  ${pct(p)}% { opacity: 0.82; background-position: ${at(k)}% 100%; }\n`;
+  // A value that holds from the first frame to the end is stated there and at 100% only; between keyframes that
+  // name it, it does not change.
+  for (const [i, { k, p }] of stops(set).entries()) {
+    mask += `  ${pct(p)}% { ${i === 0 ? `mask-image: url(${file}); ` : ''}mask-position: ${at(k)}% 100%; }\n`;
+    fx += `  ${pct(p)}% { ${i === 0 ? 'opacity: 0.82; ' : ''}background-position: ${at(k)}% 100%; }\n`;
     const [x0, y0, x1, y1] = set.boxes[Math.min(k, set.crumple - 1)];
     const cx = (x0 + x1) / 2 - 0.5, cy = (y0 + y1) / 2 - 0.5;
     content += `  ${pct(p)}% { transform: translate(${(cx * 100).toFixed(2)}vw, ${(cy * 100).toFixed(2)}svh) scale(${(x1 - x0).toFixed(4)}, ${(y1 - y0).toFixed(4)}); }\n`;
