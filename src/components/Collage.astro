@@ -1,0 +1,15 @@
+---
+import Print from "./Print.astro";
+
+// Spec 7.1 and 6.6: the Pillar print, then four decorative pieces pasted around it. Coordinates live in global.css.
+---
+
+<div class="hero-art">
+  <Print room="pillar" variant="hero" loading="eager" popover={false} />
+  <div class="collage" aria-hidden="true">
+    <div class="piece p-sky"></div>
+    <div class="piece p-braille"></div>
+    <div class="piece p-plan"><span class="art art--plan"></span></div>
+    <div class="piece p-hand"><span class="art art--hand"></span><span class="tape"></span></div>
+  </div>
+</div>

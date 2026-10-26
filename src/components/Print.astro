@@ -27,6 +27,7 @@ const TILTS: Record<string, number> = {
   cleancampus: 1, chancellor: -1, pbk: 1.2, "pillar-pair": 1, contact: -1.6,
 };
 const DEFAULT_TAPES: Record<Props["variant"], readonly Tape[]> = {
+  // The hero tape changes size with the collage, so global.css places it (spec 7.1).
   hero: [{ w: 88, h: 26, x: 84, y: -13, rotate: -3 }],
   margin: [{ w: 80, h: 22, x: -40, y: -11, rotate: -2 }],
   footer: [{ w: 78, h: 22, x: -18, y: -6, rotate: -32 }, { w: 70, h: 22, x: 216, y: -6, rotate: 28 }],
@@ -61,7 +62,7 @@ const id = room ?? extra;
       <Picture src={image} widths={widths} sizes={sizes} formats={["avif", "webp"]} alt={record.alt} loading={loading} decoding="async" />
     )}
     {tapeList.map((tape) => (
-      <span class:list={["tape", tone === "vermilion" && "tape--vermilion"]} aria-hidden="true" style={`width: ${tape.w}px; height: ${tape.h}px; left: ${tape.x < 0 ? `calc(50% + ${tape.x}px)` : `${tape.x}px`}; top: ${tape.y}px; rotate: ${tape.rotate}deg`}></span>
+      <span class:list={["tape", tone === "vermilion" && "tape--vermilion"]} aria-hidden="true" style={variant === "hero" ? undefined : `width: ${tape.w}px; height: ${tape.h}px; left: ${tape.x < 0 ? `calc(50% + ${tape.x}px)` : `${tape.x}px`}; top: ${tape.y}px; rotate: ${tape.rotate}deg`}></span>
     ))}
   </div>
   <figcaption class="print__caption">{record.caption}{room && "receipt" in record && <> <Source receipt={record.receipt} /></>}</figcaption>

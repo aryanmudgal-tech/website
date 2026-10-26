@@ -13,7 +13,9 @@ const componentFiles = [
   "src/components/SiteNav.astro",
   "src/components/Print.astro",
   "src/components/PhotoPopover.astro",
+  "src/components/TitleBlock.astro",
   "src/components/Ledger.astro",
+  "src/components/Collage.astro",
   "src/components/Source.astro",
   "src/components/Video.astro",
   "src/components/Hero.astro",
@@ -133,6 +135,11 @@ test("reduced motion is still handled and no vh units remain", () => {
   const styles = css();
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/, "missing reduced-motion block");
   assert.doesNotMatch(styles, /(?<![a-z])\d*\.?\d+vh\b/, "use dvh or svh, never vh");
+  const starting = rules(styles).filter((rule) => rule.context.includes("@starting-style"));
+  assert.ok(starting.length > 0, "the paste-in signature exists");
+  for (const rule of starting) {
+    assert.ok(rule.context.indexOf("@media (prefers-reduced-motion: no-preference)") !== -1 && rule.context.indexOf("@media (prefers-reduced-motion: no-preference)") < rule.context.indexOf("@starting-style"), `@starting-style for ${rule.selector} sits outside prefers-reduced-motion: no-preference`);
+  }
 });
 
 test("the visual system keeps one accent, theme and focus safeguards, and no template tells", () => {
@@ -150,7 +157,7 @@ test("the visual system keeps one accent, theme and focus safeguards, and no tem
   for (const font of [/--font-mono/i, /SFMono/i, /Consolas/i, /\bmonospace\b/i, /\bInter\b/]) {
     assert.doesNotMatch(styles, font);
   }
-  assert.doesNotMatch(styles, /\.hero\b[^{]*\{[^}]*(?<![a-z-])gap:/s, "the hero grid must use row-gap, never the gap shorthand");
+  assert.doesNotMatch(styles, /\.hero(?:\b|__)[^{]*\{[^}]*(?<![a-z-])gap:/s, "the hero grid must use row-gap, never the gap shorthand");
   const layout = read("src/layouts/BaseLayout.astro");
   assert.match(styles, /"Source Serif 4"/);
   assert.match(styles, /"Instrument Sans"/);
@@ -292,7 +299,11 @@ test("stocks are declared once, paint only their selectors, and hex stays in the
     }
   }
   for (const selector of [".fig--tape", ".hl--sky", ".hl--marigold"]) {
-    for (const rule of all.filter((r) => r.selector === selector)) assert.match(rule.body, /color:\s*var\(--on-stock\)/, `${selector} sets ink on its stock`);
+    // The base rule sets the ink; a size override in a media query may leave it alone but never change it.
+    for (const rule of all.filter((r) => r.selector === selector && r.context.length === 0)) assert.match(rule.body, /color:\s*var\(--on-stock\)/, `${selector} sets ink on its stock`);
+    for (const rule of all.filter((r) => r.selector.split(",").some((part) => part.trim() === selector))) {
+      for (const [key, value] of declarations(rule)) if (key === "color") assert.equal(value, "var(--on-stock)", `${selector} changes its ink`);
+    }
   }
 });
 
@@ -302,4 +313,17 @@ test("no pencil or line art sits on marigold", async () => {
   for (const rule of rules(css())) {
     if (files.some((file) => rule.body.includes(file))) assert.doesNotMatch(rule.selector, /--recognition|fig--tape|hl--marigold/, `${rule.selector} puts pencil on marigold`);
   }
+});
+
+test("the collage is four decorative pieces after the print, and nothing in it can be reached", () => {
+  const collage = read("src/components/Collage.astro");
+  const markup = collage.slice(collage.indexOf("---", 3) + 3);
+  const wrappers = markup.match(/<div class="collage" aria-hidden="true">/g) ?? [];
+  assert.equal(wrappers.length, 1, "one aria-hidden collage wrapper");
+  const start = markup.indexOf('<div class="collage"');
+  assert.ok(markup.indexOf("<Print") !== -1 && markup.indexOf("<Print") < start, "the print comes before the collage");
+  const inside = markup.slice(start, markup.lastIndexOf("</div>", markup.lastIndexOf("</div>") - 1) + 6);
+  assert.equal((inside.match(/class="piece/g) ?? []).length, 4, "exactly four pieces");
+  assert.doesNotMatch(inside, /<a\b|<button\b|<img\b|tabindex|popover/);
+  assert.equal(inside.replace(/<[^>]+>/g, "").trim(), "", "no text in the collage");
 });

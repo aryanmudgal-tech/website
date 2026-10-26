@@ -34,15 +34,54 @@ test("built homepage exposes semantic recruiter content and social metadata", ()
 
 test("built first screen carries the fixation lines, the ledger, and both actions", () => {
   const html = read(client("index.html"));
-  const { identity, ledger } = portfolio;
-  assert.ok(html.includes(identity.fixationLine), "long fixation line missing");
-  assert.ok(html.includes(identity.fixationLineShort), "short fixation line missing");
+  const { identity, ledger, titleBlock } = portfolio;
+  const joined = (name) => elements(html, (tag) => tag.includes(`class="${name}"`)).map(textOf).join(" ");
+  assert.equal(joined("tb__long"), identity.fixationLine);
+  assert.equal(joined("tb__short"), identity.fixationLineShort);
+  assert.deepEqual(elements(html, (tag, name) => name === "dt").map(textOf), ["Study", "Work", "Next"]);
+  const next = titleBlock.find((row) => row.label === "Next");
+  assert.deepEqual(elements(html, (tag) => /class="[^"]*\bhl--sky\b/.test(tag)).map(textOf), [next.long[0], next.short[0]]);
   for (const row of ledger) {
     assert.ok(html.includes(row.fraction), `ledger fraction ${row.fraction} missing`);
   }
+  assert.equal(elements(html, (tag) => /class="fig fig--tape"/.test(tag)).map(textOf).join(), ledger.find((row) => row.bold).fraction);
   assert.match(html, /Email Aryan/);
   assert.match(html, /Resume \(PDF\)/);
   assert.match(html, /href="[^"]*resume\.pdf"/);
+});
+
+test("text tapes are never hidden or decorative", () => {
+  const html = read(client("index.html"));
+  const tapes = elements(html, (tag) => /class="[^"]*\bhl--(?:sky|marigold)\b/.test(tag));
+  assert.ok(tapes.length >= 2);
+  for (const tape of tapes) {
+    const open = tape.slice(0, tape.indexOf(">") + 1);
+    assert.doesNotMatch(open, /aria-hidden|class="[^"]*\btape\b/, `text tape is hidden: ${open}`);
+  }
+});
+
+test("the hero states its facts before its art", () => {
+  const html = read(client("index.html"));
+  const hero = elements(html, (tag, name) => name === "section" && tag.includes('class="hero"'))[0];
+  const art = hero.indexOf('class="hero-art"');
+  assert.ok(art > 0);
+  assert.ok(hero.indexOf('class="ledger"') < art, "the ledger comes before the art");
+  assert.ok(hero.indexOf("Resume (PDF)") < art, "the actions come before the art");
+  assert.ok(hero.indexOf('<figure class="print') > art && hero.indexOf('<figure class="print') < hero.indexOf('class="collage"'), "the print comes before the collage");
+});
+
+test("inline SVG stays small and silent, and the built CSS keeps Safari's prefixes", () => {
+  const html = read(client("index.html"));
+  const svgs = html.match(/<svg\b[\s\S]*?<\/svg>/g) ?? [];
+  assert.ok(svgs.join("").length <= 1024, `inline SVG is ${svgs.join("").length} bytes`);
+  for (const svg of svgs) {
+    assert.match(svg, /^<svg\b[^>]*aria-hidden="true"/);
+    assert.match(svg, /^<svg\b[^>]*focusable="false"/);
+    assert.doesNotMatch(svg, /<text\b/);
+  }
+  const builtCss = readdirSync(join(root, "dist", "client", "_astro")).filter((name) => name.endsWith(".css")).map((name) => read(client(`_astro/${name}`))).join("\n");
+  assert.match(builtCss, /-webkit-box-decoration-break:clone/);
+  assert.match(builtCss, /-webkit-mask-image/);
 });
 
 test("built links are actionable and external links are safe", () => {

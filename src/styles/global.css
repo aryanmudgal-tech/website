@@ -264,13 +264,6 @@ main,
   filter: brightness(1.08);
 }
 
-.action--text {
-  color: var(--accent);
-  text-decoration: underline;
-  text-decoration-thickness: 0.06em;
-  text-underline-offset: 0.2em;
-}
-
 /* Header */
 
 .site-header {
@@ -380,10 +373,6 @@ main,
   height: auto;
 }
 
-.print--hero .print__frame {
-  width: 356px;
-}
-
 .print--margin {
   width: 304px;
 }
@@ -465,80 +454,390 @@ main,
   font-weight: 600;
 }
 
-/* Hero */
+/* Hero (spec 7.1): facts, then the collage around the Pillar print */
 
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  row-gap: 48px;
+  align-items: start;
   padding-block: 40px 64px;
   overflow-x: clip;
 }
 
 .hero__facts {
-  display: grid;
-  row-gap: 20px;
+  min-width: 0;
   max-width: 672px;
-  min-width: 0;
 }
 
-.hero-art {
-  min-width: 0;
+.tb {
+  margin-top: 20px;
+  border-block: 1px solid var(--ink);
+}
+
+.tb__row {
   display: grid;
-  justify-items: center;
+  grid-template-columns: 80px minmax(0, 1fr);
+  padding-block: 9px;
 }
 
-.fixation {
-  font-size: 1.2rem;
-  line-height: 1.45;
-  color: var(--ink-2);
-  text-wrap: pretty;
+.tb__row + .tb__row {
+  border-top: 1px solid var(--line);
 }
 
-.fixation--short {
+.tb dt {
+  padding-top: 5px;
+  font: 600 11.5px/16px var(--sans);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tb dd {
+  margin: 0;
+  font: 400 17px/25px var(--serif);
+}
+
+.tb__short {
   display: none;
 }
 
+/* Text tapes carry facts, so they are spans, never .tape (spec 5.2b, 6.6). */
+.hl--sky {
+  margin-inline: -8px;
+  padding: 0.04em 8px;
+  color: var(--on-stock);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background:
+    url(../assets/paper/tape-end-sky-l.svg) left center / 8px calc(100% - 2px) no-repeat padding-box,
+    url(../assets/paper/tape-end-sky-r.svg) right center / 8px calc(100% - 2px) no-repeat padding-box,
+    var(--grain) 0 0 / 160px content-box,
+    var(--stock-sky) content-box;
+  background-blend-mode: normal, normal, multiply, normal;
+}
+
 .ledger {
-  border-top: 1px solid var(--ink);
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  border-block: 2px solid var(--ink);
 }
 
-.ledger__row {
+.ledger li {
   display: grid;
-  grid-template-columns: 7rem 1fr;
-  column-gap: 1rem;
+  grid-template-columns: 168px minmax(0, 1fr);
+  column-gap: 24px;
   align-items: baseline;
-  padding-block: 0.7rem;
-  border-bottom: 1px solid var(--line);
+  padding-block: 12px;
 }
 
-.ledger__fraction {
-  font-family: var(--serif);
-  font-size: 1.7rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
+.ledger li + li {
+  border-top: 1px solid var(--line);
+}
+
+.fig {
+  justify-self: start;
+  font: 600 34px/40px var(--serif);
+  font-variation-settings: "opsz" 40;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--ink);
   text-decoration: none;
 }
 
-.ledger__fraction:hover {
+.fig:hover {
   text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
 }
 
-.ledger__row--bold .ledger__fraction {
-  color: var(--accent);
+/* The "1 of 2" tape: torn ends keep a fixed 12px depth at any width; the text stays straight. */
+.fig--tape {
+  position: relative;
+  z-index: 0;
+  margin-left: -8px;
+  padding-inline: 8px;
+  color: var(--on-stock);
+}
+
+.fig--tape::before {
+  content: "";
+  position: absolute;
+  inset: -3px -6px;
+  z-index: -1;
+  background: var(--grain) 0 0 / 160px, var(--stock-marigold);
+  background-blend-mode: multiply;
+  rotate: -1.5deg;
+  mask-image: url(../assets/paper/tape-fig-l.svg), url(../assets/paper/solid.svg), url(../assets/paper/tape-fig-r.svg);
+  mask-size: 12px 100%, calc(100% - 24px) 100%, 12px 100%;
+  mask-position: left, center, right;
+  mask-repeat: no-repeat;
+}
+
+.fig--tape:focus-visible {
+  outline: 3px solid var(--on-stock);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 8px var(--fibre);
+}
+
+.claim {
+  margin: 0;
+  font: 400 16px/22px var(--sans);
+}
+
+.claim strong {
   font-weight: 600;
 }
 
-.ledger__text {
-  font-size: 0.98rem;
+/* Inline receipts sit inside the sentence, in its face (spec 7.4). */
+.claim .source,
+.print__caption .source {
+  display: inline;
+  padding: 0;
+  font: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .hero__actions {
   display: flex;
-  flex-wrap: wrap;
-  column-gap: 1.25rem;
-  row-gap: 0.6rem;
+  column-gap: 16px;
+  margin-top: 24px;
+}
+
+.hero__actions .action--primary {
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 0;
+}
+
+.stub {
+  display: inline-flex;
   align-items: center;
+  border: 1px solid var(--ink);
+  border-left: 2px dashed var(--ink);
+  background: var(--paper);
+  color: var(--accent);
+}
+
+.stub--resume {
+  height: 48px;
+  padding: 0 18px 0 20px;
+  font: 600 15px/20px var(--sans);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* The collage. The print is content and never animates; the four pieces are decoration (spec 6.6, 7.1). */
+
+.hero-art {
+  position: relative;
+  justify-self: center;
+  width: 464px;
+  height: 680px;
+  margin-top: 48px;
+  isolation: isolate;
+}
+
+.hero-art .print {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  pointer-events: none;
+}
+
+.hero-art .print__frame {
+  position: absolute;
+  left: 64px;
+  top: 92px;
+  width: 356px;
+  height: 440px;
+  pointer-events: auto;
+}
+
+.print--hero img {
+  width: 336px;
+  height: 420px;
+  object-fit: cover;
+}
+
+.print--hero .tape {
+  width: 88px;
+  height: 26px;
+  left: 84px;
+  top: -13px;
+  rotate: -3deg;
+}
+
+.hero-art .print__caption {
+  position: absolute;
+  left: 72px;
+  top: 580px;
+  width: 224px;
+  max-width: none;
+  pointer-events: auto;
+}
+
+.collage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.piece {
+  position: absolute;
+  filter: drop-shadow(0 1px 1px var(--lift)) drop-shadow(0 6px 10px var(--lift-far));
+}
+
+.piece::before,
+.piece::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+.p-sky {
+  left: 24px;
+  top: 48px;
+  width: 416px;
+  height: 496px;
+  z-index: 1;
+  filter: drop-shadow(0 1px 1px var(--lift));
+}
+
+.p-braille {
+  left: -8px;
+  top: 340px;
+  width: 64px;
+  height: 320px;
+  z-index: 2;
+}
+
+.p-plan {
+  left: 312px;
+  top: 524px;
+  width: 144px;
+  height: 124px;
+  z-index: 4;
+}
+
+.p-hand {
+  left: 264px;
+  top: 8px;
+  width: 156px;
+  height: 120px;
+  z-index: 5;
+}
+
+.p-sky::before,
+.p-braille::before,
+.p-plan::before,
+.p-hand::before {
+  background-color: var(--fibre);
+}
+
+.p-sky::before {
+  mask-image: url(../assets/paper/sky.outer.svg);
+}
+
+.p-sky::after {
+  background: var(--grain) 0 0 / 160px, var(--stock-sky);
+  background-blend-mode: multiply;
+  mask-image: url(../assets/paper/sky.inner.svg);
+}
+
+.p-braille::before {
+  mask-image: url(../assets/paper/braille.outer.svg);
+}
+
+.p-braille::after {
+  background: url(../assets/paper/braille.dots.svg) 0 0 / 100% 100% no-repeat, var(--grain) 0 0 / 160px, var(--stock-leaf);
+  background-blend-mode: normal, multiply;
+  mask-image: url(../assets/paper/braille.inner.svg);
+}
+
+.p-plan::before {
+  mask-image: url(../assets/paper/plan.outer.svg);
+}
+
+.p-plan::after {
+  background: var(--grain) 0 0 / 160px, var(--stock-kraft);
+  background-blend-mode: multiply;
+  mask-image: url(../assets/paper/plan.inner.svg);
+}
+
+.p-hand::before {
+  mask-image: url(../assets/paper/hand.outer.svg);
+}
+
+.p-hand::after {
+  content: none;
+}
+
+.p-hand .tape {
+  width: 64px;
+  height: 20px;
+  left: -20px;
+  top: 2px;
+  rotate: -20deg;
+}
+
+.art--plan {
+  inset: 14px 8px 10px 9px;
+}
+
+.art--hand {
+  left: 21px;
+  top: 6px;
+  width: 113px;
+  height: 110px;
+}
+
+/* Elements whose only shape is a mask render only where masks work (spec 6.6). */
+@supports (mask-image: none) or (-webkit-mask-image: none) {
+  .art {
+    position: absolute;
+    z-index: 1;
+    background-color: var(--pencil);
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+  }
+
+  .art--plan {
+    mask-image: url(../assets/paper/plan.pencil.svg);
+  }
+
+  .art--hand {
+    mask-image: url(../assets/paper/hand.png);
+  }
+}
+
+/* The signature: the four pieces land one after another, once (spec 8.1). */
+.collage .piece {
+  rotate: var(--r);
+  transition:
+    translate 560ms cubic-bezier(0.16, 1, 0.3, 1) var(--d),
+    rotate 560ms cubic-bezier(0.16, 1, 0.3, 1) var(--d),
+    opacity 180ms linear var(--d);
+}
+
+.collage .p-sky { --r: -1deg; --d: 120ms; }
+.collage .p-braille { --r: 0.5deg; --d: 300ms; }
+.collage .p-plan { --r: -2deg; --d: 480ms; }
+.collage .p-hand { --r: 2deg; --d: 660ms; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @starting-style {
+    .collage .piece {
+      opacity: 0;
+      translate: 0 -12px;
+      rotate: calc(var(--r) + 3deg);
+    }
+  }
 }
 
 /* Chapters */
@@ -836,12 +1135,23 @@ main,
     column-gap: 48px;
     justify-content: space-between;
   }
+
+  .hero-art {
+    justify-self: end;
+    margin-top: -24px;
+  }
 }
 
 @media (min-width: 64rem) and (max-width: 72.99rem) {
   .hero {
     grid-template-columns: minmax(0, 1fr) 360px;
     column-gap: 40px;
+  }
+
+  /* The popover sits outside .hero-art because the top layer does not escape zoom (spec 7.1). */
+  .hero-art {
+    zoom: 0.776;
+    margin-top: 0;
   }
 }
 
@@ -890,11 +1200,6 @@ main,
   .print--margin .print__frame {
     rotate: none;
   }
-
-  .print--hero .print__frame {
-    width: 220px;
-    padding: 8px;
-  }
 }
 
 /* Phone and tablet: the nav collapses to Menu */
@@ -938,31 +1243,6 @@ main,
     width: 100%;
   }
 
-  .fixation--long {
-    display: none;
-  }
-
-  .fixation--short {
-    display: block;
-  }
-
-  .fixation {
-    font-size: 1.05rem;
-  }
-
-  .ledger__row {
-    grid-template-columns: 5.5rem 1fr;
-    min-height: 4.5rem;
-  }
-
-  .ledger__fraction {
-    font-size: 1.35rem;
-  }
-
-  .hero__actions .action--primary {
-    flex: 1 1 100%;
-  }
-
   .row,
   .award,
   .route li {
@@ -995,14 +1275,7 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
 .menu-button, .photo-popover__close { font: 600 15px/20px var(--sans); }
 
 .label { font: 600 11.5px/16px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-.fixation { font: 400 17px/25px var(--serif); color: var(--ink); }
-.ledger { border-top-color: var(--ink); }
-.ledger__row { grid-template-columns: 168px minmax(0, 1fr); align-items: start; }
-.ledger__fraction { font: 600 34px/40px var(--serif); font-variation-settings: "opsz" 40; letter-spacing: -0.01em; white-space: nowrap; }
-.ledger__text { font: 400 16px/22px var(--sans); }
-.ledger__row--bold .ledger__text { font-weight: 600; }
 .action--primary { min-height: 48px; font: 600 16px/20px var(--sans); }
-.action--text { min-height: 48px; font: 600 15px/20px var(--sans); }
 
 .meta, .row__meta, .card__event, .card__team { font: 400 14px/20px var(--sans); color: var(--muted); }
 .row__meta strong { font: 600 22px/28px var(--serif); color: var(--ink); }
@@ -1025,8 +1298,8 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
 .chapter { padding-top: 96px; }
 
 @media (min-width: 64rem) and (max-width: 68.74rem) {
-  .ledger__row { grid-template-columns: 136px minmax(0, 1fr); }
-  .ledger__fraction { font-size: 28px; line-height: 34px; }
+  .ledger li { grid-template-columns: 136px minmax(0, 1fr); column-gap: 16px; }
+  .fig { font-size: 28px; line-height: 34px; }
   .contact-link { font-size: 26px; line-height: 34px; }
 }
 
@@ -1036,10 +1309,6 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
   h2 { font-size: 30px; line-height: 34px; }
   h3 { font-size: 22px; line-height: 28px; }
   .wordmark { font-size: 18px; line-height: 22px; }
-  .fixation { font-size: 15px; line-height: 21px; }
-  .ledger__row { grid-template-columns: 112px minmax(0, 1fr); }
-  .ledger__fraction { font-size: 22px; line-height: 26px; }
-  .ledger__text { font-size: 15px; line-height: 21px; }
   .row__meta strong { font-size: 20px; line-height: 26px; }
   .row__body h3 { font-size: 21px; line-height: 28px; }
   .chapter__lede { font-size: 18px; line-height: 27px; }
@@ -1053,6 +1322,55 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
   .contact-link { font-size: 22px; line-height: 30px; }
   .not-found h1 { font-size: 40px; line-height: 44px; }
   .chapter { padding-top: 72px; }
+}
+
+
+/* Phone hero (spec 7.1, 8.2) */
+
+@media (max-width: 47.99rem) {
+  .hero { padding-top: 20px; }
+  .tb__long { display: none; }
+  .tb__short { display: inline; }
+  .tb__row { grid-template-columns: 64px minmax(0, 1fr); }
+  .tb dt { padding-top: 4px; font-size: 11px; line-height: 14px; }
+  .tb dd { font-size: 15px; line-height: 21px; }
+  .ledger { margin-top: 16px; }
+  .ledger li { grid-template-columns: 96px minmax(0, 1fr); column-gap: 12px; }
+  .fig { font-size: 22px; line-height: 26px; }
+  .fig--tape { margin-left: -4px; padding-inline: 6px; }
+  .fig--tape::before { inset: -2px -3px; }
+  .claim { font-size: 15px; line-height: 21px; }
+  .hero__actions { column-gap: 12px; margin-top: 16px; }
+  .hero__actions > a { flex: 1; justify-content: center; padding-inline: 10px; }
+
+  .hero-art { width: 358px; height: 456px; margin-top: 24px; }
+  .hero-art .print__frame { left: 69px; top: 64px; width: 220px; height: 275px; padding: 8px; }
+  .print--hero img { width: 204px; height: 259px; }
+  .print--hero .tape { width: 70px; height: 21px; left: 44px; top: -11px; }
+  .hero-art .print__caption { left: 29px; top: 392px; width: 300px; }
+  .p-sky { left: 29px; top: 44px; width: 300px; height: 320px; }
+  .p-sky::before { mask-image: url(../assets/paper/sky-sm.outer.svg); }
+  .p-sky::after { mask-image: url(../assets/paper/sky-sm.inner.svg); }
+  .p-hand { left: 185px; top: -14px; width: 132px; height: 102px; }
+  .p-hand .tape { width: 52px; height: 17px; left: -16px; top: 0; }
+  .art--hand { left: 18px; top: 4px; width: 96px; height: 94px; }
+  .p-braille { left: 0; top: 140px; width: 48px; height: 240px; }
+  .p-plan { left: 250px; top: 300px; width: 104px; height: 90px; }
+  .art--plan { inset: 10px 6px 8px 6px; }
+
+  /* Only the pieces above the fold land; the other two are simply there. */
+  .collage .p-sky { --d: 60ms; }
+  .collage .p-hand { --d: 240ms; }
+  .collage .p-braille,
+  .collage .p-plan { transition: none; }
+}
+
+@media (max-width: 24.37rem) {
+  .hero-art { zoom: 0.915; }
+}
+
+@media (max-width: 22.49rem) {
+  .hero-art { zoom: 0.8; }
 }
 
 @media print {
@@ -1069,7 +1387,8 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
     font-size: 10.5pt;
   }
 
-  .print {
+  .print,
+  .hero-art {
     display: none;
   }
 

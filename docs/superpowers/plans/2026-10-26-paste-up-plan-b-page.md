@@ -37,21 +37,21 @@ As Plan A: branch `v4-paste-up`, never `main`; `PATH=/opt/homebrew/opt/node@24/b
 ## Milestone 3: Frame retirement and prints
 
 ### Task 1: `aspect` and the crops (spec 6.5)
-- [ ] Source test (in "rooms stay twelve, captioned, and owned", renamed from "each room has a chapter..."): no room has `fit`; `aspect` is `"3:2" | "4:5" | "natural"`; `pillar` is `"4:5"`; `streamfair` and `contact` are `"natural"`; `ogRoom === "pillar"`; `extras.length === 8`. Run: fails on `aspect`.
-- [ ] `rooms.ts`: `fit?: "cover" | "contain"` becomes `aspect?: "3:2" | "4:5" | "natural"` (default `"3:2"`); set the three values; `ogRoom = "pillar"`; comments drop "frame".
-- [ ] `crop-rooms.mjs`: crop ratio per `aspect` (4/5 for pillar, full height); `"natural"` resizes `fit: "inside"` to 1440x1600 `withoutEnlargement`; flatten colour read from `--fibre` in `global.css` via `scripts/paper/tokens.mjs`; delete `writeOg`. Run `npm run rooms`; commit the regenerated `src/assets/rooms/*` and `src/assets/full/*`.
+- [x] Source test (in "rooms stay twelve, captioned, and owned", renamed from "each room has a chapter..."): no room has `fit`; `aspect` is `"3:2" | "4:5" | "natural"`; `pillar` is `"4:5"`; `streamfair` and `contact` are `"natural"`; `ogRoom === "pillar"`; `extras.length === 8`. Run: fails on `aspect`.
+- [x] `rooms.ts`: `fit?: "cover" | "contain"` becomes `aspect?: "3:2" | "4:5" | "natural"` (default `"3:2"`); set the three values; `ogRoom = "pillar"`; comments drop "frame".
+- [x] `crop-rooms.mjs`: crop ratio per `aspect` (4/5 for pillar, full height); `"natural"` resizes `fit: "inside"` to 1440x1600 `withoutEnlargement`; flatten colour read from `--fibre` in `global.css` via `scripts/paper/tokens.mjs`; delete `writeOg`. Run `npm run rooms`; commit the regenerated `src/assets/rooms/*` and `src/assets/full/*`.
 
 ### Task 2: `Print` and `PhotoPopover` (spec 7.2, 4.3)
-- [ ] Create `PhotoPopover.astro` from `Frame.astro`'s popover markup (`div#photo-<id>.photo-popover[popover]`: full image, caption, `Source`, extras with captions, Close).
-- [ ] Create `Print.astro` with the props of 7.2 (`room` or `extra`, `variant`, `tilt`, `tapes`, `tone`, `loading`, `popover`). Rooms: `figure.print.print--<variant>[data-room]` > `div.print__frame` (tilted) > `button.print__open[popovertarget]` holding `<Picture>` (alt from `rooms.ts`) and `<span class="sr-only">Open full photo</span>`, `aria-hidden` tapes, `figcaption` with caption and inline `Source`; then `<PhotoPopover>` unless `popover={false}`. Extras: `figure.print[data-extra]` with the caption only, no button, no receipt. Widths and sizes per 6.5 Delivery; `loading="eager"` adds `fetchpriority="high"`.
+- [x] Create `PhotoPopover.astro` from `Frame.astro`'s popover markup (`div#photo-<id>.photo-popover[popover]`: full image, caption, `Source`, extras with captions, Close).
+- [x] Create `Print.astro` with the props of 7.2 (`room` or `extra`, `variant`, `tilt`, `tapes`, `tone`, `loading`, `popover`). Rooms: `figure.print.print--<variant>[data-room]` > `div.print__frame` (tilted) > `button.print__open[popovertarget]` holding `<Picture>` (alt from `rooms.ts`) and `<span class="sr-only">Open full photo</span>`, `aria-hidden` tapes, `figcaption` with caption and inline `Source`; then `<PhotoPopover>` unless `popover={false}`. Extras: `figure.print[data-extra]` with the caption only, no button, no receipt. Widths and sizes per 6.5 Delivery; `loading="eager"` adds `fetchpriority="high"`.
 
 ### Task 3: Every room once, beside its claim (spec 4.3)
-- [ ] Hero: `div.hero-art` holds `<Print room="pillar" variant="hero" loading="eager" popover={false} />`; `<PhotoPopover room="pillar" />` follows outside `div.hero-art`.
-- [ ] Projects: margin prints per 7.6 (Dots: `dots` then `hero`); Research: `research`; Leadership Clean Campus row: `cleancampus`; Recognition: `pillar-pair` extra in the pillar row, `chancellor`, `pbk`; footer: `contact`. Card grid of 5.4 (`200px 600px 304px`) with the margin column; phone stacks prints after the body.
-- [ ] `data-room` only on prints. Delete `Frame.astro`, `ChapterFigure.astro`, the `.rooms` wrapper, the frame CSS (`.frame-col`, `.frame`, `.room*`, `timeline-scope`, both `@supports` frame blocks, the `--r-*` names); keep a `@media (prefers-reduced-motion: reduce)` block (`html { scroll-behavior: auto }`).
+- [x] Hero: `div.hero-art` holds `<Print room="pillar" variant="hero" loading="eager" popover={false} />`; `<PhotoPopover room="pillar" />` follows outside `div.hero-art`.
+- [x] Projects: margin prints per 7.6 (Dots: `dots` then `hero`); Research: `research`; Leadership Clean Campus row: `cleancampus`; Recognition: `pillar-pair` extra in the pillar row, `chancellor`, `pbk`; footer: `contact`. Card grid of 5.4 (`200px 600px 304px`) with the margin column; phone stacks prints after the body.
+- [x] `data-room` only on prints. Delete `Frame.astro`, `ChapterFigure.astro`, the `.rooms` wrapper, the frame CSS (`.frame-col`, `.frame`, `.room*`, `timeline-scope`, both `@supports` frame blocks, the `--r-*` names); keep a `@media (prefers-reduced-motion: reduce)` block (`html { scroll-behavior: auto }`).
 
 ### Task 4: Milestone 3 tests (spec 10.1 items 1 to 3, 10 to 12; 10.2 CSS budget, hidden subtrees)
-- [ ] `tests/lib/html.mjs`:
+- [x] `tests/lib/html.mjs`:
 
 ```js
 // HTML helpers for the build tests. No dependency; written for our own built HTML.
@@ -83,24 +83,24 @@ export function elements(html, test) {
 }
 ```
 
-- [ ] Source tests: `componentFiles` drops `Frame` and `ChapterFigure`, adds `Print` and `PhotoPopover`; "sections keep the approved order" with markers `["<SiteNav", "<main", "<Hero", "<Experience", "<Projects", "<Trajectory", "<Research", "<Leadership", "<Recognition", "<About", "</main>", "<SiteFooter"]` and no `<Frame|class="rooms"`; "rooms stay twelve, captioned, and owned" per 10.1 item 3.
-- [ ] Build tests: images 37, `<picture>` 33, one eager (inside `figure.print--hero`), `lazy === images - 1`; "each room renders once beside its claim" per 10.1 item 11 (owners table, no `data-room` on section, article, footer or popover, `photo-<id>` once with `popover`, no popover inside `hero-art`, extras captions in their popovers, `pillar-pair` in `#recognition-pillar` without `Source:`, at least 13 `popovertarget`); built CSS 18 KB gzip or less; hidden subtrees contain no `<a`, `<button`, `tabindex`, `<input`, `popover` or `<img` with non-empty alt.
-- [ ] `npm run check` green; visual probe; commit `feat: retire the frame; every photo is a print beside its claim`, push.
+- [x] Source tests: `componentFiles` drops `Frame` and `ChapterFigure`, adds `Print` and `PhotoPopover`; "sections keep the approved order" with markers `["<SiteNav", "<main", "<Hero", "<Experience", "<Projects", "<Trajectory", "<Research", "<Leadership", "<Recognition", "<About", "</main>", "<SiteFooter"]` and no `<Frame|class="rooms"`; "rooms stay twelve, captioned, and owned" per 10.1 item 3.
+- [x] Build tests: images 37, `<picture>` 33, one eager (inside `figure.print--hero`), `lazy === images - 1`; "each room renders once beside its claim" per 10.1 item 11 (owners table, no `data-room` on section, article, footer or popover, `photo-<id>` once with `popover`, no popover inside `hero-art`, extras captions in their popovers, `pillar-pair` in `#recognition-pillar` without `Source:`, at least 13 `popovertarget`); built CSS 18 KB gzip or less; hidden subtrees contain no `<a`, `<button`, `tabindex`, `<input`, `popover` or `<img` with non-empty alt.
+- [x] `npm run check` green; visual probe; commit `feat: retire the frame; every photo is a print beside its claim`, push.
 
 ## Milestone 4: Hero and signature (spec 7.1, 8.1 to 8.3)
 
 ### Task 5: Title block, ledger and actions
-- [ ] `TitleBlock.astro`: `dl.tb` > three `div.tb__row` > `dt` + `dd` with `span.tb__long` and `span.tb__short`; the first Next sentence in `span.hl--sky` in both.
-- [ ] `Ledger.astro`: `ol.ledger[role=list][aria-label="Three proofs"]` > `li` > `a.fig` (`a.fig.fig--tape` on the bold row) + `p.claim` (bold row in `strong`) + inline `Source`.
-- [ ] Actions: `a.action--primary` "Email Aryan" and `a.stub.stub--resume` "Resume (PDF)".
-- [ ] CSS: 7.1 grids, rules and sizes; `.fig--tape::before` with the three-layer mask; `.hl--sky` and `.hl--marigold` per 6.6; the hero rule test becomes `/\.hero(?:\b|__)[^{]*\{[^}]*(?<![a-z-])gap:/s`.
-- [ ] Build test 10.1 item 9 (title-block joins in the built HTML, three `<dt>`, `hl--sky` holds exactly the first Next sentence); "text tapes never hidden".
+- [x] `TitleBlock.astro`: `dl.tb` > three `div.tb__row` > `dt` + `dd` with `span.tb__long` and `span.tb__short`; the first Next sentence in `span.hl--sky` in both.
+- [x] `Ledger.astro`: `ol.ledger[role=list][aria-label="Three proofs"]` > `li` > `a.fig` (`a.fig.fig--tape` on the bold row) + `p.claim` (bold row in `strong`) + inline `Source`.
+- [x] Actions: `a.action--primary` "Email Aryan" and `a.stub.stub--resume` "Resume (PDF)".
+- [x] CSS: 7.1 grids, rules and sizes; `.fig--tape::before` with the three-layer mask; `.hl--sky` and `.hl--marigold` per 6.6; the hero rule test becomes `/\.hero(?:\b|__)[^{]*\{[^}]*(?<![a-z-])gap:/s`.
+- [x] Build test 10.1 item 9 (title-block joins in the built HTML, three `<dt>`, `hl--sky` holds exactly the first Next sentence); "text tapes never hidden".
 
 ### Task 6: Collage and the paste-in
-- [ ] `Collage.astro`: `div.hero-art` > the pillar print, then `div.collage[aria-hidden=true]` with four empty `div.piece` (`p-sky`, `p-braille`, `p-plan`, `p-hand`) at the 7.1 coordinates (desktop, zoom tiers, phone); pieces painted per 6.6 (fibre `::before`, stock `::after` with grain, `.art` pencil layers, `braille.dots.svg` as a background); tapes `aria-hidden`.
-- [ ] The `@starting-style` signature of 8.1 and its phone rules (8.2), inside `@media (prefers-reduced-motion: no-preference)`.
-- [ ] Source tests: collage limits (10.2), every `@starting-style` inside `prefers-reduced-motion: no-preference` (10.1 item 4). Build tests: facts precede art (hero), inline SVG 1,024 B or less, Safari prefixes present.
-- [ ] Probe: arrow line within 16px of the face and the keep-out box at 1280x800, 1024x768, 390x844; Email above the fold (7.11). Commit `feat: Paste-Up hero with the paste-in signature`, push.
+- [x] `Collage.astro`: `div.hero-art` > the pillar print, then `div.collage[aria-hidden=true]` with four empty `div.piece` (`p-sky`, `p-braille`, `p-plan`, `p-hand`) at the 7.1 coordinates (desktop, zoom tiers, phone); pieces painted per 6.6 (fibre `::before`, stock `::after` with grain, `.art` pencil layers, `braille.dots.svg` as a background); tapes `aria-hidden`.
+- [x] The `@starting-style` signature of 8.1 and its phone rules (8.2), inside `@media (prefers-reduced-motion: no-preference)`.
+- [x] Source tests: collage limits (10.2), every `@starting-style` inside `prefers-reduced-motion: no-preference` (10.1 item 4). Build tests: facts precede art (hero), inline SVG 1,024 B or less, Safari prefixes present.
+- [x] Probe: arrow line within 16px of the face and the keep-out box at 1280x800, 1024x768, 390x844; Email above the fold (7.11). Commit `feat: Paste-Up hero with the paste-in signature`, push.
 
 ## Milestone 5: Pages, plates, sections and the crumple (spec 5.2b, 7.3 to 7.9, 8.4)
 

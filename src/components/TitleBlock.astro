@@ -1,0 +1,24 @@
+---
+import { titleBlock } from "../data/portfolio";
+
+// Spec 4.2 and 7.1: the fixation lines as three labelled rows. The first Next sentence wears the sky tape.
+const sentences = (label: string, list: readonly string[]) =>
+  list.map((sentence, index) => ({ sentence, taped: label === "Next" && index === 0, lead: index > 0 }));
+---
+
+<dl class="tb">
+  {titleBlock.map((row) => (
+    <div class="tb__row">
+      <dt>{row.label}</dt>
+      <dd>
+        {(["long", "short"] as const).map((length) => (
+          <span class={`tb__${length}`}>
+            {sentences(row.label, row[length]).map(({ sentence, taped, lead }) => (
+              <>{lead && " "}{taped ? <span class="hl--sky">{sentence}</span> : sentence}</>
+            ))}
+          </span>
+        ))}
+      </dd>
+    </div>
+  ))}
+</dl>
