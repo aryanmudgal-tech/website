@@ -192,3 +192,32 @@ test("package pins Astro 7, Node 24, and Sharp for the crop pipeline", () => {
   assert.equal(read(".nvmrc").trim(), "24");
   assert.match(read(".gitignore"), /^Pictures\/$/m);
 });
+
+const fixtureCopy = () => JSON.parse(read("tests/fixtures/copy-v3.json"));
+const MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December";
+const COLOPHON_TYPE_V4 = "Set in Source Serif 4 and Instrument Sans.";
+const COLOPHON_VERSION_V4 = new RegExp(`^v4, (?:${MONTHS}) 2026\\. v3 \\(September 2026\\) dissolved its photos as you scrolled\\. v2 \\(July 2026\\) was a plain page\\. v1 \\(June 2026\\) had a projector and a mini-golf game\\.$`);
+const pick = (object, keys) => Object.fromEntries(keys.map((key) => [key, object[key]]));
+
+test("copy matches the v3 freeze", () => {
+  const fixture = fixtureCopy();
+  const current = JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(portfolio).filter(([key]) => key !== "titleBlock"))));
+  const { colophon, ...rest } = current;
+  const { colophon: frozen, ...frozenRest } = fixture.portfolio;
+  assert.deepEqual(rest, frozenRest);
+  assert.ok(colophon.type === frozen.type || colophon.type === COLOPHON_TYPE_V4, `colophon.type changed: ${colophon.type}`);
+  assert.ok(colophon.version === frozen.version || COLOPHON_VERSION_V4.test(colophon.version), `colophon.version changed: ${colophon.version}`);
+  assert.deepEqual({ ...colophon, type: 0, version: 0 }, { ...frozen, type: 0, version: 0 });
+  assert.deepEqual(JSON.parse(JSON.stringify(rooms.map((room) => pick(room, ["id", "caption", "alt", "receipt", "source"])))), fixture.rooms);
+  assert.deepEqual(JSON.parse(JSON.stringify(extras.map((extra) => pick(extra, ["id", "caption", "alt", "source", "room"])))), fixture.extras);
+});
+
+test("the 1 of 2 receipt is the same everywhere it renders", () => {
+  const ledgerReceipt = portfolio.ledger[0].receipt;
+  const award = portfolio.recognitions.find((item) => item.id === "pillar").receipts[0];
+  const room = rooms.find((item) => item.id === "pillar").receipt;
+  for (const other of [award, room]) {
+    assert.equal(other.label, ledgerReceipt.label);
+    assert.equal(other.href, ledgerReceipt.href);
+  }
+});
