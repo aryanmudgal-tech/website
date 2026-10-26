@@ -1041,6 +1041,7 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
 .site-nav a::after { content: attr(data-label) / ""; height: 0; overflow: hidden; visibility: hidden; font-weight: 600; pointer-events: none; }
 .site-nav a[aria-current="location"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
 .site-nav--menu a { font: 500 16px/20px var(--sans); }
+.menu-button, .photo-popover__close { font: 600 15px/20px var(--sans); }
 
 .label { font: 600 11.5px/16px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 .fixation { font: 400 17px/25px var(--serif); color: var(--ink); }
