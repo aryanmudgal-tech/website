@@ -1,0 +1,36 @@
+---
+import { Image } from "astro:assets";
+import arena from "../assets/paper/arena.jpg";
+import cleancampus from "../assets/paper/cleancampus.jpg";
+
+// Spec 7.3: a torn plate opens each section with one subject taken from that section's own evidence.
+// Everything here is decoration, so the whole plate is hidden; the Research note describes the drawing it sits under.
+interface Props {
+  name: "work" | "projects" | "route" | "research" | "leadership" | "recognition" | "about";
+}
+
+const { name } = Astro.props;
+---
+
+<div class={`plate plate--${name}`} aria-hidden="true">
+  {name === "work" && (
+    <div class="piece plate__log"><span class="art art--log"></span><span class="tape"></span></div>
+  )}
+  {name === "projects" && (
+    <div class="piece plate__duo"><div class="duo"><Image src={arena} alt="" width={448} height={92} loading="lazy" decoding="async" /></div></div>
+  )}
+  {name === "route" && <div class="plate__art plate__art--route"></div>}
+  {name === "research" && (
+    <>
+      <div class="plate__art plate__art--cells"></div>
+      <p class="plate-note">An illustration, not study data. Drawn in code.</p>
+    </>
+  )}
+  {name === "leadership" && (
+    <div class="piece plate__duo"><div class="duo"><Image src={cleancampus} alt="" width={368} height={92} loading="lazy" decoding="async" /></div><span class="tape"></span></div>
+  )}
+  {name === "recognition" && <div class="piece plate__band"></div>}
+  {name === "about" && (
+    <div class="piece plate__graph"><span class="tape"></span></div>
+  )}
+</div>

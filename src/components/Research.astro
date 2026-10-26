@@ -3,9 +3,11 @@ import { research, headings } from "../data/portfolio";
 import { researchParagraphs } from "../lib/text";
 import Source from "./Source.astro";
 import Print from "./Print.astro";
+import Plate from "./Plate.astro";
 ---
 
 <section id="research" class="section" aria-labelledby="research-title">
+  <Plate name="research" />
   <h2 id="research-title">{headings.research}</h2>
   {research.map((item) => (
     <article class="card card--research">

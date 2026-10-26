@@ -3,9 +3,11 @@ import { recognitions, headings } from "../data/portfolio";
 import Source from "./Source.astro";
 import Print from "./Print.astro";
 import Video from "./Video.astro";
+import Plate from "./Plate.astro";
 ---
 
 <section id="recognition" class="section" aria-labelledby="recognition-title">
+  <Plate name="recognition" />
   <h2 id="recognition-title">{headings.recognition}</h2>
   {recognitions.map((award) => (
     <article class="card card--award" id={`recognition-${award.id}`}>

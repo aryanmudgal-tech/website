@@ -1221,6 +1221,250 @@ h2 + .card {
   .lines li:nth-child(5)::before { mask-image: url(../assets/paper/tick-5.svg); }
 }
 
+/* Plates: a torn sheet of stock opens each section, with one subject from that section (spec 6.6, 7.3) */
+
+.plate {
+  position: relative;
+  height: 112px;
+  overflow-x: clip;
+  filter: drop-shadow(0 1px 0.8px var(--lift));
+}
+
+.plate::before,
+.plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mask-image: url(../assets/paper/edge-top.outer.svg), url(../assets/paper/solid.svg), url(../assets/paper/edge-bottom.outer.svg);
+  mask-position: var(--edge-x, 0) top, center, var(--edge-x, 0) bottom;
+  mask-size: 1200px 16px, 100% calc(100% - 28px), 1200px 16px;
+  mask-repeat: repeat-x, no-repeat, repeat-x;
+}
+
+.plate::before {
+  background-color: var(--fibre);
+}
+
+.plate::after {
+  mask-image: url(../assets/paper/edge-top.inner.svg), url(../assets/paper/solid.svg), url(../assets/paper/edge-bottom.inner.svg);
+  background-blend-mode: multiply;
+}
+
+/* The stock face paints after the children, so the subjects lift above it. */
+.plate > * {
+  z-index: 1;
+}
+
+.plate--work { --edge-x: 0px; }
+.plate--projects { --edge-x: -180px; }
+.plate--route { --edge-x: -340px; }
+.plate--research { --edge-x: -520px; }
+.plate--leadership { --edge-x: -700px; }
+.plate--recognition { --edge-x: -860px; }
+.plate--about { --edge-x: -1020px; }
+
+.plate--work::after { background: var(--grain) 0 0 / 160px, var(--stock-sky); }
+.plate--projects::after { background: var(--grain) 0 0 / 160px, var(--stock-vermilion); }
+.plate--route::after,
+.plate--about::after { background: var(--grain) 0 0 / 160px, var(--stock-kraft); }
+.plate--research::after { background: var(--grain) 0 0 / 160px, var(--stock-ub); }
+.plate--leadership::after { background: var(--grain) 0 0 / 160px, var(--stock-leaf); }
+.plate--recognition::after { background: var(--grain) 0 0 / 160px, var(--stock-marigold); }
+
+.plate__log {
+  left: 56px;
+  top: -12px;
+  width: 248px;
+  height: 114px;
+  rotate: -2deg;
+}
+
+.plate__log::before {
+  background-color: var(--fibre);
+  mask-image: url(../assets/paper/log.outer.svg);
+}
+
+.plate__log .tape {
+  width: 56px;
+  height: 18px;
+  right: -18px;
+  top: -5px;
+  rotate: 24deg;
+}
+
+.art--log {
+  inset: 8px;
+}
+
+.plate__duo {
+  padding: 4px;
+  background: var(--fibre);
+}
+
+.plate__duo::before,
+.plate__duo::after,
+.plate__log::after,
+.plate__graph::after {
+  content: none;
+}
+
+.plate--projects .plate__duo {
+  right: 40px;
+  top: 24px;
+  width: 456px;
+  height: 100px;
+  rotate: 1deg;
+}
+
+.plate--leadership .plate__duo {
+  left: 64px;
+  top: -10px;
+  width: 376px;
+  height: 100px;
+  rotate: -1.5deg;
+}
+
+.duo {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-blend-mode: multiply;
+}
+
+.plate--projects .duo { background: var(--grain) 0 0 / 160px, var(--stock-vermilion); }
+.plate--leadership .duo { background: var(--grain) 0 0 / 160px, var(--stock-leaf); }
+
+.duo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+}
+
+.plate--leadership .tape {
+  width: 60px;
+  height: 18px;
+  left: 24px;
+  top: -8px;
+  rotate: -6deg;
+}
+
+.plate__band {
+  left: 68%;
+  top: -10px;
+  width: 48px;
+  height: calc(100% + 24px);
+  rotate: 0.8deg;
+}
+
+.plate__band::before {
+  background-color: var(--fibre);
+  mask-image: url(../assets/paper/band.outer.svg);
+}
+
+.plate__band::after {
+  background: var(--grain) 0 0 / 160px, var(--stock-ub);
+  background-blend-mode: multiply;
+  mask-image: url(../assets/paper/band.inner.svg);
+}
+
+.plate__graph {
+  left: 72px;
+  top: -12px;
+  width: 248px;
+  height: 112px;
+  rotate: 2deg;
+}
+
+.plate__graph::before {
+  background-color: var(--fibre);
+  mask-image: url(../assets/paper/graph.outer.svg);
+}
+
+.plate__graph .tape {
+  width: 52px;
+  height: 18px;
+  left: 98px;
+  top: -8px;
+  rotate: -4deg;
+}
+
+.plate__art {
+  position: absolute;
+  inset: 0;
+}
+
+/* The cell field stays on the stock, inside both tears. */
+.plate__art--cells {
+  clip-path: inset(14px 0);
+}
+
+/* Room for the note between the Research plate and its heading. */
+.section .plate--research + h2 {
+  margin-top: 52px;
+}
+
+/* The Research note describes the hidden drawing, so it is hidden with it; it sits on paper, below the plate. */
+.plate-note {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  font: 400 13px/19px var(--sans);
+  color: var(--muted);
+  text-align: right;
+}
+
+@supports (mask-image: none) or (-webkit-mask-image: none) {
+  .art--log {
+    mask-image: url(../assets/paper/log.pencil.svg);
+  }
+
+  .plate__graph::after {
+    content: "";
+    background-color: var(--pencil);
+    mask-image: url(../assets/paper/graph.tile.svg), url(../assets/paper/graph.outer.svg);
+    mask-size: 60px 60px, 100% 100%;
+    mask-repeat: repeat, no-repeat;
+    mask-composite: intersect;
+  }
+
+  .plate__art--route {
+    background-color: var(--pencil);
+    mask: url(../assets/paper/route.pencil.svg) left center / contain no-repeat;
+  }
+
+  .plate__art--cells {
+    background-color: var(--fibre);
+    mask: url(../assets/paper/cells.svg) right center / 744px 112px no-repeat;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .plate { height: 72px; }
+  .plate__log { left: 14px; top: -8px; width: 132px; height: 61px; }
+  .plate__log .tape { width: 40px; height: 14px; right: -12px; top: -4px; }
+  .art--log { inset: 4px; }
+  .plate__duo { padding: 3px; }
+  .plate--projects .plate__duo { right: 12px; top: 28px; width: 196px; height: 52px; }
+  .plate--leadership .plate__duo { left: 12px; top: -8px; width: 180px; height: 50px; }
+  .plate--leadership .tape { width: 44px; height: 14px; left: 16px; top: -6px; }
+  .plate__band { width: 32px; }
+  .plate__graph { left: 20px; top: -8px; width: 140px; height: 62px; }
+  .plate__graph .tape { width: 40px; height: 14px; left: 50px; top: -6px; }
+  .plate-note { left: 0; right: auto; text-align: left; }
+  .plate__art--cells { clip-path: inset(12px 0); }
+  .section .plate--research + h2 { margin-top: 48px; }
+}
+
+@supports (mask-image: none) or (-webkit-mask-image: none) {
+  @media (max-width: 47.99rem) {
+    .plate__art--route { mask-image: url(../assets/paper/route-sm.pencil.svg); }
+    .plate__art--cells { mask: url(../assets/paper/cells-sm.svg) right center / 358px 72px no-repeat; }
+  }
+}
+
 /* Footer */
 
 .site-footer {
@@ -1564,7 +1808,8 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
   }
 
   .print,
-  .hero-art {
+  .hero-art,
+  .plate {
     display: none;
   }
 

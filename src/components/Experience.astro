@@ -1,9 +1,11 @@
 ---
 import { experiences, headings } from "../data/portfolio";
 import Source from "./Source.astro";
+import Plate from "./Plate.astro";
 ---
 
 <section id="work" class="section" aria-labelledby="work-title">
+  <Plate name="work" />
   <h2 id="work-title">{headings.work}</h2>
   {experiences.map((job) => (
     <article class="row">

@@ -104,7 +104,7 @@ test("built links are actionable and external links are safe", () => {
 test("built images reserve space, describe themselves, and load in the right order", () => {
   const html = read(client("index.html"));
   const images = html.match(/<img\b[^>]*>/g) ?? [];
-  assert.equal(images.length, 37, "13 prints, 12 popover photos, 8 popover extras, 4 YouTube posters");
+  assert.equal(images.length, 39, "13 prints, 12 popover photos, 8 popover extras, 4 YouTube posters, 2 plate duotones");
   for (const image of images) {
     assert.match(image, /\bwidth="\d+"/);
     assert.match(image, /\bheight="\d+"/);
@@ -161,7 +161,7 @@ test("hidden subtrees hold nothing focusable or described", () => {
   const html = read(client("index.html"));
   for (const hidden of elements(html, (tag) => /aria-hidden="true"/.test(tag))) {
     assert.doesNotMatch(hidden, /<a\b|<button\b|tabindex=|<input\b|\spopover(?:=""|\s|>)/, `hidden subtree holds a control: ${hidden.slice(0, 120)}`);
-    for (const image of hidden.match(/<img\b[^>]*>/g) ?? []) assert.match(image, /alt=""/);
+    for (const image of hidden.match(/<img\b[^>]*>/g) ?? []) assert.match(image, /\salt(?:=""|[\s/>])/, "hidden images have empty alt");
   }
 });
 
@@ -258,5 +258,18 @@ test("no hidden subtree or decorative tape carries a result or a title-block sen
   for (const hidden of elements(html, (tag) => /aria-hidden="true"/.test(tag) || /class="(?:[^"]*\s)?tape(?:\s|")/.test(tag))) {
     const text = textOf(hidden);
     for (const fact of facts) assert.ok(!text.includes(fact), `hidden or taped element holds "${fact}"`);
+  }
+});
+
+test("seven plates open the sections, each hidden and holding one subject", () => {
+  const html = read(client("index.html"));
+  const plates = elements(html, (tag, name) => name === "div" && /class="plate plate--/.test(tag));
+  assert.deepEqual(plates.map((plate) => plate.match(/class="plate (plate--[a-z]+)"/)[1]), ["plate--work", "plate--projects", "plate--route", "plate--research", "plate--leadership", "plate--recognition", "plate--about"]);
+  for (const plate of plates) {
+    assert.match(plate.slice(0, plate.indexOf(">")), /aria-hidden="true"/);
+    const subjects = elements(plate, (tag) => /class="[^"]*\b(?:piece|plate__art)\b/.test(tag));
+    assert.ok(subjects.length >= 1 && subjects.length <= 2, `${plate.slice(0, 60)} holds ${subjects.length} subjects`);
+    const text = textOf(plate);
+    assert.ok(text === "" || (plate.includes("plate--research") && text === "An illustration, not study data. Drawn in code."), `plate text: ${text}`);
   }
 });

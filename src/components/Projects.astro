@@ -3,9 +3,11 @@ import { projects, headings } from "../data/portfolio";
 import Source from "./Source.astro";
 import Print from "./Print.astro";
 import Video from "./Video.astro";
+import Plate from "./Plate.astro";
 ---
 
 <section id="projects" class="section" aria-labelledby="projects-title">
+  <Plate name="projects" />
   <h2 id="projects-title">{headings.projects}</h2>
   <p class="lede">Hackathon builds, each finished in a day or two and shown to judges. Team size and my part are stated on every card.</p>
   <ol class="index" role="list">

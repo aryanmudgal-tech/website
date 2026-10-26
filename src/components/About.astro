@@ -1,9 +1,11 @@
 ---
 import { about, headings } from "../data/portfolio";
 import Source from "./Source.astro";
+import Plate from "./Plate.astro";
 ---
 
 <section id="about" class="section" aria-labelledby="about-title">
+  <Plate name="about" />
   <h2 id="about-title">{headings.about}</h2>
   <ul class="lines" role="list">
     {about.map((line) => (
