@@ -1,3 +1,5 @@
+@import "./crumple.css";
+
 /* Fallback faces, measured 26 October 2026 against the real fixation line, so the font swap does not move the first screen. */
 @font-face { font-family: "Source Serif 4 Fallback"; src: local("Georgia"); size-adjust: 99.75%; ascent-override: 103.86%; descent-override: 33.58%; line-gap-override: 0%; }
 @font-face { font-family: "Source Serif 4 Fallback Noto"; src: local("Noto Serif"); size-adjust: 93.71%; ascent-override: 110.55%; descent-override: 35.75%; line-gap-override: 0%; }
@@ -90,9 +92,6 @@ body {
   min-width: 20rem;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--sans);
-  font-size: 1.0625rem;
-  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -149,25 +148,7 @@ button {
 h1,
 h2,
 h3 {
-  font-family: var(--serif);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
   text-wrap: balance;
-}
-
-h1 {
-  font-size: clamp(2.6rem, 5.2vw, 4.25rem);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-
-h2 {
-  font-size: clamp(1.7rem, 2.8vw, 2.4rem);
-}
-
-h3 {
-  font-size: 1.35rem;
 }
 
 .sr-only {
@@ -199,25 +180,11 @@ h3 {
 }
 
 .shell,
-main,
-.site-footer {
+.content > * {
   width: 100%;
   max-width: var(--shell);
   margin-inline: auto;
   padding-inline: var(--gutter);
-}
-
-.label {
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.meta {
-  color: var(--muted);
-  font-size: 0.95rem;
 }
 
 /* Inline receipts sit inside the sentence, in its face (spec 7.4). */
@@ -239,8 +206,10 @@ main,
 }
 
 .action--primary {
+  min-height: 48px;
   background: var(--accent);
   color: var(--on-accent);
+  font: 600 16px/20px var(--sans);
 }
 
 .action--primary:hover {
@@ -266,9 +235,8 @@ main,
 }
 
 .wordmark {
-  font-family: var(--serif);
-  font-size: 1.2rem;
-  font-weight: 500;
+  font: 600 20px/24px var(--serif);
+  letter-spacing: -0.005em;
   text-decoration: none;
 }
 
@@ -284,12 +252,14 @@ main,
 
 .site-nav a {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   min-height: 2.75rem;
-  font-size: 0.95rem;
+  font: 400 15px/20px var(--sans);
   text-decoration: none;
   color: var(--ink-2);
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
 }
 
 .site-nav a:hover,
@@ -299,7 +269,8 @@ main,
 
 .site-nav a[aria-current="location"] {
   color: var(--ink);
-  border-bottom-color: var(--accent);
+  font-weight: 600;
+  border-bottom-color: var(--ink);
 }
 
 .menu-button {
@@ -484,19 +455,24 @@ main,
   display: none;
 }
 
-/* Text tapes carry facts, so they are spans, never .tape (spec 5.2b, 6.6). */
-.hl--sky {
+/* Text tapes carry facts, so they are spans, never .tape (spec 5.2b, 6.6). Torn ends repeat on every line. */
+.hl--sky,
+.hl--marigold {
   margin-inline: -8px;
   padding: 0.04em 8px;
   color: var(--on-stock);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
+  background-blend-mode: normal, normal, multiply, normal;
+}
+
+.hl--sky {
+  color: var(--on-stock);
   background:
     url(../assets/paper/tape-end-sky-l.svg) left center / 8px calc(100% - 2px) no-repeat padding-box,
     url(../assets/paper/tape-end-sky-r.svg) right center / 8px calc(100% - 2px) no-repeat padding-box,
     var(--grain) 0 0 / 160px content-box,
     var(--stock-sky) content-box;
-  background-blend-mode: normal, normal, multiply, normal;
 }
 
 .ledger {
@@ -813,6 +789,180 @@ main,
   }
 }
 
+/* Sheets: every section on its own sheet of paper (spec 5.2b, 8.4) */
+
+/* How far the crumple has moved a sheet from where it lies; anchors add them back (see the crumple block). */
+@property --arrive {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --hold {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.sheet {
+  position: relative;
+  overflow-x: clip;
+}
+
+.crumple {
+  position: relative;
+  isolation: isolate;
+}
+
+.content {
+  min-height: 100svh;
+  padding-bottom: 96px;
+  background-blend-mode: multiply;
+}
+
+.sheet--paper .content { background: var(--paper); }
+.sheet--marigold .content { background: var(--grain) 0 0 / 160px, var(--page-marigold); }
+.sheet--sky .content { background: var(--grain) 0 0 / 160px, var(--page-sky); }
+.sheet--mint .content { background: var(--grain) 0 0 / 160px, var(--page-mint); }
+.sheet--coral .content { background: var(--grain) 0 0 / 160px, var(--page-coral); }
+.sheet--rose .content { background: var(--grain) 0 0 / 160px, var(--page-rose); }
+.sheet--lilac .content { background: var(--grain) 0 0 / 160px, var(--page-lilac); }
+.sheet--slab .content { background: var(--slab); }
+
+/* A coloured page is paper in both themes: ink text, --page-ink-2 for secondary text, ink hairlines at 28%, and
+   stubs filled with fibre. Re-pointing these tokens keeps every rule on the page honest; links and focus turn ink below. */
+.sheet--coloured {
+  --ink: var(--on-stock);
+  --ink-2: var(--page-ink-2);
+  --muted: var(--page-ink-2);
+  --line: rgba(27, 26, 23, 0.28);
+  --paper: var(--fibre);
+  --paper-2: var(--fibre);
+  --lift: rgba(27, 26, 23, 0.26);
+  --lift-far: rgba(27, 26, 23, 0.12);
+  color: var(--ink);
+}
+
+.sheet--coloured a {
+  color: var(--ink);
+}
+
+.sheet--coloured :focus-visible {
+  outline: 2px solid var(--ink);
+}
+
+/* The crumple: only where scroll-driven animation exists and motion is welcome. Elsewhere the runways stay
+   0 tall, nothing overlaps, and the stack is an ordinary page of coloured sections of the same height. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    body {
+      timeline-scope: --r1, --r2, --r3, --r4, --r5, --r6, --r7, --r8;
+    }
+
+    html {
+      scroll-padding-top: 0;
+    }
+
+    .runway {
+      height: 100svh;
+      view-timeline: var(--name) block;
+    }
+
+    /* Fragment scrolling measures the transformed box, and a target waits a screen up under the sheet before it
+       (arrive) or rides a screen down over its own runway (hold). Both keyframes also carry their offset as a
+       length every id inherits, so a jump from anywhere lands where the crumple before its target has just finished. */
+    .sheet [id] {
+      scroll-margin-top: calc(var(--arrive) + var(--hold));
+    }
+
+    .fx {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      height: 100svh;
+      pointer-events: none;
+      background: url(../assets/paper/crumple-d.avif) 0 100% / 2500% 100% no-repeat;
+      mix-blend-mode: multiply;
+      opacity: 0;
+    }
+
+    .crumple {
+      mask-size: 2500% 100svh;
+      mask-repeat: no-repeat;
+    }
+
+    .content {
+      transform-origin: 50% calc(100% - 50svh);
+    }
+
+    /* Leaving: the last screen holds still while it crumples and rolls away. */
+    [data-out] :is(.pin, .crumple, .content, .fx) {
+      animation-range: entry 0% entry 100%;
+      animation-fill-mode: both;
+    }
+
+    /* Once its crumple is over, the sheet stays hidden by the pin alone and its content lies flat again, so its
+       anchors are where they were laid out. */
+    [data-out] :is(.crumple, .content) {
+      animation-fill-mode: backwards;
+    }
+
+    [data-out] .pin { animation-name: hold; animation-timing-function: linear; }
+    [data-out] .crumple { animation-name: mask-d, roll; animation-timing-function: step-end, linear; animation-timeline: var(--out), var(--out); }
+    [data-out] .content { animation-name: content-d; animation-timing-function: linear; }
+    [data-out] .fx { animation-name: fx-d; animation-timing-function: step-end; }
+
+    [data-out] :is(.pin, .content, .fx) { animation-timeline: var(--out); }
+
+    /* Arriving: the next sheet waits at the top of the screen, underneath. */
+    .sheet[data-in] {
+      margin-top: -100svh;
+      animation: arrive linear both;
+      animation-timeline: var(--in);
+      animation-range: entry 0% entry 100%;
+    }
+
+    @keyframes hold {
+      0% { translate: 0 0; --hold: 0px; filter: none; visibility: visible; }
+      3% { filter: drop-shadow(0 10px 14px rgba(27, 26, 23, 0.22)); }
+      99.9% { visibility: visible; }
+      100% { translate: 0 100svh; --hold: 100svh; filter: drop-shadow(0 10px 14px rgba(27, 26, 23, 0.22)); visibility: hidden; }
+    }
+
+    @keyframes arrive {
+      from { translate: 0 -100svh; --arrive: -100svh; }
+      to { translate: 0 0; --arrive: 0px; }
+    }
+
+    @keyframes roll {
+      0%, 74% { translate: 0 0; }
+      100% { translate: 78vw 4svh; }
+    }
+
+    /* Portrait screens use the tall strip. */
+    @media (max-aspect-ratio: 3/4) {
+      .fx { background-image: url(../assets/paper/crumple-m.avif); }
+      [data-out] .crumple { animation-name: mask-m, roll; }
+      [data-out] .content { animation-name: content-m; }
+      [data-out] .fx { animation-name: fx-m; }
+    }
+
+    /* Paints a pixel of each strip early, so the first crumple never waits on decoding. */
+    .preload {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 1px;
+      height: 1px;
+      opacity: 0.01;
+      pointer-events: none;
+      background: url(../assets/paper/crumple-d.avif) 0 0 / 1px 1px, url(../assets/paper/crumple-m.avif) 0 0 / 1px 1px;
+    }
+  }
+}
+
 /* Sections (spec 5.4, 7.5 to 7.9) */
 
 .section {
@@ -983,17 +1133,12 @@ h2 + .card {
 }
 
 .hl--marigold {
-  margin-inline: -8px;
-  padding: 0.04em 8px;
   color: var(--on-stock);
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
   background:
     url(../assets/paper/tape-end-marigold-l.svg) left center / 8px calc(100% - 2px) no-repeat padding-box,
     url(../assets/paper/tape-end-marigold-r.svg) right center / 8px calc(100% - 2px) no-repeat padding-box,
     var(--grain) 0 0 / 160px content-box,
     var(--stock-marigold) content-box;
-  background-blend-mode: normal, normal, multiply, normal;
 }
 
 .aside {
@@ -1096,6 +1241,7 @@ h2 + .card {
   left: 12px;
   top: 12px;
   padding: 3px 8px;
+  font: 600 12px/16px var(--sans);
   background: var(--fibre);
   color: var(--on-stock);
 }
@@ -1156,6 +1302,9 @@ h2 + .card {
 
 .award__fig {
   margin-right: 6px;
+  font: 600 64px/64px var(--serif);
+  font-variation-settings: "opsz" 60;
+  letter-spacing: -0.02em;
 }
 
 /* About */
@@ -1170,6 +1319,7 @@ h2 + .card {
 
 .lines li {
   display: grid;
+  font: 400 22px/32px var(--serif);
   grid-template-columns: 32px minmax(0, 1fr);
   padding-block: 12px;
   border-top: 1px solid var(--line);
@@ -1255,7 +1405,6 @@ h2 + .card {
   z-index: 1;
 }
 
-.plate--work { --edge-x: 0px; }
 .plate--projects { --edge-x: -180px; }
 .plate--route { --edge-x: -340px; }
 .plate--research { --edge-x: -520px; }
@@ -1692,23 +1841,16 @@ h1 { font: 600 72px/72px var(--serif); font-variation-settings: "opsz" 60; lette
 h2 { font: 400 44px/50px var(--serif); font-variation-settings: "opsz" 48; letter-spacing: -0.012em; max-width: 900px; text-wrap: balance; }
 h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; letter-spacing: -0.008em; }
 
-.wordmark { font: 600 20px/24px var(--serif); letter-spacing: -0.005em; }
-.site-nav a { display: inline-flex; flex-direction: column; justify-content: center; font: 400 15px/20px var(--sans); border-bottom: 3px solid transparent; }
 .site-nav a::after { content: attr(data-label) / ""; height: 0; overflow: hidden; visibility: hidden; font-weight: 600; pointer-events: none; }
-.site-nav a[aria-current="location"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
 .site-nav--menu a { font: 500 16px/20px var(--sans); }
 .menu-button, .photo-popover__close { font: 600 15px/20px var(--sans); }
 
 .label { font: 600 11.5px/16px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-.action--primary { min-height: 48px; font: 600 16px/20px var(--sans); }
 
 .video__caption, .print__caption, .photo-popover__caption { font: 400 13px/19px var(--sans); color: var(--muted); }
-.video__badge { font: 600 12px/16px var(--sans); }
 .route__period { font: 400 15px/22px var(--sans); color: var(--muted); }
 .route a { font: 400 18px/28px var(--serif); }
-.award__fig { font: 600 64px/64px var(--serif); font-variation-settings: "opsz" 60; letter-spacing: -0.02em; }
 .award__den { font: italic 400 22px/30px var(--serif); color: var(--ink-2); }
-.lines li { font: 400 22px/32px var(--serif); }
 .contact-link { font: 400 34px/44px var(--serif); font-variation-settings: "opsz" 40; }
 .profiles a { font: 500 16px/22px var(--sans); }
 .colophon { font: 400 13px/19px var(--sans); }

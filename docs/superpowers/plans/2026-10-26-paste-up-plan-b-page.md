@@ -105,23 +105,23 @@ export function elements(html, test) {
 ## Milestone 5: Pages, plates, sections and the crumple (spec 5.2b, 7.3 to 7.9, 8.4)
 
 ### Task 7: Sections
-- [ ] `src/lib/text.ts` (`numeralRuns`, `researchParagraphs`) with its source tests (10.2).
-- [ ] `Source.astro` `variant: "inline" | "stub"`; stubs in `div.stubs` per 7.4; receipts test.
-- [ ] Work, Projects (index, `hl--marigold` results, `Video mat="demo"`, asides with the bracket), Route, Research (split detail), Leadership (`h3.meta-lead`, `#leadership-<slug>`, numerals), Recognition (`award__line`, plain-mat video), About (ticks) per 7.5 to 7.9; `Video.astro` mats, play glyph, poster fade and poster click (7.4).
-- [ ] Build tests: facts precede art (cards), exceptions and stubs, the delete test (10.2).
+- [x] `src/lib/text.ts` (`numeralRuns`, `researchParagraphs`) with its source tests (10.2).
+- [x] `Source.astro` `variant: "inline" | "stub"`; stubs in `div.stubs` per 7.4; receipts test.
+- [x] Work, Projects (index, `hl--marigold` results, `Video mat="demo"`, asides with the bracket), Route, Research (split detail), Leadership (`h3.meta-lead`, `#leadership-<slug>`, numerals), Recognition (`award__line`, plain-mat video), About (ticks) per 7.5 to 7.9; `Video.astro` mats, play glyph, poster fade and poster click (7.4).
+- [x] Build tests: facts precede art (cards), exceptions and stubs, the delete test (10.2).
 
 ### Task 8: Plates
-- [ ] `Plate.astro` with the 7.3 table: masks from the edge strips (`--edge-x` per plate), the subject piece or `plate__art`, the duotones through `<Image>`, the Research note; tablet rules. Images become 39.
-- [ ] Build test "Plates" (10.2); source test "no pencil on marigold" now has real rules to check.
+- [x] `Plate.astro` with the 7.3 table: masks from the edge strips (`--edge-x` per plate), the subject piece or `plate__art`, the duotones through `<Image>`, the Research note; tablet rules. Images become 39.
+- [x] Build test "Plates" (10.2); source test "no pencil on marigold" now has real rules to check.
 
 ### Task 9: The crumple strips
-- [ ] `scripts/crumple/` from the prototype tools: `page3d.js`, `render.mjs` (headless Chromium via Playwright, devDependency `playwright` pinned), `pack.mjs` (25-frame AVIF strips, `src/assets/paper/crumple-d.avif` 640x400 frames and `crumple-m.avif` 270x584 frames, plus `src/data/crumple.json`), `css.mjs` (writes `src/styles/crumple.css`); devDependencies `three@0.169.0`, `simplex-noise@4.0.3`; script `"crumple"`. Add the strips to `paper.ts` as `kind: "rendered"`; paper tests check strip width and frame counts (6.7).
+- [x] `scripts/crumple/` from the prototype tools: `page3d.js`, `render.mjs` (headless Chromium via Playwright, devDependency `playwright` pinned), `pack.mjs` (25-frame AVIF strips, `src/assets/paper/crumple-d.avif` 640x400 frames and `crumple-m.avif` 270x584 frames, plus `src/data/crumple.json`), `css.mjs` (writes `src/styles/crumple.css`); devDependencies `three@0.169.0`, `simplex-noise@4.0.3`; script `"crumple"`. Add the strips to `paper.ts` as `kind: "rendered"`; paper tests check strip width and frame counts (6.7).
 
 ### Task 10: Sheets and the crumple
-- [ ] `Sheet.astro` (7.2) and `index.astro` wrapping Hero to About and the footer in nine sheets with page colours of 5.2b and runways `r1` to `r8`; `body { timeline-scope: --r1, ..., --r8 }`.
-- [ ] CSS from the approved prototype: hold, arrive, outline mask, creases, content shrink, roll, preload, portrait switch, all inside both gates; page colour rules of 5.2b (ink text, `--page-ink-2`, ink links and focus, `--fibre` stubs).
-- [ ] Tests of 10.3 "New for the pages and the crumple": sheets and runways in order, gates, page colours and their contrast, crumple data; the probe: same document height with and without reduced motion, no horizontal overflow through every runway.
-- [ ] Probe frame strips of every crumple at 1280x800 and 390x844 against the prototype; commit `feat: coloured sheets that crumple between sections`, push.
+- [x] `Sheet.astro` (7.2) and `index.astro` wrapping Hero to About and the footer in nine sheets with page colours of 5.2b and runways `r1` to `r8`; `body { timeline-scope: --r1, ..., --r8 }`.
+- [x] CSS from the approved prototype: hold, arrive, outline mask, creases, content shrink, roll, preload, portrait switch, all inside both gates; page colour rules of 5.2b (ink text, `--page-ink-2`, ink links and focus, `--fibre` stubs).
+- [x] Tests of 10.3 "New for the pages and the crumple": sheets and runways in order, gates, page colours and their contrast, crumple data; the probe: same document height with and without reduced motion, no horizontal overflow through every runway.
+- [x] Probe frame strips of every crumple at 1280x800 and 390x844 against the prototype; commit `feat: coloured sheets that crumple between sections`, push.
 
 ## Milestone 6: Footer, 404, print, OG (spec 7.10, 5.6 to 5.8)
 

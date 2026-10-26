@@ -273,3 +273,28 @@ test("seven plates open the sections, each hidden and holding one subject", () =
     assert.ok(text === "" || (plate.includes("plate--research") && text === "An illustration, not study data. Drawn in code."), `plate text: ${text}`);
   }
 });
+
+test("nine sheets in page order, each boundary a runway named on both sides", () => {
+  const html = read(client("index.html"));
+  const sheets = [...html.matchAll(/<div class="sheet sheet--([a-z]+)( sheet--coloured)?"([^>]*)>/g)].map((m) => ({ page: m[1], coloured: Boolean(m[2]), attrs: m[3], at: m.index }));
+  assert.deepEqual(sheets.filter((s) => s.coloured).map((s) => s.page), ["marigold", "sky", "mint", "coral", "rose", "lilac", "sky"]);
+  assert.deepEqual(sheets.map((s) => s.page), ["paper", "marigold", "sky", "mint", "coral", "rose", "lilac", "sky", "slab"]);
+  const attr = (s, name) => s.attrs.match(new RegExp(`${name}="([^"]*)"`))?.[1];
+  const runways = [...html.matchAll(/<div class="runway" id="(r\d)"[^>]*>/g)].map((m) => m[1]);
+  assert.deepEqual(runways, ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"]);
+  sheets.forEach((sheet, i) => {
+    const out = attr(sheet, "data-out");
+    if (i === sheets.length - 1) { assert.equal(out, undefined, "the footer sheet has no runway"); return; }
+    assert.equal(out, `r${i + 1}`);
+    const own = elements(html.slice(sheet.at), (tag) => tag.startsWith('<div class="sheet'))[0];
+    assert.match(html.slice(sheet.at + own.length).trimStart(), new RegExp(`^<div class="runway" id="${out}"`), `runway ${out} follows its sheet`);
+    assert.equal(attr(sheets[i + 1], "data-in"), out, `the next sheet arrives on ${out}`);
+  });
+  for (const part of elements(html, (tag) => /class="(?:fx|runway)"/.test(tag))) {
+    assert.match(part, /^<div[^>]*aria-hidden="true"/);
+    assert.equal(textOf(part), "");
+    assert.doesNotMatch(part, /<a\b|<button\b|tabindex/);
+  }
+  const inSheets = elements(html, (tag) => tag.startsWith('<div class="sheet')).join("");
+  for (const { href } of portfolio.navItems) assert.ok(inSheets.includes(`id="${href.slice(1)}"`), `${href} sits inside a sheet`);
+});

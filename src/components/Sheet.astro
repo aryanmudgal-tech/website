@@ -1,0 +1,24 @@
+---
+// Spec 7.2 and 8.4: one section on its own sheet of coloured paper. When `out` is set, a one-screen runway follows,
+// and while it scrolls past, this sheet's last screen crumples and rolls away to reveal the sheet whose `in` names it.
+interface Props {
+  page: "paper" | "marigold" | "sky" | "mint" | "coral" | "rose" | "lilac" | "slab";
+  out?: string;
+  in?: string;
+}
+
+const { page, out, in: incoming } = Astro.props;
+// Timeline names travel as custom properties, so each crumple rule is written once; only the gated CSS reads them.
+// Each sheet lies on top of the next (r1 leaves first, so the hero is highest).
+const style = [out && `--out: --${out}`, incoming && `--in: --${incoming}`, `z-index: ${out ? 10 - Number(out.slice(1)) : 1}`].filter(Boolean).join("; ");
+---
+
+<div class:list={["sheet", `sheet--${page}`, page !== "paper" && page !== "slab" && "sheet--coloured"]} data-in={incoming} data-out={out} style={style}>
+  <div class="pin">
+    <div class="crumple">
+      <div class="content"><slot /></div>
+      <div class="fx" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+{out && <div class="runway" id={out} style={`--name: --${out}`} aria-hidden="true"></div>}

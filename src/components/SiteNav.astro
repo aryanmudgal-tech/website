@@ -25,10 +25,6 @@ import { navItems } from "../data/portfolio";
 
 <script>
   const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-nav a[href^="#"]'));
-  const destinations = links
-    .map((link) => document.getElementById(link.hash.slice(1)))
-    .filter((element): element is HTMLElement => element !== null);
-  const unique = Array.from(new Set(destinations));
 
   function setCurrent(id: string | null) {
     links.forEach((link) => {
@@ -40,19 +36,23 @@ import { navItems } from "../data/portfolio";
     });
   }
 
-  if (unique.length > 0) {
-    const visibility = new Map<string, number>();
+  // Sheets move while they crumple, so the runways between them decide, since they never move: the current section
+  // is the sheet after the last runway whose top has passed a line 20% down the screen (spec 8.4). Without motion the
+  // runways are 0 tall and sit on the same boundaries, so the rule holds either way.
+  const runways = Array.from(document.querySelectorAll<HTMLElement>(".runway"));
+  const after = new Map(runways.map((runway) => [runway, document.querySelector(`[data-in="${runway.id}"] .content > [id]`)?.id ?? null]));
+  const passed = new Map<Element, boolean>();
+  if (runways.length > 0) {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          visibility.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
-        });
-        const current = [...visibility.entries()].filter(([, ratio]) => ratio > 0).sort((a, b) => b[1] - a[1])[0];
-        setCurrent(current?.[0] ?? null);
+        entries.forEach((entry) => passed.set(entry.target, entry.isIntersecting));
+        const last = runways.filter((runway) => passed.get(runway)).pop();
+        setCurrent(last ? after.get(last) ?? null : null);
       },
-      { rootMargin: "-20% 0px -58% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
+      // Everything above the line counts as passed, so a jump of any size still crosses the line and fires.
+      { rootMargin: "100000px 0px -80% 0px", threshold: 0 },
     );
-    unique.forEach((element) => observer.observe(element));
+    runways.forEach((runway) => observer.observe(runway));
   }
 
   const menu = document.getElementById("site-menu");

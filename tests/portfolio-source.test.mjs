@@ -350,3 +350,67 @@ test("leadership numerals and the research split change no words", async () => {
   for (const paragraph of paragraphs) assert.equal(paragraph.split(/(?<=\.) (?=[A-Z])/).length, 2, `not two sentences: ${paragraph}`);
   for (const file of ["Leadership", "Research"]) assert.match(read(`src/components/${file}.astro`), /from "\.\.\/lib\/text"/);
 });
+
+const GATES = ["@supports (animation-timeline: view())", "@media (prefers-reduced-motion: no-preference)"];
+
+test("the crumple only runs behind both gates", () => {
+  const all = [...rules(css()), ...rules(read("src/styles/crumple.css"))];
+  const moving = all.filter((rule) => !rule.context.some((c) => c.startsWith("@keyframes")) && declarations(rule).some(([key, value]) =>
+    key === "animation-timeline" || key === "view-timeline" || key === "view-timeline-name"
+    || (key === "margin-top" && rule.selector.includes("[data-in]") && value.startsWith("-"))
+    || (key === "height" && rule.selector.includes(".runway") && !/^0(?:px)?$/.test(value))));
+  assert.ok(moving.length >= 4, "the crumple rules exist");
+  for (const rule of moving) {
+    for (const gate of GATES) assert.ok(rule.context.includes(gate), `${rule.selector} sets crumple motion outside ${gate}`);
+  }
+  for (const rule of all) {
+    if (rule.context.length === 0 && rule.selector.includes(".runway")) assert.doesNotMatch(rule.body, /height:\s*[1-9]/, "an ungated runway takes space");
+  }
+});
+
+const PAGES = ["marigold", "sky", "mint", "coral", "rose", "lilac"];
+
+test("pages are paper: declared once, painted only by sheets, and read in ink", () => {
+  const all = rules(css());
+  const root = all.filter((rule) => rule.selector === ":root" && rule.context.length === 0).flatMap(declarations);
+  const value = (name) => root.filter(([key]) => key === name).map(([, v]) => v);
+  for (const page of [...PAGES, "ink-2"]) assert.equal(value(`--page-${page}`).length, 1, `--page-${page} is declared once in :root`);
+  for (const rule of all) {
+    for (const [key, v] of declarations(rule)) {
+      if (/var\(--page-(?!ink-2)/.test(v)) {
+        assert.ok(["background", "background-color"].includes(key), `page colour in ${key} of ${rule.selector}`);
+        assert.ok(rule.selector.split(",").every((s) => /^\.sheet--(?!coloured)/.test(s.trim())), `${rule.selector} paints a page colour`);
+      }
+      if (v.includes("var(--page-ink-2)")) assert.ok(rule.selector.split(",").every((s) => s.trim().startsWith(".sheet--")), `${rule.selector} uses --page-ink-2 outside a coloured sheet`);
+      if (key.startsWith("--page-")) assert.ok(rule.selector === ":root", `${key} redeclared in ${rule.selector}`);
+    }
+  }
+  // On a coloured page the secondary inks and the link colour all resolve to ink or --page-ink-2.
+  const coloured = all.find((rule) => rule.selector === ".sheet--coloured" && rule.context.length === 0);
+  assert.ok(coloured, "the coloured sheets re-point their inks");
+  const remap = Object.fromEntries(declarations(coloured));
+  assert.equal(remap["--ink"], "var(--on-stock)");
+  for (const token of ["--ink-2", "--muted"]) assert.equal(remap[token], "var(--page-ink-2)");
+  assert.equal(remap["--accent"], undefined, "the accent keeps its two values; links turn ink by their own rule");
+  const links = all.find((rule) => rule.selector === ".sheet--coloured a");
+  assert.ok(links && /color:\s*var\(--ink\)/.test(links.body), "links on a coloured page are ink");
+  for (const rule of all.filter((r) => r.selector.includes(".sheet--"))) {
+    for (const [key, v] of declarations(rule)) if (key === "color") assert.doesNotMatch(v, /--ink-2|--muted|--accent/, `${rule.selector} colours text off-ink`);
+  }
+});
+
+test("ink stays readable on every page through the grain", () => {
+  const root = rules(css()).filter((rule) => rule.selector === ":root" && rule.context.length === 0).flatMap(declarations);
+  const hex = (name) => root.find(([key]) => key === name)[1];
+  const channels = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+  const linear = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const luminance = (rgb) => { const [r, g, b] = rgb.map(linear); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+  for (const page of PAGES) {
+    const paper = channels(hex(`--page-${page}`)).map((c) => c * 0.874);
+    for (const ink of ["--on-stock", "--page-ink-2"]) {
+      const r = ratio(channels(hex(ink)), paper);
+      assert.ok(r >= 4.5, `${ink} on --page-${page} through the grain is ${r.toFixed(2)}`);
+    }
+  }
+});

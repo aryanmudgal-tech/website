@@ -406,7 +406,7 @@ Decision 10. Each `section` after the hero is a sheet (8.4) whose background is 
 
 No two neighbouring sheets share a colour, and no plate shares its page's colour, so every crumple reveals a new colour.
 
-**Rules on a coloured page.**
+**Rules on a coloured page.** As built, every coloured sheet also carries the class `sheet--coloured`, which re-points `--ink` to `--on-stock`, `--ink-2` and `--muted` to `--page-ink-2`, `--line` to ink at 28%, `--paper` and `--paper-2` to `--fibre`, and the lifts to their light values; `.sheet--coloured a` is ink and its focus ring is a 2px ink outline. `--accent` keeps its two values (10.1 item 5), so links turn ink by their own rule.
 
 - Text is `--ink`; secondary text (meta, ledes, captions, denominators, asides, index results) is `--page-ink-2`. Never `--ink-2`, `--muted` or `--accent`.
 - Links are `--ink` with a 0.08em underline. Focus is a 2px `--ink` outline. Source stubs keep their ink border and fill with `--fibre` instead of `--paper`.
@@ -1310,8 +1310,9 @@ Decision 9. The page is a stack of sheets (Hero, Work, Projects, Route, Research
 **Rules.**
 
 - Text never moves or fades while a sheet is being read; it moves only inside its own crumple. Facts are never covered at rest.
-- Nav and in-page links land exactly at the end of the crumple before their target: sections inside sheets set `scroll-margin-top: 0` within the motion block, so a jump shows the target sheet with the previous one already gone; the sticky nav overlaps only the plate band.
-- Only `translate`, `transform`, `opacity`, `filter`, `visibility`, `mask-image`, `mask-position` and `background-position` animate.
+- Nav and in-page links land exactly at the end of the crumple before their target, so a jump shows the target sheet with the previous one already gone; the sticky nav overlaps only the plate band. As built (milestone 5): fragment scrolling measures the transformed box, and a target waits a screen up under the sheet before it (arrive) or rides a screen down over its own runway (hold), so `scroll-margin-top: 0` alone landed a screen off. The arrive and hold keyframes also animate two registered lengths, `--arrive` (-100svh to 0) and `--hold` (0 to 100svh), and every `[id]` inside a sheet sets `scroll-margin-top: calc(var(--arrive) + var(--hold))`. Once a crumple is over, `.crumple` and `.content` fill backwards only, so the hidden sheet lies flat and its anchors are where they were laid out. Measured at 1280x800 and 390x844: every nav target, `#recognition-pillar` and `#project-safeline` land exactly, jumping from the top, the bottom or mid-page. The one miss is following a link to a sheet while that same sheet is mid-crumple (its content is part-way into the ball); the jump still lands inside the right sheet. Chrome 153 does not stack two scroll-driven animations with `animation-composition: add` on `scroll-margin-top`, which is why the offsets travel as registered lengths.
+- Only `translate`, `transform`, `opacity`, `filter`, `visibility`, `mask-image`, `mask-position` and `background-position` animate, plus the two registered lengths `--arrive` and `--hold`, which move nothing (see the previous rule).
+- **The current section** comes from the runways, the only boundaries that never move: SiteNav's section observer watches the eight `.runway` elements with a band that runs from far above the screen to a line 20% down it, and the current section is the sheet after the last runway inside that band. Watching the sections themselves failed once they moved: a waiting sheet sits a screen up under the one being read and wins the reading band. Measured at 1280x800 and 390x844, with and without reduced motion: the right item is current at the top, middle and last screen of every section, and Contact is current at maximum scroll.
 - **Fallbacks:** without scroll-driven animation support (Firefox), or with reduced motion, the runways are `0` tall, `[data-in]` has no negative margin, nothing animates, and the stack is an ordinary scrolling page with coloured sections. A test checks the document height is the same either way.
 - **Pacing:** every boundary is a `Sheet` prop, so a crumple can be switched off for one boundary without touching CSS. All eight ship on; milestone 5's review on Aryan's own phone decides whether any is switched off.
 
@@ -1373,7 +1374,7 @@ Screen readers hear the title block as three term and definition pairs ("Study, 
 | Item | Budget |
 |---|---|
 | `index.html` | 20 KB gzipped or less (unchanged; v3 is 16.0 KB) |
-| Built CSS | 18 KB gzipped or less |
+| Built CSS | 18 KB gzipped or less (18,431 of 18,432 B at the end of milestone 5, after folding the v3 base type rules into the v4 ones; milestone 6 removes the v3 footer rules as it adds the slab) |
 | Inline `<svg>` in `index.html` | 1,024 bytes raw or less |
 | Inline scripts (the existing two, both inline) | 3 KB gzipped or less in total |
 | Fonts, woff2, latin | 180,000 bytes or less in total (171,736 B measured on 26 October 2026, section 5.3). If over, drop opsz from the roman request (50,952 B without it) and set the h1 and figures without optical sizing. |
@@ -1381,7 +1382,7 @@ Screen readers hear the title block as three term and definition pairs ("Study, 
 | Paper assets fetched at load (every mask and background file, wherever it sits on the page) | 110 KB transferred or less, measured from a cold load's network log |
 | First desktop load, lazy images excluded (HTML, CSS, fonts, scripts, hero print, paper assets) | 600 KB or less (v3's criterion was 900 KB) |
 | Crumple strip (8.4), one per visit, chosen by screen shape | 180 KB or less each (`crumple-d.avif` about 160 KB, `crumple-m.avif` about 130 KB); not counted in the first-load figure because it is only needed at the end of the hero, and it is not downloaded under reduced motion or without scroll-driven animation support |
-| `crumple.css` (generated keyframes) | 6 KB gzipped or less, counted inside the built CSS budget |
+| `crumple.css` (generated keyframes) | 6 KB gzipped or less, counted inside the built CSS budget (1.4 KB measured at milestone 5; a value that holds between frames is stated only at its first frame and at 100%) |
 
 ### Speed targets
 
