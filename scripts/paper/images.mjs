@@ -8,7 +8,8 @@ export async function pencilAlpha(src, region, size) {
     .resize(size[0], size[1], { kernel: 'lanczos3' }).raw().toBuffer({ resolveWithObject: true });
   const out = Buffer.alloc(info.width * info.height * 4);
   for (let i = 0; i < info.width * info.height; i++) {
-    const a = Math.pow(Math.max(0, Math.min(1, (236 - data[i * info.channels]) / 172)), 0.82);
+    // the scan's paper sits at L 209 to 226 (measured 26 October 2026), so 206 is the clear point: paper drops out, ink stays
+    const a = Math.pow(Math.max(0, Math.min(1, (206 - data[i * info.channels]) / 142)), 0.82);
     out[i * 4 + 3] = Math.round(a * 255);
   }
   // black plus alpha, quantised to a 16-colour palette: the alpha is all the mask needs
