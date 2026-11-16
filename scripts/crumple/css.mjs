@@ -23,12 +23,17 @@ function keyframes(name, set, file) {
   let content = `@keyframes content-${name} {\n  0% { transform: none; }\n`;
   // A value that holds from the first frame to the end is stated there and at 100% only; between keyframes that
   // name it, it does not change.
-  for (const [i, { k, p }] of stops(set).entries()) {
+  const all = stops(set);
+  for (const [i, { k, p }] of all.entries()) {
     mask += `  ${pct(p)}% { ${i === 0 ? `mask-image: url(${file}); ` : ''}mask-position: ${at(k)}% 100%; }\n`;
     fx += `  ${pct(p)}% { ${i === 0 ? `opacity: 0.82; background-image: url(${file}); ` : ''}background-position: ${at(k)}% 100%; }\n`;
     const [x0, y0, x1, y1] = set.boxes[Math.min(k, set.crumple - 1)];
     const cx = (x0 + x1) / 2 - 0.5, cy = (y0 + y1) / 2 - 0.5;
-    content += `  ${pct(p)}% { transform: translate(${(cx * 100).toFixed(2)}vw, ${(cy * 100).toFixed(2)}svh) scale(${(x1 - x0).toFixed(4)}, ${(y1 - y0).toFixed(4)}); }\n`;
+    // The page lies flat again at the very end, not only after it. The last crumple of the document stops exactly
+    // at 100%, where the scroll runs out, and its anchors must be where they were laid out there too. The ball
+    // holds its size up to that point (step-end), and the sheet is hidden at the same instant.
+    if (i === all.length - 1) content += `  ${pct(p)}% { transform: none; }\n`;
+    else content += `  ${pct(p)}% { transform: translate(${(cx * 100).toFixed(2)}vw, ${(cy * 100).toFixed(2)}svh) scale(${(x1 - x0).toFixed(4)}, ${(y1 - y0).toFixed(4)});${i === all.length - 2 ? ' animation-timing-function: step-end;' : ''} }\n`;
   }
   mask += `  100% { mask-image: url(${file}); mask-position: 100% 100%; }\n}\n`;
   fx += `  100% { opacity: 0.82; background-image: url(${file}); background-position: 100% 100%; }\n}\n`;

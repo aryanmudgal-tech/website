@@ -854,17 +854,19 @@ h3 {
    0 tall, nothing overlaps, and the stack is an ordinary page of coloured sections of the same height. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    body {
-      timeline-scope: --r1, --r2, --r3, --r4, --r5, --r6, --r7, --r8;
-    }
-
     html {
       scroll-padding-top: 0;
     }
 
     .runway {
       height: 100svh;
-      view-timeline: var(--name) block;
+    }
+
+    /* Every sheet is its own view timeline, read only by itself and its own subtree. A timeline shared across the
+       page through timeline-scope never leaves the main thread in Chrome, and a sheet steered from there trails the
+       scroll by a frame or more: the page that should hold still slides with the scroll and snaps back. */
+    .sheet {
+      view-timeline: --sheet block;
     }
 
     /* Fragment scrolling measures the transformed box, and a target waits a screen up under the sheet before it
@@ -896,50 +898,88 @@ h3 {
       transform-origin: 50% calc(100% - 50svh);
     }
 
-    /* Leaving: the last screen holds still while it crumples and rolls away. */
+    /* Leaving: the last screen holds still while it crumples and rolls away. The range opens when the sheet's bottom
+       edge meets the bottom of the screen and lasts one screen of scrolling: the runway after the sheet. */
     [data-out] :is(.pin, .crumple, .content, .fx) {
-      animation-range: entry 0% entry 100%;
+      animation-timeline: --sheet;
+      animation-range: entry-crossing 100% entry-crossing calc(100% + 100svh);
       animation-fill-mode: both;
     }
 
-    /* Once its crumple is over, the sheet stays hidden by the pin alone and its content lies flat again, so its
+    /* Once its crumple is over, the sheet stays out of sight (gone, below) and its content lies flat again, so its
        anchors are where they were laid out. */
     [data-out] :is(.crumple, .content) {
       animation-fill-mode: backwards;
     }
 
-    [data-out] .pin { animation-name: hold; animation-timing-function: linear; }
-    [data-out] .crumple { animation-name: mask-d, roll; animation-timing-function: step-end, linear; animation-timeline: var(--out), var(--out); }
+    [data-out] .pin { animation-name: hold, held; animation-timing-function: linear; }
+    [data-out] .crumple { animation-name: mask-d, roll, gone; animation-timing-function: step-end, linear, linear; animation-fill-mode: backwards, backwards, both; }
     [data-out] .content { animation-name: content-d; animation-timing-function: linear; }
     [data-out] .fx { animation-name: fx-d; animation-timing-function: step-end; }
 
-    [data-out] :is(.pin, .content, .fx) { animation-timeline: var(--out); }
-
-    /* Arriving: the next sheet waits at the top of the screen, underneath. */
+    /* Arriving: the next sheet waits at the top of the screen, underneath. Its range opens when its own top edge
+       meets the bottom of the screen, the same scroll position as the leaving sheet's, and lasts the same screen. */
+    /* Longhands on purpose: the build expands an `animation` shorthand that lists two animations and writes
+       `animation-duration: 0s` into it, and a scroll-driven animation with a duration of 0s sits at its end. */
     .sheet[data-in] {
       margin-top: -100svh;
-      animation: arrive linear both;
-      animation-timeline: var(--in);
-      animation-range: entry 0% entry 100%;
+      animation-name: arrive, arrived;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --sheet;
+      animation-range: entry 0% entry 100svh;
     }
 
+    /* What moves a sheet is kept apart from what only marks its state. translate alone runs on the compositor, in
+       step with the scroll; a registered length in the same keyframes would hold the whole animation on the main
+       thread, a frame behind. */
     @keyframes hold {
-      0% { translate: 0 0; --hold: 0px; filter: none; visibility: visible; }
+      from { translate: 0 0; }
+      to { translate: 0 100svh; }
+    }
+
+    @keyframes held {
+      0% { --hold: 0px; filter: none; }
       3% { filter: drop-shadow(0 10px 14px rgba(27, 26, 23, 0.22)); }
-      99.9% { visibility: visible; }
-      100% { translate: 0 100svh; --hold: 100svh; filter: drop-shadow(0 10px 14px rgba(27, 26, 23, 0.22)); visibility: hidden; }
+      100% { --hold: 100svh; filter: drop-shadow(0 10px 14px rgba(27, 26, 23, 0.22)); }
+    }
+
+    /* A sheet that has rolled away is hidden, so it never takes a click or the keyboard. The pin's child carries
+       this, not the pin: Chrome takes an element's animations off the compositor for good once it has been hidden,
+       and every later pass over this crumple would hold a frame behind the scroll again. */
+    @keyframes gone {
+      0%, 99.9% { visibility: visible; }
+      100% { visibility: hidden; }
+    }
+
+    /* The pin itself stays visible, an empty box a screen down over the top of the next sheet, and the crumple is a
+       full screen wide however small the ball inside it, so neither is a target: only the page they hold takes the
+       pointer. The sheet being revealed can be clicked around the ball, and at the very end of the document, where
+       the last crumple stops a fraction short of done, the ball's box no longer lies over the footer's links. */
+    .pin { pointer-events: none; }
+    .content { pointer-events: auto; }
+
+    /* The roll carries the ball down as well as across. Clipped here, it cannot lengthen the document: unclipped,
+       the last roll added 4svh below the footer, and the end of the page moved under the reader as it came and went. */
+    .pin { overflow: clip; }
+
+    @keyframes arrive {
+      from { translate: 0 -100svh; }
+      to { translate: 0 0; }
     }
 
     /* A waiting sheet is clear until its crumple starts, so nothing hidden beneath the page is painted or measured. */
-    @keyframes arrive {
-      from { translate: 0 -100svh; --arrive: -100svh; opacity: 0; }
+    @keyframes arrived {
+      from { --arrive: -100svh; opacity: 0; }
       0.1% { opacity: 1; }
-      to { translate: 0 0; --arrive: 0px; opacity: 1; }
+      to { --arrive: 0px; opacity: 1; }
     }
 
+    /* The ball is back where the sheet lies at the very end, the instant the sheet is hidden: see content-d. */
     @keyframes roll {
       0%, 74% { translate: 0 0; }
-      100% { translate: 78vw 4svh; }
+      99.99% { translate: 78vw 4svh; animation-timing-function: step-end; }
+      100% { translate: 0 0; }
     }
 
     /* Paints a pixel of this screen's strip as soon as the reader scrolls, so the first crumple never waits on the
@@ -971,7 +1011,7 @@ h3 {
     /* Portrait screens use the tall strip. */
     @media (max-aspect-ratio: 3/4) {
       .preload { animation-name: strip-m; }
-      [data-out] .crumple { animation-name: mask-m, roll; }
+      [data-out] .crumple { animation-name: mask-m, roll, gone; }
       [data-out] .content { animation-name: content-m; }
       [data-out] .fx { animation-name: fx-m; }
     }

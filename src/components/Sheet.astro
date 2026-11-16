@@ -8,9 +8,9 @@ interface Props {
 }
 
 const { page, out, in: incoming } = Astro.props;
-// Timeline names travel as custom properties, so each crumple rule is written once; only the gated CSS reads them.
-// Each sheet lies on top of the next (r1 leaves first, so the hero is highest).
-const style = [out && `--out: --${out}`, incoming && `--in: --${incoming}`, `z-index: ${out ? 10 - Number(out.slice(1)) : 1}`].filter(Boolean).join("; ");
+// Each sheet lies on top of the next (r1 leaves first, so the hero is highest). The crumple itself needs nothing from
+// here: every sheet is its own scroll timeline in the gated CSS, and `out` and `in` only say which rules apply.
+const style = `z-index: ${out ? 10 - Number(out.slice(1)) : 1}`;
 ---
 
 <div class:list={["sheet", `sheet--${page}`, page !== "paper" && page !== "slab" && "sheet--coloured"]} data-in={incoming} data-out={out} style={style}>
@@ -21,4 +21,4 @@ const style = [out && `--out: --${out}`, incoming && `--in: --${incoming}`, `z-i
     </div>
   </div>
 </div>
-{out && <div class="runway" id={out} style={`--name: --${out}`} aria-hidden="true"></div>}
+{out && <div class="runway" id={out} aria-hidden="true"></div>}
