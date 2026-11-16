@@ -27,7 +27,13 @@ function keyframes(name, set, file) {
   for (const [i, { k, p }] of all.entries()) {
     mask += `  ${pct(p)}% { ${i === 0 ? `mask-image: url(${file}); ` : ''}mask-position: ${at(k)}% 100%; }\n`;
     fx += `  ${pct(p)}% { ${i === 0 ? `opacity: 0.82; background-image: url(${file}); ` : ''}background-position: ${at(k)}% 100%; }\n`;
-    const [x0, y0, x1, y1] = set.boxes[Math.min(k, set.crumple - 1)];
+    // The outline steps from frame to frame while the page shrinks smoothly between them, so the page must never
+    // be the smaller of the two: where it fell short of the outline, the paper's colour stopped at a straight edge
+    // and the white render showed as a rim that jumped at every step. Each keyframe covers its own frame's box and
+    // the one before it, so on the way to the next keyframe the page still covers the outline being shown.
+    const box = (j) => set.boxes[Math.min(all[Math.max(j, 0)].k, set.crumple - 1)];
+    const [a, b] = [box(i - 1), box(i)];
+    const [x0, y0, x1, y1] = [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])];
     const cx = (x0 + x1) / 2 - 0.5, cy = (y0 + y1) / 2 - 0.5;
     // The page lies flat again at the very end, not only after it. The last crumple of the document stops exactly
     // at 100%, where the scroll runs out, and its anchors must be where they were laid out there too. The ball
