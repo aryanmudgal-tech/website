@@ -104,20 +104,37 @@ const youtubeHref =
   });
 
   if (!reduced && "IntersectionObserver" in window) {
+    // A player is a network round trip and about a megabyte of script, and where frames share the page's thread
+    // (Safari, phones) that work lands in the middle of the scroll. So a demo starts only once it has stayed half
+    // in view for a moment: one that just passes through the screen on the way down the page never loads.
+    const DWELL = 400;
+    const waiting = new Map<HTMLElement, number>();
+    const cancel = (figure: HTMLElement) => {
+      clearTimeout(waiting.get(figure));
+      waiting.delete(figure);
+    };
+    const start = (figure: HTMLElement) => {
+      waiting.delete(figure);
+      const file = figure.querySelector<HTMLVideoElement>("video");
+      if (file) {
+        file.play().catch(() => {
+          file.controls = true;
+        });
+      } else {
+        mountYoutube(figure, true);
+      }
+    };
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const figure = entry.target as HTMLElement;
-          const file = figure.querySelector<HTMLVideoElement>("video");
           if (entry.intersectionRatio >= 0.5) {
-            if (file) {
-              file.play().catch(() => {
-                file.controls = true;
-              });
-            } else {
-              mountYoutube(figure, true);
-            }
-          } else if (!entry.isIntersecting) {
+            if (!waiting.has(figure)) waiting.set(figure, window.setTimeout(start, DWELL, figure));
+            return;
+          }
+          cancel(figure);
+          if (!entry.isIntersecting) {
+            const file = figure.querySelector<HTMLVideoElement>("video");
             if (file) file.pause();
             else unmountYoutube(figure);
           }
