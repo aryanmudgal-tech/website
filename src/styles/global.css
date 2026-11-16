@@ -926,6 +926,22 @@ h3 {
       animation-name: arrive, arrived;
       animation-timing-function: linear;
       animation-fill-mode: both;
+    /* The mark at the end of the document goes back down as far as its sheet has come up, so it stays where it was
+       laid out. Riding with a waiting sheet, it sat on the screen while the sheet before was still being read, and
+       the nav took that for the end of the page (spec 7.10). */
+    .sheet[data-in] #page-end {
+      animation-name: stay;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --sheet;
+      animation-range: entry 0% entry 100svh;
+    }
+
+    @keyframes stay {
+      from { translate: 0 100svh; }
+      to { translate: 0 0; }
+    }
+
       animation-timeline: --sheet;
       animation-range: entry 0% entry 100svh;
     }
@@ -2124,6 +2140,7 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
   .tb__short { display: none; }
 
   /* Print is not scrolled: every sheet lies flat in order. */
+  .sheet[data-in] #page-end { animation: none; }
   .runway { height: 0; }
   .sheet[data-in] { margin-top: 0; animation: none; }
   [data-out] :is(.pin, .crumple, .content, .fx) { animation: none; }
