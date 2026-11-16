@@ -7,6 +7,10 @@ import { fileURLToPath } from 'node:url';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const CRUMPLE_END = 0.72; // share of the runway spent crumpling
 export const ROLL_START = 0.74; // the roll fills the rest
+// A crumple is over here, a little before its range ends: hidden, flat, the ball back in place (`gone` and `roll` in
+// global.css use the same figure). The last crumple of the document ends where the scroll runs out, and the scroll
+// stops on a whole pixel while the layout does not, so it can rest a fraction of a pixel short of 100% for good.
+export const DONE = 0.995;
 const pct = (v) => +(v * 100).toFixed(3);
 
 function stops(set) {
@@ -35,10 +39,10 @@ function keyframes(name, set, file) {
     const [a, b] = [box(i - 1), box(i)];
     const [x0, y0, x1, y1] = [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])];
     const cx = (x0 + x1) / 2 - 0.5, cy = (y0 + y1) / 2 - 0.5;
-    // The page lies flat again at the very end, not only after it. The last crumple of the document stops exactly
-    // at 100%, where the scroll runs out, and its anchors must be where they were laid out there too. The ball
-    // holds its size up to that point (step-end), and the sheet is hidden at the same instant.
-    if (i === all.length - 1) content += `  ${pct(p)}% { transform: none; }\n`;
+    // The page lies flat again from DONE, not only once the range is behind it, so its anchors are where they were
+    // laid out even where the scroll can go no further. The ball holds its size up to that point (step-end), and
+    // the sheet is hidden at the same instant.
+    if (i === all.length - 1) content += `  ${pct(DONE)}%, 100% { transform: none; }\n`;
     else content += `  ${pct(p)}% { transform: translate(${(cx * 100).toFixed(2)}vw, ${(cy * 100).toFixed(2)}svh) scale(${(x1 - x0).toFixed(4)}, ${(y1 - y0).toFixed(4)});${i === all.length - 2 ? ' animation-timing-function: step-end;' : ''} }\n`;
   }
   mask += `  100% { mask-image: url(${file}); mask-position: 100% 100%; }\n}\n`;

@@ -84,7 +84,7 @@
   88.857% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
   92.571% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); }
   96.286% { transform: translate(0.04vw, -3.19svh) scale(0.2086, 0.3088); animation-timing-function: step-end; }
-  100% { transform: none; }
+  99.5%, 100% { transform: none; }
 }
 @keyframes mask-m {
   0% { mask-image: none; }
@@ -170,5 +170,5 @@
   88.857% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
   92.571% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); }
   96.286% { transform: translate(0.26vw, -2.55svh) scale(0.4410, 0.1813); animation-timing-function: step-end; }
-  100% { transform: none; }
+  99.5%, 100% { transform: none; }
 }

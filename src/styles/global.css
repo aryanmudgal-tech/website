@@ -906,14 +906,10 @@ h3 {
       animation-fill-mode: both;
     }
 
-    /* Once its crumple is over, the sheet stays out of sight (gone, below) and its content lies flat again, so its
-       anchors are where they were laid out. */
-    [data-out] :is(.crumple, .content) {
-      animation-fill-mode: backwards;
-    }
-
+    /* Once its crumple is over, the sheet stays out of sight and its content lies flat again, so its anchors are
+       where they were laid out. The keyframes end that way and fill forwards; only the mask is dropped. */
     [data-out] .pin { animation-name: hold, held; animation-timing-function: linear; }
-    [data-out] .crumple { animation-name: mask-d, roll, gone; animation-timing-function: step-end, linear, linear; animation-fill-mode: backwards, backwards, both; }
+    [data-out] .crumple { animation-name: mask-d, roll, gone; animation-timing-function: step-end, linear, linear; animation-fill-mode: backwards, both, both; }
     [data-out] .content { animation-name: content-d; animation-timing-function: linear; }
     [data-out] .fx { animation-name: fx-d; animation-timing-function: step-end; }
 
@@ -926,6 +922,10 @@ h3 {
       animation-name: arrive, arrived;
       animation-timing-function: linear;
       animation-fill-mode: both;
+      animation-timeline: --sheet;
+      animation-range: entry 0% entry 100svh;
+    }
+
     /* The mark at the end of the document goes back down as far as its sheet has come up, so it stays where it was
        laid out. Riding with a waiting sheet, it sat on the screen while the sheet before was still being read, and
        the nav took that for the end of the page (spec 7.10). */
@@ -940,10 +940,6 @@ h3 {
     @keyframes stay {
       from { translate: 0 100svh; }
       to { translate: 0 0; }
-    }
-
-      animation-timeline: --sheet;
-      animation-range: entry 0% entry 100svh;
     }
 
     /* What moves a sheet is kept apart from what only marks its state. translate alone runs on the compositor, in
@@ -964,14 +960,13 @@ h3 {
        this, not the pin: Chrome takes an element's animations off the compositor for good once it has been hidden,
        and every later pass over this crumple would hold a frame behind the scroll again. */
     @keyframes gone {
-      0%, 99.9% { visibility: visible; }
-      100% { visibility: hidden; }
+      0%, 99.4% { visibility: visible; }
+      99.5%, 100% { visibility: hidden; }
     }
 
     /* The pin itself stays visible, an empty box a screen down over the top of the next sheet, and the crumple is a
        full screen wide however small the ball inside it, so neither is a target: only the page they hold takes the
-       pointer. The sheet being revealed can be clicked around the ball, and at the very end of the document, where
-       the last crumple stops a fraction short of done, the ball's box no longer lies over the footer's links. */
+       pointer, and the sheet being revealed can be clicked around the ball. */
     .pin { pointer-events: none; }
     .content { pointer-events: auto; }
 
@@ -991,11 +986,14 @@ h3 {
       to { --arrive: 0px; opacity: 1; }
     }
 
-    /* The ball is back where the sheet lies at the very end, the instant the sheet is hidden: see content-d. */
+    /* A crumple is over at 99.5% (DONE in scripts/crumple/css.mjs, which says why): the sheet is hidden, and in the
+       same instant the ball is back where the sheet lies and the page is flat (content-d). The ball goes clear in
+       this keyframe too, on the compositor with the move, so it is never seen back in the middle of the screen in
+       the frame before the main thread gets to `gone`. */
     @keyframes roll {
-      0%, 74% { translate: 0 0; }
-      99.99% { translate: 78vw 4svh; animation-timing-function: step-end; }
-      100% { translate: 0 0; }
+      0%, 74% { translate: 0 0; opacity: 1; }
+      99.4% { translate: 78vw 4svh; opacity: 1; animation-timing-function: step-end; }
+      99.5%, 100% { translate: 0 0; opacity: 0; }
     }
 
     /* Paints a pixel of this screen's strip as soon as the reader scrolls, so the first crumple never waits on the
@@ -2140,9 +2138,9 @@ h3 { font: 600 26px/32px var(--serif); font-variation-settings: "opsz" 32; lette
   .tb__short { display: none; }
 
   /* Print is not scrolled: every sheet lies flat in order. */
-  .sheet[data-in] #page-end { animation: none; }
   .runway { height: 0; }
   .sheet[data-in] { margin-top: 0; animation: none; }
+  .sheet[data-in] #page-end { animation: none; }
   [data-out] :is(.pin, .crumple, .content, .fx) { animation: none; }
 
   .source[href^="http"]::after,
