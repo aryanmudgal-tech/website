@@ -91,6 +91,27 @@ import { navItems } from "../data/portfolio";
         if (Math.abs(want - scrollY) > 1) scrollTo({ top: want, behavior: "instant" });
       });
     });
+
+    // A link into the sheet that is crumpling right now: the browser would measure its target inside the shrinking
+    // page and land a screen or more off. Step back first to the last scroll position where that sheet lies flat,
+    // then follow the link in the next animation frame. The crumple is sampled once a frame, so only from then on
+    // does the sheet measure flat, and that frame is not drawn until the jump is done. The jump itself is the
+    // browser's, so :target and the focus starting point are what a plain link gives. The new history entry is
+    // pushed before the step back, so the entry being left keeps the reader's place and Back returns there
+    // (spec 8.4).
+    document.addEventListener("click", (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href^="#"]') : null;
+      if (!link || link.hash.length < 2) return;
+      const sheet = document.getElementById(decodeURIComponent(link.hash.slice(1)))?.closest<HTMLElement>(".sheet[data-out]");
+      if (!sheet) return;
+      const leaves = laidOut(document.getElementById(sheet.dataset.out!)!), flat = leaves - innerHeight;
+      if (scrollY <= flat + 0.5 || scrollY >= leaves) return;
+      event.preventDefault();
+      if (link.href !== location.href) history.pushState(null, "", link.href);
+      scrollTo({ top: flat, behavior: "instant" });
+      requestAnimationFrame(() => location.replace(link.href));
+    });
   }
 
   const menu = document.getElementById("site-menu");
